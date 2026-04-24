@@ -10,9 +10,7 @@ const pdfParse = require('pdf-parse');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-4-20250514';
-// 폴백 모델 (메인 모델 실패 시)
-const FALLBACK_MODEL = 'claude-3-5-sonnet-20241022';
+const MODEL = process.env.CLAUDE_MODEL || 'claude-haiku-4-5-20251001';
 
 // uploads 디렉토리 확보
 if (!fs.existsSync('uploads')) fs.mkdirSync('uploads');
@@ -430,31 +428,14 @@ app.post('/api/analyze', upload.fields([
       step: 5, total: 6
     });
 
-    let analysisResponse;
-    try {
-      analysisResponse = await anthropic.messages.create({
-        model: MODEL,
-        max_tokens: 8000,
-        messages: [{
-          role: 'user',
-          content: finalContent
-        }]
-      });
-    } catch (modelErr) {
-      console.error(`모델 ${MODEL} 실패, 폴백 모델 ${FALLBACK_MODEL} 시도:`, modelErr.message);
-      sendEvent('progress', {
-        message: `기본 모델 실패. 대체 모델로 재시도 중...`,
-        step: 5, total: 6
-      });
-      analysisResponse = await anthropic.messages.create({
-        model: FALLBACK_MODEL,
-        max_tokens: 8000,
-        messages: [{
-          role: 'user',
-          content: finalContent
-        }]
-      });
-    }
+    const analysisResponse = await anthropic.messages.create({
+      model: MODEL,
+      max_tokens: 8000,
+      messages: [{
+        role: 'user',
+        content: finalContent
+      }]
+    });
 
     sendEvent('progress', { message: '분석 결과 처리 중...', step: 6, total: 6 });
 
