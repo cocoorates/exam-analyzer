@@ -63,13 +63,11 @@ function compressPdf(inputPath, quality = '/ebook') {
   const outputPath = inputPath + '_compressed.pdf';
   try {
     execSync(`gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=${quality} -dNOPAUSE -dQUIET -dBATCH -sOutputFile="${outputPath}" "${inputPath}"`, {
-      timeout: 60000
+      timeout: 120000
     });
-    // 압축 결과가 원본보다 작으면 사용
     if (fs.existsSync(outputPath) && getFileSizeMB(outputPath) < getFileSizeMB(inputPath)) {
       return outputPath;
     }
-    // 아니면 원본 반환
     try { fs.unlinkSync(outputPath); } catch(e) {}
     return inputPath;
   } catch (e) {
@@ -77,6 +75,67 @@ function compressPdf(inputPath, quality = '/ebook') {
     try { fs.unlinkSync(outputPath); } catch(e2) {}
     return inputPath;
   }
+}
+
+// 목표 크기까지 단계적 압축 (ebook → screen → 커스텀 DPI)
+const TARGET_MB = 6;
+function smartCompress(inputPath, label, sendEvent) {
+  const originalMB = getFileSizeMB(inputPath);
+
+  // 이미 목표 이하면 그대로 반환
+  if (originalMB <= TARGET_MB) {
+    console.log(`${label}: ${originalMB.toFixed(1)}MB - 압축 불필요`);
+    return { path: inputPath, cleanups: [] };
+  }
+
+  const cleanups = [];
+
+  // 1단계: /ebook 품질
+  sendEvent('progress', { message: `${label} PDF 최적화 중... (${originalMB.toFixed(0)}MB → 목표 ${TARGET_MB}MB)`, step: 2, total: 5 });
+  let currentPath = compressPdf(inputPath, '/ebook');
+  if (currentPath !== inputPath) cleanups.push(currentPath);
+  let currentMB = getFileSizeMB(currentPath);
+  console.log(`${label} 1단계(/ebook): ${originalMB.toFixed(1)}MB → ${currentMB.toFixed(1)}MB`);
+
+  // 2단계: /screen 품질 (더 강한 압축)
+  if (currentMB > TARGET_MB) {
+    sendEvent('progress', { message: `${label} PDF 추가 압축 중... (${currentMB.toFixed(0)}MB → 목표 ${TARGET_MB}MB)`, step: 2, total: 5 });
+    const screenPath = compressPdf(inputPath, '/screen');
+    if (screenPath !== inputPath) {
+      cleanups.push(screenPath);
+      currentPath = screenPath;
+      currentMB = getFileSizeMB(currentPath);
+    }
+    console.log(`${label} 2단계(/screen): → ${currentMB.toFixed(1)}MB`);
+  }
+
+  // 3단계: 커스텀 DPI로 더 강하게 (150 → 100 → 72 DPI)
+  if (currentMB > TARGET_MB) {
+    for (const dpi of [150, 100, 72]) {
+      sendEvent('progress', { message: `${label} PDF 이미지 해상도 조정 중... (${dpi}DPI)`, step: 2, total: 5 });
+      const customPath = inputPath + `_${dpi}dpi.pdf`;
+      try {
+        execSync(`gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/screen -dColorImageResolution=${dpi} -dGrayImageResolution=${dpi} -dMonoImageResolution=${dpi} -dDownsampleColorImages=true -dDownsampleGrayImages=true -dNOPAUSE -dQUIET -dBATCH -sOutputFile="${customPath}" "${inputPath}"`, {
+          timeout: 120000
+        });
+        if (fs.existsSync(customPath) && getFileSizeMB(customPath) < currentMB) {
+          cleanups.push(customPath);
+          currentPath = customPath;
+          currentMB = getFileSizeMB(currentPath);
+          console.log(`${label} 3단계(${dpi}DPI): → ${currentMB.toFixed(1)}MB`);
+          if (currentMB <= TARGET_MB) break;
+        } else {
+          try { fs.unlinkSync(customPath); } catch(e) {}
+        }
+      } catch(e) {
+        console.error(`${label} ${dpi}DPI 압축 실패:`, e.message);
+        try { fs.unlinkSync(customPath); } catch(e2) {}
+      }
+    }
+  }
+
+  sendEvent('progress', { message: `${label} PDF 최적화 완료 (${originalMB.toFixed(0)}MB → ${currentMB.toFixed(1)}MB)`, step: 2, total: 5 });
+  return { path: currentPath, cleanups };
 }
 
 // 분석 프롬프트
@@ -178,74 +237,16 @@ app.post('/api/analyze', upload.fields([
       step: 1, total: 5
     });
 
-    // === 1단계: PDF 압축 (필요 시) ===
+    // === 1단계: 모든 PDF 자동 최적화 (목표: 6MB 이하) ===
     sendEvent('progress', { message: 'PDF 최적화 중...', step: 2, total: 5 });
 
-    let textbookPath = textbookFile.path;
-    let examPath = examFile.path;
+    const tbResult = smartCompress(textbookFile.path, '교재', sendEvent);
+    let textbookPath = tbResult.path;
+    filesToClean.push(...tbResult.cleanups);
 
-    // 교재 압축
-    if (textbookSizeMB > 15) {
-      sendEvent('progress', { message: '교재 PDF 압축 중...', step: 2, total: 5 });
-      textbookPath = compressPdf(textbookFile.path);
-      if (textbookPath !== textbookFile.path) filesToClean.push(textbookPath);
-      console.log(`교재 압축: ${textbookSizeMB.toFixed(1)}MB → ${getFileSizeMB(textbookPath).toFixed(1)}MB`);
-    }
-
-    // 시험지 압축
-    if (examSizeMB > 15) {
-      sendEvent('progress', { message: '시험지 PDF 압축 중...', step: 2, total: 5 });
-      examPath = compressPdf(examFile.path);
-      if (examPath !== examFile.path) filesToClean.push(examPath);
-      console.log(`시험지 압축: ${examSizeMB.toFixed(1)}MB → ${getFileSizeMB(examPath).toFixed(1)}MB`);
-    }
-
-    // === 2단계: base64 변환 ===
-    const textbookBase64 = pdfToBase64(textbookPath);
-    const examBase64 = pdfToBase64(examPath);
-
-    const textbookB64MB = getBase64SizeMB(textbookBase64);
-    const examB64MB = getBase64SizeMB(examBase64);
-    const totalB64MB = textbookB64MB + examB64MB;
-
-    console.log(`Base64 크기 - 교재: ${textbookB64MB.toFixed(1)}MB, 시험지: ${examB64MB.toFixed(1)}MB, 합계: ${totalB64MB.toFixed(1)}MB`);
-
-    // 압축 후에도 너무 크면 더 강하게 압축
-    if (totalB64MB > 40) {
-      sendEvent('progress', { message: '추가 압축 진행 중...', step: 2, total: 5 });
-
-      if (examB64MB > MAX_BASE64_MB) {
-        const examPath2 = compressPdf(examFile.path, '/screen');
-        if (examPath2 !== examFile.path) {
-          filesToClean.push(examPath2);
-          examPath = examPath2;
-        }
-      }
-      if (textbookB64MB > MAX_BASE64_MB) {
-        const tbPath2 = compressPdf(textbookFile.path, '/screen');
-        if (tbPath2 !== textbookFile.path) {
-          filesToClean.push(tbPath2);
-          textbookPath = tbPath2;
-        }
-      }
-
-      // 재변환
-      const tb64_2 = pdfToBase64(textbookPath);
-      const ex64_2 = pdfToBase64(examPath);
-      const total2 = getBase64SizeMB(tb64_2) + getBase64SizeMB(ex64_2);
-      console.log(`추가 압축 후 합계: ${total2.toFixed(1)}MB`);
-
-      if (total2 > 45) {
-        sendEvent('error', {
-          message: `압축 후에도 PDF 합산 크기(${total2.toFixed(1)}MB)가 API 한도를 초과합니다. 교재나 시험지를 분할해서 업로드해주세요.`
-        });
-        res.end();
-        return;
-      }
-
-      // 재할당
-      Object.assign(textbookBase64, {});  // dummy
-    }
+    const exResult = smartCompress(examFile.path, '시험지', sendEvent);
+    let examPath = exResult.path;
+    filesToClean.push(...exResult.cleanups);
 
     // === 3단계: Claude API 호출 ===
     sendEvent('progress', {
@@ -415,7 +416,7 @@ app.get('/api/health', (req, res) => {
     status: 'ok',
     hasApiKey: !!process.env.ANTHROPIC_API_KEY,
     model: MODEL,
-    version: '2.2.0'
+    version: '3.0.0'
   });
 });
 
