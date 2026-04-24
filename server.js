@@ -272,11 +272,36 @@ app.post('/api/analyze', upload.fields([
       step: 4, total: 5
     });
 
-    const analysisResponse = await anthropic.messages.create({
-      model: MODEL,
-      max_tokens: 8000,
-      messages: [{ role: 'user', content }]
-    });
+    // Rate limit 자동 재시도 (최대 3회, 대기시간 증가)
+    let analysisResponse;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        analysisResponse = await anthropic.messages.create({
+          model: MODEL,
+          max_tokens: 8000,
+          messages: [{ role: 'user', content }]
+        });
+        break; // 성공
+      } catch (apiErr) {
+        if (apiErr.status === 429 && attempt < 3) {
+          const waitSec = attempt * 30;
+          sendEvent('progress', {
+            message: `API 요청 한도 초과. ${waitSec}초 후 재시도합니다... (${attempt}/3)`,
+            step: 4, total: 5
+          });
+          await new Promise(resolve => setTimeout(resolve, waitSec * 1000));
+        } else if (apiErr.status === 529 && attempt < 3) {
+          const waitSec = attempt * 15;
+          sendEvent('progress', {
+            message: `서버 과부하. ${waitSec}초 후 재시도합니다... (${attempt}/3)`,
+            step: 4, total: 5
+          });
+          await new Promise(resolve => setTimeout(resolve, waitSec * 1000));
+        } else {
+          throw apiErr;
+        }
+      }
+    }
 
     // === 4단계: 결과 파싱 ===
     sendEvent('progress', { message: '분석 결과 처리 중...', step: 5, total: 5 });
