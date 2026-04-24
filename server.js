@@ -3,14 +3,17 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { execSync } = require('child_process');
 const AnthropicModule = require('@anthropic-ai/sdk');
 const Anthropic = AnthropicModule.default || AnthropicModule;
 const cors = require('cors');
-const pdfParse = require('pdf-parse');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-4-6';
+
+// API 요청 당 base64 한도 (안전하게 20MB로)
+const MAX_BASE64_MB = 20;
 
 // uploads 디렉토리 확보
 if (!fs.existsSync('uploads')) fs.mkdirSync('uploads');
@@ -34,55 +37,46 @@ app.use(express.json({ limit: '50mb' }));
 
 // Claude API 클라이언트
 function getClient() {
-  return new Anthropic({
-    apiKey: process.env.ANTHROPIC_API_KEY,
-  });
+  return new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 }
 
 // PDF를 base64로 읽기
 function pdfToBase64(filePath) {
-  const buffer = fs.readFileSync(filePath);
-  return buffer.toString('base64');
+  return fs.readFileSync(filePath).toString('base64');
 }
 
-// PDF에서 텍스트 추출
-async function extractTextFromPdf(filePath) {
-  const buffer = fs.readFileSync(filePath);
-  const data = await pdfParse(buffer);
-  return {
-    text: data.text,
-    numPages: data.numpages
-  };
-}
-
-// PDF 파일 크기 체크 (MB)
+// 파일 크기 (MB)
 function getFileSizeMB(filePath) {
-  const stats = fs.statSync(filePath);
-  return stats.size / (1024 * 1024);
+  return fs.statSync(filePath).size / (1024 * 1024);
 }
 
-// 텍스트를 청크로 분할 (토큰 수 추정 기준)
-function splitTextIntoChunks(text, maxCharsPerChunk = 80000) {
-  const chunks = [];
-  let start = 0;
-  while (start < text.length) {
-    let end = start + maxCharsPerChunk;
-    // 문장 경계에서 자르기
-    if (end < text.length) {
-      const lastPeriod = text.lastIndexOf('.', end);
-      const lastNewline = text.lastIndexOf('\n', end);
-      const breakPoint = Math.max(lastPeriod, lastNewline);
-      if (breakPoint > start + maxCharsPerChunk * 0.5) {
-        end = breakPoint + 1;
-      }
+// base64 크기 (MB)
+function getBase64SizeMB(base64str) {
+  return Buffer.byteLength(base64str, 'utf8') / (1024 * 1024);
+}
+
+// Ghostscript로 PDF 압축 (이미지 해상도 낮춤, 텍스트는 보존)
+function compressPdf(inputPath, quality = '/ebook') {
+  const outputPath = inputPath + '_compressed.pdf';
+  try {
+    execSync(`gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=${quality} -dNOPAUSE -dQUIET -dBATCH -sOutputFile="${outputPath}" "${inputPath}"`, {
+      timeout: 60000
+    });
+    // 압축 결과가 원본보다 작으면 사용
+    if (fs.existsSync(outputPath) && getFileSizeMB(outputPath) < getFileSizeMB(inputPath)) {
+      return outputPath;
     }
-    chunks.push(text.substring(start, end));
-    start = end;
+    // 아니면 원본 반환
+    try { fs.unlinkSync(outputPath); } catch(e) {}
+    return inputPath;
+  } catch (e) {
+    console.error('Ghostscript 압축 실패:', e.message);
+    try { fs.unlinkSync(outputPath); } catch(e2) {}
+    return inputPath;
   }
-  return chunks;
 }
 
-// 분석 프롬���트 생성
+// 분석 프롬프트
 function buildAnalysisPrompt() {
   return `당신은 영어 시험지 분석 전문가입니다. 교재 PDF와 시험지 PDF를 비교 분석하여 정확한 분석 결과를 JSON으로 반환해야 합니다.
 
@@ -141,28 +135,11 @@ function buildAnalysisPrompt() {
 - typeSummary의 totalScore는 해당 유형의 모든 문항 배점을 합산한 값`;
 }
 
-// 교재 요��� 프롬프트 (텍스트 기반)
-function buildTextSummaryPrompt(chunkIndex, totalChunks) {
-  return `아래는 영어 교재의 텍스트입니다 (${chunkIndex}/${totalChunks} 부분). 수록된 모든 영어 지문의 정보를 빠짐없이 정리해주세요.
-
-각 지문에 대해 반드시 다음 정보를 포함:
-1. 출처 (텍스트에 표기된 정보 그대로. 예: "고1 24년 6월 29번", "교과서 2과" 등)
-2. 지문의 주제/소재 키워드 3~5개
-3. 지문의 시작 2문장 (정확히 복사)
-4. 지문의 끝 1문장 (정확히 ��사)
-
-JSON 배열로만 반환 (다른 텍스트 금지):
-\`\`\`json
-[{"source": "고1 24년 6월 29번", "topic": "소재 키워드", "opening": "��작 2문장", "closing": "끝 1문장"}]
-\`\`\``;
-}
-
 // SSE 엔드포인트
 app.post('/api/analyze', upload.fields([
   { name: 'textbook', maxCount: 1 },
   { name: 'exam', maxCount: 1 }
 ]), async (req, res) => {
-  // SSE 설정
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
@@ -189,268 +166,185 @@ app.post('/api/analyze', upload.fields([
 
     const anthropic = getClient();
 
-    // 파일 크기 확인
     const textbookSizeMB = getFileSizeMB(textbookFile.path);
     const examSizeMB = getFileSizeMB(examFile.path);
 
     sendEvent('progress', {
-      message: `PDF 파일 확인 완료 (교재: ${textbookSizeMB.toFixed(1)}MB, 시험지: ${examSizeMB.toFixed(1)}MB)`,
-      step: 1, total: 6
+      message: `PDF 확인 완료 (교재: ${textbookSizeMB.toFixed(1)}MB, 시험지: ${examSizeMB.toFixed(1)}MB)`,
+      step: 1, total: 5
     });
 
-    // 시험지는 항상 base64로 (보통 작음)
-    const examBase64 = pdfToBase64(examFile.path);
-    const examBase64SizeMB = Buffer.byteLength(examBase64, 'utf8') / (1024 * 1024);
+    // === 1단계: PDF 압축 (필요 시) ===
+    sendEvent('progress', { message: 'PDF 최적화 중...', step: 2, total: 5 });
 
-    // 교재 크기에 따른 전략 결정
-    // - 교재 원본 20MB 이하 (base64 ~27MB): 직접 PDF 전송
-    // - 교재 원본 20MB 초과: 텍스트 추출 후 요약 → 분석
-    const useTextExtraction = textbookSizeMB > 20;
+    let textbookPath = textbookFile.path;
+    let examPath = examFile.path;
 
-    let finalContent = [];
+    // 교재 압축
+    if (textbookSizeMB > 15) {
+      sendEvent('progress', { message: '교재 PDF 압축 중...', step: 2, total: 5 });
+      textbookPath = compressPdf(textbookFile.path);
+      if (textbookPath !== textbookFile.path) filesToClean.push(textbookPath);
+      console.log(`교재 압축: ${textbookSizeMB.toFixed(1)}MB → ${getFileSizeMB(textbookPath).toFixed(1)}MB`);
+    }
 
-    if (useTextExtraction) {
-      // === 텍스트 추출 전략: 대용량 교재 ===
-      sendEvent('progress', {
-        message: `교재가 ${textbookSizeMB.toFixed(1)}MB로 커서 텍스트 추출 방식으로 분석합니다...`,
-        step: 2, total: 6
-      });
+    // 시험지 압축
+    if (examSizeMB > 15) {
+      sendEvent('progress', { message: '시험지 PDF 압축 중...', step: 2, total: 5 });
+      examPath = compressPdf(examFile.path);
+      if (examPath !== examFile.path) filesToClean.push(examPath);
+      console.log(`시험지 압축: ${examSizeMB.toFixed(1)}MB → ${getFileSizeMB(examPath).toFixed(1)}MB`);
+    }
 
-      // 1단계: 교재에서 텍스트 추출
-      let textbookData;
-      try {
-        textbookData = await extractTextFromPdf(textbookFile.path);
-      } catch (extractErr) {
-        // 텍스트 추출 실패 시 (이미지 기반 PDF 등) - 교재도 base64로 시도하되 크기 경고
-        console.error('텍스트 추출 실패, base64 폴백 시도:', extractErr.message);
-        sendEvent('progress', {
-          message: '텍스트 추출 실패. 이미지 기반 PDF일 수 있습니다. 직접 전송을 시도합니다...',
-          step: 3, total: 6
-        });
+    // === 2단계: base64 변환 ===
+    const textbookBase64 = pdfToBase64(textbookPath);
+    const examBase64 = pdfToBase64(examPath);
 
-        const textbookBase64 = pdfToBase64(textbookFile.path);
-        const textbookBase64SizeMB = Buffer.byteLength(textbookBase64, 'utf8') / (1024 * 1024);
+    const textbookB64MB = getBase64SizeMB(textbookBase64);
+    const examB64MB = getBase64SizeMB(examBase64);
+    const totalB64MB = textbookB64MB + examB64MB;
 
-        if (textbookBase64SizeMB > 30) {
-          sendEvent('error', {
-            message: `교재 PDF가 너무 큽니다 (${textbookSizeMB.toFixed(1)}MB). 이미지 기반 PDF는 최대 약 22MB까지 지원됩니다. 교재를 분할하거나 압축해서 다시 시도해주세요.`
-          });
-          res.end();
-          return;
+    console.log(`Base64 크기 - 교재: ${textbookB64MB.toFixed(1)}MB, 시험지: ${examB64MB.toFixed(1)}MB, 합계: ${totalB64MB.toFixed(1)}MB`);
+
+    // 압축 후에도 너무 크면 더 강하게 압축
+    if (totalB64MB > 40) {
+      sendEvent('progress', { message: '추가 압축 진행 중...', step: 2, total: 5 });
+
+      if (examB64MB > MAX_BASE64_MB) {
+        const examPath2 = compressPdf(examFile.path, '/screen');
+        if (examPath2 !== examFile.path) {
+          filesToClean.push(examPath2);
+          examPath = examPath2;
         }
+      }
+      if (textbookB64MB > MAX_BASE64_MB) {
+        const tbPath2 = compressPdf(textbookFile.path, '/screen');
+        if (tbPath2 !== textbookFile.path) {
+          filesToClean.push(tbPath2);
+          textbookPath = tbPath2;
+        }
+      }
 
-        // 크기가 간당간당하면 2단계 전략으로
-        finalContent = [
-          { type: 'text', text: '=== 교재 PDF ===' },
-          {
-            type: 'document',
-            source: { type: 'base64', media_type: 'application/pdf', data: textbookBase64 }
-          },
-          { type: 'text', text: '=== 시험지 PDF ===' },
-          {
-            type: 'document',
-            source: { type: 'base64', media_type: 'application/pdf', data: examBase64 }
-          },
-          { type: 'text', text: buildAnalysisPrompt() }
-        ];
+      // 재변환
+      const tb64_2 = pdfToBase64(textbookPath);
+      const ex64_2 = pdfToBase64(examPath);
+      const total2 = getBase64SizeMB(tb64_2) + getBase64SizeMB(ex64_2);
+      console.log(`추가 압축 후 합계: ${total2.toFixed(1)}MB`);
 
-        sendEvent('progress', {
-          message: 'Claude API가 분석 중입니다... (2~5분 소요)',
-          step: 4, total: 6
+      if (total2 > 45) {
+        sendEvent('error', {
+          message: `압축 후에도 PDF 합산 크기(${total2.toFixed(1)}MB)가 API 한도를 초과합니다. 교재나 시험지를 분할해서 업로드해주세요.`
         });
-
-        const analysisResponse = await anthropic.messages.create({
-          model: MODEL,
-          max_tokens: 8000,
-          messages: [{ role: 'user', content: finalContent }]
-        });
-
-        sendEvent('progress', { message: '분석 결과 처리 중...', step: 6, total: 6 });
-        parseAndSendResult(analysisResponse.content[0].text, sendEvent, res);
+        res.end();
         return;
       }
 
-      const textbookText = textbookData.text;
-      const numPages = textbookData.numPages;
-
-      sendEvent('progress', {
-        message: `교재 텍스트 추출 완료 (${numPages}페이지, ${(textbookText.length / 1000).toFixed(0)}K자). 지문 정보를 분석 중...`,
-        step: 3, total: 6
-      });
-
-      // 2단계: 텍스트를 청크로 나누어 각각 요약
-      const chunks = splitTextIntoChunks(textbookText, 80000);
-      let allSummaries = [];
-
-      for (let i = 0; i < chunks.length; i++) {
-        sendEvent('progress', {
-          message: `교재 분석 중... (${i + 1}/${chunks.length} 부분)`,
-          step: 3, total: 6
-        });
-
-        const summaryResponse = await anthropic.messages.create({
-          model: MODEL,
-          max_tokens: 16000,
-          messages: [{
-            role: 'user',
-            content: [
-              { type: 'text', text: chunks[i] },
-              { type: 'text', text: buildTextSummaryPrompt(i + 1, chunks.length) }
-            ]
-          }]
-        });
-
-        allSummaries.push(summaryResponse.content[0].text);
-      }
-
-      const combinedSummary = allSummaries.join('\n\n');
-
-      sendEvent('progress', {
-        message: '교재 요약 완료. 시험지와 비교 분석 중... (1~3분 소요)',
-        step: 4, total: 6
-      });
-
-      // 3단계: 요약 + 시험지 PDF로 최종 분석
-      finalContent = [
-        {
-          type: 'text',
-          text: '=== 교재에 수록된 지문 목록 (텍스트 추출 결과) ===\n' + combinedSummary
-        },
-        {
-          type: 'document',
-          source: { type: 'base64', media_type: 'application/pdf', data: examBase64 }
-        },
-        {
-          type: 'text',
-          text: buildAnalysisPrompt()
-        }
-      ];
-
-    } else {
-      // === 직접 전송 전략: 소용량 교재 ===
-      sendEvent('progress', {
-        message: 'PDF 파일을 처리 중...',
-        step: 2, total: 6
-      });
-
-      const textbookBase64 = pdfToBase64(textbookFile.path);
-      const textbookBase64SizeMB = Buffer.byteLength(textbookBase64, 'utf8') / (1024 * 1024);
-
-      // 두 PDF 합쳐서 30MB 넘으면 교재만 텍스트 추출로 전환
-      if (textbookBase64SizeMB + examBase64SizeMB > 30) {
-        sendEvent('progress', {
-          message: '두 PDF 합산 크기가 커서 교재 텍스트 추출 방식으로 전환합니다...',
-          step: 3, total: 6
-        });
-
-        let textbookData;
-        try {
-          textbookData = await extractTextFromPdf(textbookFile.path);
-        } catch (e) {
-          sendEvent('error', {
-            message: `교재 텍스트 추출에 실패했습니다. 교재 PDF를 20MB 이하로 줄여서 다시 시도해주세요.`
-          });
-          res.end();
-          return;
-        }
-
-        const chunks = splitTextIntoChunks(textbookData.text, 80000);
-        let allSummaries = [];
-
-        for (let i = 0; i < chunks.length; i++) {
-          sendEvent('progress', {
-            message: `교재 분석 중... (${i + 1}/${chunks.length} 부분)`,
-            step: 3, total: 6
-          });
-
-          const summaryResponse = await anthropic.messages.create({
-            model: MODEL,
-            max_tokens: 16000,
-            messages: [{
-              role: 'user',
-              content: [
-                { type: 'text', text: chunks[i] },
-                { type: 'text', text: buildTextSummaryPrompt(i + 1, chunks.length) }
-              ]
-            }]
-          });
-          allSummaries.push(summaryResponse.content[0].text);
-        }
-
-        finalContent = [
-          {
-            type: 'text',
-            text: '=== 교재에 수��된 지문 목록 ===\n' + allSummaries.join('\n\n')
-          },
-          {
-            type: 'document',
-            source: { type: 'base64', media_type: 'application/pdf', data: examBase64 }
-          },
-          { type: 'text', text: buildAnalysisPrompt() }
-        ];
-
-        sendEvent('progress', {
-          message: '시험지와 비교 분석 중... (1~3분 소요)',
-          step: 4, total: 6
-        });
-
-      } else {
-        // 직접 두 PDF 전송
-        sendEvent('progress', {
-          message: 'Claude API에 교재와 시험지를 전송하여 분석 중... (1~3분 소요)',
-          step: 3, total: 6
-        });
-
-        finalContent = [
-          { type: 'text', text: '=== 교재 PDF ===' },
-          {
-            type: 'document',
-            source: { type: 'base64', media_type: 'application/pdf', data: textbookBase64 }
-          },
-          { type: 'text', text: '=== 시험지 PDF ===' },
-          {
-            type: 'document',
-            source: { type: 'base64', media_type: 'application/pdf', data: examBase64 }
-          },
-          { type: 'text', text: buildAnalysisPrompt() }
-        ];
-
-        sendEvent('progress', {
-          message: 'Claude API가 분석 중입니다... (1~3분 소요)',
-          step: 4, total: 6
-        });
-      }
+      // 재할당
+      Object.assign(textbookBase64, {});  // dummy
     }
 
-    // 최종 분석 API 호출 (모델 폴백 포함)
+    // === 3단계: Claude API 호출 ===
     sendEvent('progress', {
-      message: '최종 분석 API 호출 중... (1~3분 소요)',
-      step: 5, total: 6
+      message: 'Claude AI가 교재와 시험지를 분석 중... (1~3분 소요)',
+      step: 3, total: 5
+    });
+
+    // 최종 base64 (압축 적용된 것)
+    const finalTextbookB64 = pdfToBase64(textbookPath);
+    const finalExamB64 = pdfToBase64(examPath);
+
+    const content = [
+      { type: 'text', text: '=== 교재 PDF ===' },
+      {
+        type: 'document',
+        source: { type: 'base64', media_type: 'application/pdf', data: finalTextbookB64 }
+      },
+      { type: 'text', text: '=== 시험지 PDF ===' },
+      {
+        type: 'document',
+        source: { type: 'base64', media_type: 'application/pdf', data: finalExamB64 }
+      },
+      { type: 'text', text: buildAnalysisPrompt() }
+    ];
+
+    sendEvent('progress', {
+      message: 'Claude API 응답 대기 중... (1~3분 소요)',
+      step: 4, total: 5
     });
 
     const analysisResponse = await anthropic.messages.create({
       model: MODEL,
       max_tokens: 8000,
-      messages: [{
-        role: 'user',
-        content: finalContent
-      }]
+      messages: [{ role: 'user', content }]
     });
 
-    sendEvent('progress', { message: '분석 결과 처리 중...', step: 6, total: 6 });
+    // === 4단계: 결과 파싱 ===
+    sendEvent('progress', { message: '분석 결과 처리 중...', step: 5, total: 5 });
 
-    parseAndSendResult(analysisResponse.content[0].text, sendEvent, res);
+    const resultText = analysisResponse.content[0].text;
+    let analysisResult;
+
+    try {
+      const jsonMatch = resultText.match(/```json\s*([\s\S]*?)\s*```/);
+      if (jsonMatch) {
+        analysisResult = JSON.parse(jsonMatch[1]);
+      } else {
+        const jsonStart = resultText.indexOf('{');
+        const jsonEnd = resultText.lastIndexOf('}');
+        if (jsonStart !== -1 && jsonEnd !== -1) {
+          analysisResult = JSON.parse(resultText.substring(jsonStart, jsonEnd + 1));
+        } else {
+          throw new Error('JSON을 찾을 수 없음');
+        }
+      }
+
+      if (!analysisResult.questions || !Array.isArray(analysisResult.questions)) {
+        throw new Error('응답에 questions 배열이 없습니다');
+      }
+
+      analysisResult.questions = analysisResult.questions.map(q => ({
+        number: q.number || 0,
+        score: Number(q.score) || 0,
+        type: q.type || '미분류',
+        source: q.source || '미확인'
+      }));
+
+      if (!analysisResult.typeSummary || !Array.isArray(analysisResult.typeSummary)) {
+        const typeMap = {};
+        analysisResult.questions.forEach(q => {
+          if (!typeMap[q.type]) typeMap[q.type] = { type: q.type, count: 0, totalScore: 0 };
+          typeMap[q.type].count++;
+          typeMap[q.type].totalScore += Number(q.score) || 0;
+        });
+        analysisResult.typeSummary = Object.values(typeMap);
+        analysisResult.typeSummary.forEach(s => {
+          s.totalScore = Math.round(s.totalScore * 10) / 10;
+        });
+      }
+
+    } catch (parseError) {
+      sendEvent('result', {
+        success: false,
+        rawText: resultText,
+        message: 'JSON 파싱에 실패했습니다. 원본 응답을 표시합니다.'
+      });
+      res.end();
+      return;
+    }
+
+    sendEvent('result', { success: true, data: analysisResult });
+    res.end();
 
   } catch (error) {
     console.error('분석 오류:', error);
     let errorMsg = '분석 중 오류가 발생했습니다.';
     const rawMsg = error.message || '';
-    const statusCode = error.status || error.statusCode || '';
+    const statusCode = error.status || '';
 
     if (error.status === 413 || rawMsg.includes('too large') || rawMsg.includes('size') || rawMsg.includes('maximum')) {
-      errorMsg = 'PDF 파일이 API 전송 한도를 초과했습니다. 교재 PDF를 20MB 이하로 줄이거나, 페이지를 나누어 업로드해주세요.';
+      errorMsg = 'PDF 파일이 API 전송 한도를 초과했습니다. 교재/시험지 PDF를 줄여서 다시 시도해주세요.';
     } else if (error.status === 401) {
-      errorMsg = 'API 키가 유효하지 않습니다. 서버의 ANTHROPIC_API_KEY를 확인해주세요.';
+      errorMsg = 'API 키가 유효하지 않습니다.';
     } else if (error.status === 429) {
       errorMsg = 'API 요청 제한에 걸렸습니다. 잠시 후 다시 시도해주세요.';
     } else if (error.status === 400) {
@@ -463,84 +357,28 @@ app.post('/api/analyze', upload.fields([
     sendEvent('error', { message: errorMsg });
     res.end();
   } finally {
-    // 업로드된 파일 정리
     filesToClean.forEach(fp => {
       try { fs.unlinkSync(fp); } catch(e) {}
     });
   }
 });
 
-// 결과 파싱 공통 ��수
-function parseAndSendResult(resultText, sendEvent, res) {
-  let analysisResult;
-  try {
-    const jsonMatch = resultText.match(/```json\s*([\s\S]*?)\s*```/);
-    if (jsonMatch) {
-      analysisResult = JSON.parse(jsonMatch[1]);
-    } else {
-      const jsonStart = resultText.indexOf('{');
-      const jsonEnd = resultText.lastIndexOf('}');
-      if (jsonStart !== -1 && jsonEnd !== -1) {
-        analysisResult = JSON.parse(resultText.substring(jsonStart, jsonEnd + 1));
-      } else {
-        throw new Error('JSON을 찾을 수 없음');
-      }
-    }
-
-    if (!analysisResult.questions || !Array.isArray(analysisResult.questions)) {
-      throw new Error('응답에 questions ���열이 없습니다');
-    }
-
-    analysisResult.questions = analysisResult.questions.map(q => ({
-      number: q.number || 0,
-      score: Number(q.score) || 0,
-      type: q.type || '미분류',
-      source: q.source || '미확인'
-    }));
-
-    if (!analysisResult.typeSummary || !Array.isArray(analysisResult.typeSummary)) {
-      const typeMap = {};
-      analysisResult.questions.forEach(q => {
-        if (!typeMap[q.type]) typeMap[q.type] = { type: q.type, count: 0, totalScore: 0 };
-        typeMap[q.type].count++;
-        typeMap[q.type].totalScore += Number(q.score) || 0;
-      });
-      analysisResult.typeSummary = Object.values(typeMap);
-      analysisResult.typeSummary.forEach(s => {
-        s.totalScore = Math.round(s.totalScore * 10) / 10;
-      });
-    }
-
-  } catch (parseError) {
-    sendEvent('result', {
-      success: false,
-      rawText: resultText,
-      message: 'JSON 파싱에 실패했습니다. 원본 응답을 표시합니다.'
-    });
-    res.end();
-    return;
-  }
-
-  sendEvent('result', { success: true, data: analysisResult });
-  res.end();
-}
-
 // 헬스체크
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
     hasApiKey: !!process.env.ANTHROPIC_API_KEY,
-    version: '1.2.0'
+    model: MODEL,
+    version: '2.0.0'
   });
 });
 
 const server = app.listen(PORT, () => {
   console.log(`시험지 분석기 서버 시작: http://localhost:${PORT}`);
   console.log(`사용 모델: ${MODEL}`);
-  console.log(`API 키 설정: ${process.env.ANTHROPIC_API_KEY ? '확인됨' : '⚠️ 미설정 - .env 파일에 ANTHROPIC_API_KEY를 설정하세요'}`);
+  console.log(`API 키 설정: ${process.env.ANTHROPIC_API_KEY ? '확인됨' : '⚠️ 미설정'}`);
 });
 
-// Graceful shutdown
 process.on('SIGTERM', () => {
   console.log('SIGTERM 수신, 서버 종료 중...');
   server.close(() => {
