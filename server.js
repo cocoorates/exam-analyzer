@@ -11,6 +11,8 @@ const pdfParse = require('pdf-parse');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-4-20250514';
+// 폴백 모델 (메인 모델 실패 시)
+const FALLBACK_MODEL = 'claude-3-5-sonnet-20241022';
 
 // uploads 디렉토리 확보
 if (!fs.existsSync('uploads')) fs.mkdirSync('uploads');
@@ -422,20 +424,37 @@ app.post('/api/analyze', upload.fields([
       }
     }
 
-    // 최종 분석 API 호출
+    // 최종 분석 API 호출 (모델 폴백 포함)
     sendEvent('progress', {
       message: '최종 분석 API 호출 중... (1~3분 소요)',
       step: 5, total: 6
     });
 
-    const analysisResponse = await anthropic.messages.create({
-      model: MODEL,
-      max_tokens: 8000,
-      messages: [{
-        role: 'user',
-        content: finalContent
-      }]
-    });
+    let analysisResponse;
+    try {
+      analysisResponse = await anthropic.messages.create({
+        model: MODEL,
+        max_tokens: 8000,
+        messages: [{
+          role: 'user',
+          content: finalContent
+        }]
+      });
+    } catch (modelErr) {
+      console.error(`모델 ${MODEL} 실패, 폴백 모델 ${FALLBACK_MODEL} 시도:`, modelErr.message);
+      sendEvent('progress', {
+        message: `기본 모델 실패. 대체 모델로 재시도 중...`,
+        step: 5, total: 6
+      });
+      analysisResponse = await anthropic.messages.create({
+        model: FALLBACK_MODEL,
+        max_tokens: 8000,
+        messages: [{
+          role: 'user',
+          content: finalContent
+        }]
+      });
+    }
 
     sendEvent('progress', { message: '분석 결과 처리 중...', step: 6, total: 6 });
 
@@ -443,19 +462,22 @@ app.post('/api/analyze', upload.fields([
 
   } catch (error) {
     console.error('분석 오류:', error);
-    let errorMsg = '분석 중 오류가 발생했습니다. 다시 시도해주세요.';
+    let errorMsg = '분석 중 오류가 발생했습니다.';
     const rawMsg = error.message || '';
+    const statusCode = error.status || error.statusCode || '';
 
     if (error.status === 413 || rawMsg.includes('too large') || rawMsg.includes('size') || rawMsg.includes('maximum')) {
-      errorMsg = `PDF 파일이 API 전송 한도를 초��했습니다. 교재 PDF(현재 크기 확인 불가)를 20MB 이하로 줄이거나, 페이지를 나누어 업로드해주세요.`;
+      errorMsg = 'PDF 파일이 API 전송 한도를 초과했습니다. 교재 PDF를 20MB 이하로 줄이거나, 페이지를 나누어 업로드해주세요.';
     } else if (error.status === 401) {
-      errorMsg = 'API 키가 유효하지 않습니다. 서버의 ANTHROPIC_API_KEY를 확��해주세요.';
+      errorMsg = 'API 키가 유효하지 않습니다. 서버의 ANTHROPIC_API_KEY를 확인해주세요.';
     } else if (error.status === 429) {
-      errorMsg = 'API 요청 제한에 걸렸���니다. ��시 후 다시 시도���주세요.';
+      errorMsg = 'API 요청 제한에 걸렸습니다. 잠시 후 다시 시도해주세요.';
     } else if (error.status === 400) {
-      errorMsg = `API 요청 오류: ${rawMsg.substring(0, 200)}`;
+      errorMsg = `API 요청 오류: ${rawMsg.substring(0, 300)}`;
     } else if (error.status === 529 || error.status === 503) {
-      errorMsg = 'Claude API 서버가 ��부하 상태입니다. 잠시 후 다시 시도해주세요.';
+      errorMsg = 'Claude API 서버가 과부하 상태입니다. 잠시 후 다시 시도해주세요.';
+    } else {
+      errorMsg = `분석 중 오류 (${statusCode}): ${rawMsg.substring(0, 300)}`;
     }
     sendEvent('error', { message: errorMsg });
     res.end();
@@ -527,7 +549,7 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
     hasApiKey: !!process.env.ANTHROPIC_API_KEY,
-    version: '1.1.0'
+    version: '1.2.0'
   });
 });
 
