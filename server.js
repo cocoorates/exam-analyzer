@@ -35,6 +35,9 @@ app.use(cors());
 app.use(express.static('public'));
 app.use(express.json({ limit: '50mb' }));
 
+// 마지막 분석 결과 저장 (디버그/테스트용)
+let lastAnalysis = { status: 'idle', timestamp: null, result: null, error: null };
+
 // Claude API 클라이언트
 function getClient() {
   return new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -152,6 +155,7 @@ app.post('/api/analyze', upload.fields([
   };
 
   let filesToClean = [];
+  lastAnalysis = { status: 'processing', timestamp: new Date().toISOString(), result: null, error: null };
 
   try {
     if (!req.files || !req.files.textbook || !req.files.exam) {
@@ -362,6 +366,7 @@ app.post('/api/analyze', upload.fields([
       return;
     }
 
+    lastAnalysis = { status: 'done', timestamp: new Date().toISOString(), result: analysisResult, error: null };
     sendEvent('result', { success: true, data: analysisResult });
     res.end();
 
@@ -389,6 +394,7 @@ app.post('/api/analyze', upload.fields([
     } else {
       errorMsg = `분석 중 오류 (${statusCode}): ${rawMsg.substring(0, 300)}`;
     }
+    lastAnalysis = { status: 'error', timestamp: new Date().toISOString(), result: null, error: errorMsg };
     sendEvent('error', { message: errorMsg });
     res.end();
   } finally {
@@ -398,13 +404,18 @@ app.post('/api/analyze', upload.fields([
   }
 });
 
+// 마지막 분석 결과 조회 (테스트용)
+app.get('/api/last-result', (req, res) => {
+  res.json(lastAnalysis);
+});
+
 // 헬스체크
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
     hasApiKey: !!process.env.ANTHROPIC_API_KEY,
     model: MODEL,
-    version: '2.1.0'
+    version: '2.2.0'
   });
 });
 
