@@ -10,7 +10,7 @@ const pdfParse = require('pdf-parse');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const MODEL = process.env.CLAUDE_MODEL || 'claude-haiku-4-5-20251001';
+const MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-4-6';
 
 // uploads 디렉토리 확보
 if (!fs.existsSync('uploads')) fs.mkdirSync('uploads');
