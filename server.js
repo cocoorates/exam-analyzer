@@ -272,9 +272,10 @@ app.post('/api/analyze', upload.fields([
       step: 4, total: 5
     });
 
-    // Rate limit 자동 재시도 (최대 3회, 대기시간 증가)
+    // Rate limit 자동 재시도 (최대 5회, retry-after 헤더 기반 대기)
+    const MAX_RETRIES = 5;
     let analysisResponse;
-    for (let attempt = 1; attempt <= 3; attempt++) {
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
         analysisResponse = await anthropic.messages.create({
           model: MODEL,
@@ -283,17 +284,21 @@ app.post('/api/analyze', upload.fields([
         });
         break; // 성공
       } catch (apiErr) {
-        if (apiErr.status === 429 && attempt < 3) {
-          const waitSec = attempt * 30;
+        const retryAfter = apiErr.headers?.['retry-after'];
+        console.log(`API 에러 (시도 ${attempt}/${MAX_RETRIES}): status=${apiErr.status}, retry-after=${retryAfter}, message=${(apiErr.message||'').substring(0,200)}`);
+
+        if (apiErr.status === 429 && attempt < MAX_RETRIES) {
+          // retry-after 헤더가 있으면 그 값 사용, 없으면 기본값
+          const waitSec = retryAfter ? Math.min(parseInt(retryAfter) + 5, 300) : attempt * 30;
           sendEvent('progress', {
-            message: `API 요청 한도 초과. ${waitSec}초 후 재시도합니다... (${attempt}/3)`,
+            message: `API 요청 한도 초과. ${waitSec}초 후 재시도합니다... (${attempt}/${MAX_RETRIES})`,
             step: 4, total: 5
           });
           await new Promise(resolve => setTimeout(resolve, waitSec * 1000));
-        } else if (apiErr.status === 529 && attempt < 3) {
-          const waitSec = attempt * 15;
+        } else if ((apiErr.status === 529 || apiErr.status === 503) && attempt < MAX_RETRIES) {
+          const waitSec = retryAfter ? Math.min(parseInt(retryAfter) + 5, 120) : attempt * 15;
           sendEvent('progress', {
-            message: `서버 과부하. ${waitSec}초 후 재시도합니다... (${attempt}/3)`,
+            message: `서버 과부하. ${waitSec}초 후 재시도합니다... (${attempt}/${MAX_RETRIES})`,
             step: 4, total: 5
           });
           await new Promise(resolve => setTimeout(resolve, waitSec * 1000));
@@ -399,7 +404,7 @@ app.get('/api/health', (req, res) => {
     status: 'ok',
     hasApiKey: !!process.env.ANTHROPIC_API_KEY,
     model: MODEL,
-    version: '2.0.0'
+    version: '2.1.0'
   });
 });
 
