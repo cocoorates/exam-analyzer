@@ -1,0 +1,20 @@
+{
+  "name": "exam-analyzer",
+  "version": "1.0.0",
+  "description": "시험지 분석 웹앱 - PDF 교재와 시험지를 비교 분석",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "express": "^4.21.0",
+    "multer": "^1.4.5-lts.1",
+    "dotenv": "^16.4.5",
+    "cors": "^2.8.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
