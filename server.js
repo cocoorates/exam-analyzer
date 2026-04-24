@@ -410,6 +410,14 @@ app.get('/api/last-result', (req, res) => {
   res.json(lastAnalysis);
 });
 
+// Supabase config (public keys only - safe to expose)
+app.get('/api/config', (req, res) => {
+  res.json({
+    supabaseUrl: process.env.SUPABASE_URL || '',
+    supabaseAnonKey: process.env.SUPABASE_ANON_KEY || ''
+  });
+});
+
 // 헬스체크
 app.get('/api/health', (req, res) => {
   res.json({
