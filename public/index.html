@@ -1148,7 +1148,7 @@
     <div class="footer">Powered by Claude AI</div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" onerror="console.warn('Supabase SDK load failed')"></script>
   <script>
     // ── Supabase Init ──
     let supabase = null;
@@ -1157,7 +1157,7 @@
 
     // Load config from server and init Supabase
     fetch('/api/config').then(r => r.json()).then(cfg => {
-      if (cfg.supabaseUrl && cfg.supabaseAnonKey) {
+      if (cfg.supabaseUrl && cfg.supabaseAnonKey && window.supabase) {
         supabase = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
         // Check existing session
         supabase.auth.getSession().then(({ data: { session } }) => {
