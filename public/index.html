@@ -347,6 +347,69 @@
       border-color: rgba(255,255,255,0.7);
     }
 
+    /* ── FEATURES SECTION ── */
+    .features {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 40px 60px;
+    }
+    .features-label {
+      text-align: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #6366f1;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+    .features-title {
+      text-align: center;
+      font-size: 24px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 36px;
+      letter-spacing: -0.3px;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .feature-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 28px 24px;
+      border: 1px solid #f1f5f9;
+      transition: all 0.2s;
+    }
+    .feature-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(99,102,241,0.08);
+      border-color: #e0e7ff;
+    }
+    .feature-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    .feature-icon.fi1 { background: linear-gradient(135deg, #e0e7ff, #c7d2fe); }
+    .feature-icon.fi2 { background: linear-gradient(135deg, #ede9fe, #ddd6fe); }
+    .feature-icon.fi3 { background: linear-gradient(135deg, #dbeafe, #bfdbfe); }
+    .feature-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1e1b4b;
+      margin-bottom: 8px;
+    }
+    .feature-desc {
+      font-size: 13px;
+      color: #94a3b8;
+      line-height: 1.7;
+    }
+
     /* ── ANALYZE PAGE ── */
     .page-analyze {
       display: none;
@@ -595,19 +658,30 @@
     }
     .copy-btn {
       position: absolute;
-      top: 18px;
-      right: 18px;
-      padding: 5px 14px;
+      top: 16px;
+      right: 16px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       background: #fff;
       border: 1px solid #e2e8f0;
-      border-radius: 6px;
-      font-size: 12px;
+      border-radius: 8px;
       cursor: pointer;
       color: #94a3b8;
       transition: all 0.15s;
+      padding: 0;
     }
     .copy-btn:hover { background: #f8fafc; color: #6366f1; border-color: #c7d2fe; }
     .copy-btn.copied { background: #f0fdf4; color: #22c55e; border-color: #86efac; }
+
+    /* 3-column layout for score/type/source */
+    .result-trio {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
 
     /* Tables */
     table {
@@ -677,6 +751,8 @@
       .hero-left { padding: 32px 20px; }
       .upload-area { grid-template-columns: 1fr; }
       .result-stats { grid-template-columns: repeat(2, 1fr); }
+      .result-trio { grid-template-columns: 1fr; }
+      .features-grid { grid-template-columns: 1fr; }
       .nav { padding: 0 16px; }
       .nav-menu { display: none; }
       .page-analyze { padding: 24px 16px; }
@@ -737,6 +813,35 @@
         <div class="hero-right-big">Benefit<br>for All</div>
         <div class="hero-right-desc">모두를 위한<br>교육 혁신</div>
         <button class="hero-right-btn" onclick="showPage('analyze')">View More</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURES (part of Home) -->
+  <div class="features" id="featuresSection">
+    <div class="features-label">FEATURES</div>
+    <div class="features-title">WonderBridge가 제공하는 기능</div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon fi1">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        <div class="feature-name">시험지 분석</div>
+        <div class="feature-desc">교재 PDF와 시험지를 업로드하면 AI가 문항별 배점, 유형, 출처를 자동 분석합니다.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon fi2">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        </div>
+        <div class="feature-name">학습 자료 관리</div>
+        <div class="feature-desc">분석된 시험 데이터를 아카이브하고 교재별, 학교별로 체계적으로 관리하세요.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon fi3">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div class="feature-name">성취도 추적</div>
+        <div class="feature-desc">학생별 유형 취약점과 성적 변화를 추적하여 맞춤형 학습 전략을 세울 수 있습니다.</div>
       </div>
     </div>
   </div>
@@ -802,32 +907,32 @@
 
       <div class="result-card">
         <h2>Analysis Results</h2>
-        <button class="copy-btn" onclick="copyTable('mainTable', this)">Copy</button>
+        <button class="copy-btn" onclick="copyTable('mainTable', this)" title="Copy"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
         <div id="mainTableContainer"></div>
       </div>
 
       <div class="result-card">
         <h2>Type Summary</h2>
-        <button class="copy-btn" onclick="copyTable('summaryTable', this)">Copy</button>
+        <button class="copy-btn" onclick="copyTable('summaryTable', this)" title="Copy"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
         <div id="summaryTableContainer"></div>
       </div>
 
-      <div class="result-card">
-        <h2>Score</h2>
-        <button class="copy-btn" onclick="copyTable('scoreTable', this)">Copy</button>
-        <div id="scoreTableContainer"></div>
-      </div>
-
-      <div class="result-card">
-        <h2>Type</h2>
-        <button class="copy-btn" onclick="copyTable('typeTable', this)">Copy</button>
-        <div id="typeTableContainer"></div>
-      </div>
-
-      <div class="result-card">
-        <h2>Source</h2>
-        <button class="copy-btn" onclick="copyTable('sourceTable', this)">Copy</button>
-        <div id="sourceTableContainer"></div>
+      <div class="result-trio">
+        <div class="result-card">
+          <h2>Score</h2>
+          <button class="copy-btn" onclick="copyTable('scoreTable', this)" title="Copy"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+          <div id="scoreTableContainer"></div>
+        </div>
+        <div class="result-card">
+          <h2>Type</h2>
+          <button class="copy-btn" onclick="copyTable('typeTable', this)" title="Copy"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+          <div id="typeTableContainer"></div>
+        </div>
+        <div class="result-card">
+          <h2>Source</h2>
+          <button class="copy-btn" onclick="copyTable('sourceTable', this)" title="Copy"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+          <div id="sourceTableContainer"></div>
+        </div>
       </div>
     </div>
 
@@ -837,14 +942,24 @@
   <script>
     let selectedModel = 'claude-sonnet-4-6';
 
-    // Page navigation
-    function showPage(page) {
+    // Page navigation with History API
+    function showPage(page, pushState = true) {
       document.getElementById('pageHome').style.display = page === 'home' ? 'grid' : 'none';
+      document.getElementById('featuresSection').style.display = page === 'home' ? 'block' : 'none';
       document.getElementById('pageAnalyze').style.display = page === 'analyze' ? 'block' : 'none';
       document.querySelectorAll('.nav-item').forEach(el => {
         el.classList.toggle('active', el.dataset.page === page);
       });
+      if (pushState) {
+        history.pushState({ page }, '', '#' + page);
+      }
     }
+    window.addEventListener('popstate', (e) => {
+      const page = (e.state && e.state.page) || 'home';
+      showPage(page, false);
+    });
+    // Set initial state
+    history.replaceState({ page: 'home' }, '', '#home');
 
     // Model selection
     function selectModel(el, model) {
@@ -1066,20 +1181,21 @@
         text += Array.from(cells).map(c => c.textContent.trim()).join('\t') + '\n';
       });
 
-      navigator.clipboard.writeText(text.trim()).then(() => {
-        btn.textContent = 'Copied!';
+      const copyIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+      const checkIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+      function showCopied() {
+        btn.innerHTML = checkIcon;
         btn.classList.add('copied');
-        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
-      }).catch(() => {
+        setTimeout(() => { btn.innerHTML = copyIcon; btn.classList.remove('copied'); }, 2000);
+      }
+      navigator.clipboard.writeText(text.trim()).then(showCopied).catch(() => {
         const textarea = document.createElement('textarea');
         textarea.value = text.trim();
         document.body.appendChild(textarea);
         textarea.select();
         document.execCommand('copy');
         document.body.removeChild(textarea);
-        btn.textContent = 'Copied!';
-        btn.classList.add('copied');
-        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+        showCopied();
       });
     }
   </script>
