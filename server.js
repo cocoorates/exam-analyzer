@@ -341,16 +341,21 @@ app.post('/api/analyze', upload.fields([
     const rawMsg = error.message || '';
     const statusCode = error.status || '';
 
-    if (error.status === 413 || rawMsg.includes('too large') || rawMsg.includes('size') || rawMsg.includes('maximum')) {
-      errorMsg = 'PDF 파일이 API 전송 한도를 초과했습니다. 교재/시험지 PDF를 줄여서 다시 시도해주세요.';
+    if (error.status === 413) {
+      errorMsg = 'PDF 파일이 API 전송 한도를 초과했습니다. PDF를 줄여서 다시 시도해주세요.';
     } else if (error.status === 401) {
       errorMsg = 'API 키가 유효하지 않습니다.';
     } else if (error.status === 429) {
       errorMsg = 'API 요청 제한에 걸렸습니다. 잠시 후 다시 시도해주세요.';
-    } else if (error.status === 400) {
-      errorMsg = `API 요청 오류: ${rawMsg.substring(0, 300)}`;
     } else if (error.status === 529 || error.status === 503) {
       errorMsg = 'Claude API 서버가 과부하 상태입니다. 잠시 후 다시 시도해주세요.';
+    } else if (error.status === 400) {
+      // 400 에러 중 크기 관련 여부 구분
+      if (rawMsg.includes('too large') || rawMsg.includes('exceeds') || rawMsg.includes('maximum allowed size')) {
+        errorMsg = 'PDF 파일이 API 전송 한도를 초과했습니다. PDF를 줄여서 다시 시도해주세요.';
+      } else {
+        errorMsg = `API 요청 오류: ${rawMsg.substring(0, 300)}`;
+      }
     } else {
       errorMsg = `분석 중 오류 (${statusCode}): ${rawMsg.substring(0, 300)}`;
     }
