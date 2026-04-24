@@ -903,33 +903,32 @@
     <div class="error-box" id="errorBox"></div>
 
     <div class="result-section" id="resultSection">
-      <div class="result-stats" id="resultStats"></div>
 
       <div class="result-card">
-        <h2>Analysis Results</h2>
+        <h2>분석 결과</h2>
         <button class="copy-btn" onclick="copyTable('mainTable', this)" title="Copy"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
         <div id="mainTableContainer"></div>
       </div>
 
       <div class="result-card">
-        <h2>Type Summary</h2>
+        <h2>유형 요약</h2>
         <button class="copy-btn" onclick="copyTable('summaryTable', this)" title="Copy"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
         <div id="summaryTableContainer"></div>
       </div>
 
       <div class="result-trio">
         <div class="result-card">
-          <h2>Score</h2>
+          <h2>배점</h2>
           <button class="copy-btn" onclick="copyTable('scoreTable', this)" title="Copy"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
           <div id="scoreTableContainer"></div>
         </div>
         <div class="result-card">
-          <h2>Type</h2>
+          <h2>유형</h2>
           <button class="copy-btn" onclick="copyTable('typeTable', this)" title="Copy"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
           <div id="typeTableContainer"></div>
         </div>
         <div class="result-card">
-          <h2>Source</h2>
+          <h2>출처</h2>
           <button class="copy-btn" onclick="copyTable('sourceTable', this)" title="Copy"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
           <div id="sourceTableContainer"></div>
         </div>
@@ -1125,18 +1124,8 @@
       const typeSummary = data.typeSummary || [];
       const e = escapeHtml;
 
-      // Stats
-      const totalScore = questions.reduce((s, q) => s + (Number(q.score) || 0), 0);
-      const externalCount = questions.filter(q => (q.source || '').includes('외부')).length;
-      document.getElementById('resultStats').innerHTML = `
-        <div class="stat-card"><div class="stat-value">${questions.length}</div><div class="stat-label">Questions</div></div>
-        <div class="stat-card"><div class="stat-value">${Math.round(totalScore * 10) / 10}</div><div class="stat-label">Total</div></div>
-        <div class="stat-card"><div class="stat-value">${typeSummary.length}</div><div class="stat-label">Types</div></div>
-        <div class="stat-card"><div class="stat-value">${externalCount}</div><div class="stat-label">External</div></div>
-      `;
-
       // Main table
-      let mainHtml = '<table id="mainTable"><thead><tr><th>No.</th><th>Score</th><th>Type</th><th>Source</th></tr></thead><tbody>';
+      let mainHtml = '<table id="mainTable"><thead><tr><th>번호</th><th>배점</th><th>유형</th><th>출처</th></tr></thead><tbody>';
       questions.forEach(q => {
         mainHtml += `<tr><td>${e(String(q.number))}</td><td>${e(String(q.score))}</td><td>${getTypeBadge(q.type)}</td><td>${e(q.source)}</td></tr>`;
       });
@@ -1144,7 +1133,7 @@
       document.getElementById('mainTableContainer').innerHTML = mainHtml;
 
       // Summary table
-      let summaryHtml = '<table id="summaryTable"><thead><tr><th>Type</th><th>Count</th><th>Total Score</th></tr></thead><tbody>';
+      let summaryHtml = '<table id="summaryTable"><thead><tr><th>유형</th><th>문항수</th><th>총배점</th></tr></thead><tbody>';
       typeSummary.forEach(s => {
         summaryHtml += `<tr><td>${getTypeBadge(s.type)}</td><td>${e(String(s.count))}</td><td>${e(String(s.totalScore))}</td></tr>`;
       });
@@ -1175,11 +1164,24 @@
       const table = document.getElementById(tableId);
       if (!table) return;
 
+      // Build plain text (tab-separated) for text/plain
       let text = '';
       table.querySelectorAll('tr').forEach(row => {
         const cells = row.querySelectorAll('th, td');
         text += Array.from(cells).map(c => c.textContent.trim()).join('\t') + '\n';
       });
+
+      // Build clean HTML table for text/html (so it pastes as a real table in Excel/Sheets)
+      let html = '<table>';
+      table.querySelectorAll('tr').forEach(row => {
+        html += '<tr>';
+        row.querySelectorAll('th, td').forEach(cell => {
+          const tag = cell.tagName.toLowerCase();
+          html += `<${tag}>${cell.textContent.trim()}</${tag}>`;
+        });
+        html += '</tr>';
+      });
+      html += '</table>';
 
       const copyIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
       const checkIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
@@ -1188,15 +1190,34 @@
         btn.classList.add('copied');
         setTimeout(() => { btn.innerHTML = copyIcon; btn.classList.remove('copied'); }, 2000);
       }
-      navigator.clipboard.writeText(text.trim()).then(showCopied).catch(() => {
-        const textarea = document.createElement('textarea');
-        textarea.value = text.trim();
-        document.body.appendChild(textarea);
-        textarea.select();
+
+      // Use ClipboardItem with both text/html and text/plain
+      try {
+        const htmlBlob = new Blob([html], { type: 'text/html' });
+        const textBlob = new Blob([text.trim()], { type: 'text/plain' });
+        navigator.clipboard.write([
+          new ClipboardItem({ 'text/html': htmlBlob, 'text/plain': textBlob })
+        ]).then(showCopied).catch(() => {
+          // Fallback: select the table and execCommand
+          const range = document.createRange();
+          range.selectNode(table);
+          const sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+          document.execCommand('copy');
+          sel.removeAllRanges();
+          showCopied();
+        });
+      } catch(e) {
+        const range = document.createRange();
+        range.selectNode(table);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
         document.execCommand('copy');
-        document.body.removeChild(textarea);
+        sel.removeAllRanges();
         showCopied();
-      });
+      }
     }
   </script>
 </body>
