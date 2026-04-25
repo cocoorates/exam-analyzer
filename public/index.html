@@ -3784,7 +3784,23 @@
     spRender();
 
     // ── Mock exam page logic ──
-    const mkMonths = [3, 4, 6, 7, 9, 10, 11];
+    // 학년별 실제 시행 월 (DB 기준)
+    const mkMonthsByGrade = {
+      '고1': [3, 6, 9, 10, 11],
+      '고2': [3, 6, 9, 10, 11],
+      '고3': [3, 4, 6, 7, 9, 10, 11]
+    };
+    // 고1/고2: 2024~2025는 11월 대신 10월
+    function mkGetMonths(grade, year) {
+      const months = mkMonthsByGrade[grade] || [3, 6, 9, 11];
+      if ((grade === '고1' || grade === '고2') && (year === 2024 || year === 2025)) {
+        return months.filter(m => m !== 11); // 10월은 이미 포함
+      }
+      if ((grade === '고1' || grade === '고2') && year <= 2023) {
+        return months.filter(m => m !== 10); // 10월 없음, 11월만
+      }
+      return months;
+    }
     const mkMonthNames = {3:'3월',4:'4월',6:'6월',7:'7월',9:'9월',10:'10월',11:'11월(수능)'};
     const mkGradeBarColors = { '고1': 'var(--blush-ink)', '고2': 'var(--sage-ink)', '고3': 'var(--sky-ink)' };
     const mkMonthBadge = {
@@ -3834,7 +3850,7 @@
       let items = [];
       years.forEach(year => {
         grades.forEach(grade => {
-          mkMonths.forEach(m => {
+          mkGetMonths(grade, year).forEach(m => {
             if (year === 2026 && m > 4) return;
             items.push({ grade, year, month: m, key: `${grade}-${year}-${m}` });
           });
