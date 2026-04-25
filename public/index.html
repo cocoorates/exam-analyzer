@@ -153,6 +153,14 @@
       padding: 12px 16px; border-radius: var(--r-pill);
     }
     .btn-ghost:hover { background: rgba(20,18,14,.06); }
+    .nav-auth-group { display: flex; align-items: center; gap: 8px; }
+    .nav-signup {
+      background: transparent; color: var(--ink-700);
+      border: 1.5px solid var(--ink-200); border-radius: var(--r-pill);
+      padding: 9px 18px; font-size: 13.5px; font-weight: 500;
+      cursor: pointer; transition: all .15s;
+    }
+    .nav-signup:hover { border-color: var(--ink-400); background: var(--paper-2); transform: translateY(-1px); }
     .nav-login {
       background: var(--ink-900); color: var(--paper);
       border-radius: var(--r-pill); padding: 10px 20px;
@@ -1510,6 +1518,21 @@
     .auth-subtitle {
       font-size: 13px; color: var(--ink-400); margin-bottom: 24px;
     }
+    .auth-social-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .auth-social-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 12px;
+      border: 1px solid var(--ink-200);
+      border-radius: 12px; background: var(--white);
+      font-size: 14px; font-weight: 500;
+      color: var(--ink-700); cursor: pointer;
+      transition: all .15s;
+    }
+    .auth-social-btn:hover { border-color: var(--ink-300); background: var(--paper); }
+    .auth-social-btn.kakao {
+      background: #FEE500; border-color: #FEE500; color: #191919;
+    }
+    .auth-social-btn.kakao:hover { background: #F5DC00; border-color: #F5DC00; }
     .auth-google-btn {
       display: flex; align-items: center; justify-content: center; gap: 10px;
       width: 100%; padding: 12px;
@@ -1647,7 +1670,7 @@
       .stats-strip .stat-item { border-left: none; padding-left: 0; }
       .nav .nav-links { display: none; }
       .nav-hamburger { display: block; }
-      .nav .nav-login { display: none; }
+      .nav .nav-auth-group, .nav .nav-login, .nav .auth-user-info { display: none; }
       .upload-row { grid-template-columns: 1fr; }
       .triple-grid { grid-template-columns: 1fr; }
       .result-duo { grid-template-columns: 1fr; }
@@ -1688,7 +1711,10 @@
       <button class="nav-hamburger" onclick="openMobileMenu()">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
-      <button class="nav-login" id="authBtn" onclick="openAuthModal()">로그인</button>
+      <div class="nav-auth-group" id="authBtn">
+        <button class="nav-signup" onclick="openAuthModal('signup')">회원가입</button>
+        <button class="nav-login" onclick="openAuthModal('login')">로그인</button>
+      </div>
     </nav>
   </div>
 
@@ -1706,7 +1732,7 @@
         <a href="#" onclick="showPage('analyze');closeMobileMenu()">분석서</a>
         <a href="#" onclick="showPage('analyze2');closeMobileMenu()">분석서2</a>
         <div class="mobile-divider"></div>
-        <a href="#" onclick="openAuthModal();closeMobileMenu()" style="font-weight:600;color:var(--ink-700)">로그인 / 회원가입</a>
+        <a href="#" class="mobile-auth-link" onclick="openAuthModal('login');closeMobileMenu()" style="font-weight:600;color:var(--ink-700)">로그인 / 회원가입</a>
       </div>
     </div>
   </div>
@@ -1720,14 +1746,20 @@
 
       <div class="auth-error" id="authError"></div>
 
-      <button class="auth-google-btn" onclick="googleLogin()">
-        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A11.96 11.96 0 0 0 0 12c0 1.94.46 3.77 1.28 5.4l3.56-2.77.01-.54z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 1.99 14.97.96 12 .96 7.7.96 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-        Google로 계속하기
-      </button>
+      <div class="auth-social-group">
+        <button class="auth-social-btn" onclick="googleLogin()">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A11.96 11.96 0 0 0 0 12c0 1.94.46 3.77 1.28 5.4l3.56-2.77.01-.54z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 1.99 14.97.96 12 .96 7.7.96 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Google로 계속하기
+        </button>
+        <button class="auth-social-btn kakao" onclick="kakaoLogin()">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#191919" d="M12 3C6.48 3 2 6.36 2 10.39c0 2.59 1.73 4.87 4.33 6.17-.14.52-.9 3.35-.93 3.56 0 0-.02.17.09.24.11.06.24.01.24.01.32-.04 3.7-2.42 4.28-2.83.64.09 1.3.14 1.99.14 5.52 0 10-3.36 10-7.29C22 6.36 17.52 3 12 3z"/></svg>
+          Kakao로 계속하기
+        </button>
+      </div>
 
       <div class="auth-divider">
         <div class="auth-divider-line"></div>
-        <div class="auth-divider-text">또는</div>
+        <div class="auth-divider-text">또는 이메일로</div>
         <div class="auth-divider-line"></div>
       </div>
 
@@ -2460,7 +2492,7 @@
           <div class="tb-quota-note">현재 보유 Quota 내에서 생성 가능합니다.</div>
         </div>
 
-        <button class="tb-generate-btn">문제 생성하기</button>
+        <button class="tb-generate-btn" onclick="requireAuth()">문제 생성하기</button>
       </div>
     </div>
   </div>
@@ -2675,7 +2707,7 @@
             <div class="tb-quota-note">현재 보유 Quota 내에서 생성 가능합니다.</div>
           </div>
 
-          <button class="tb-generate-btn">문제 생성하기</button>
+          <button class="tb-generate-btn" onclick="requireAuth()">문제 생성하기</button>
         </div>
 
         <!-- Passages Panel -->
@@ -2898,7 +2930,7 @@
           <div class="tb-quota-note">현재 보유 Quota 내에서 생성 가능합니다.</div>
         </div>
 
-        <button class="tb-generate-btn">문제 생성하기</button>
+        <button class="tb-generate-btn" onclick="requireAuth()">문제 생성하기</button>
       </div>
     </div>
   </div>
@@ -2935,28 +2967,43 @@
     })();
 
     function updateAuthUI() {
-      const btn = document.getElementById('authBtn');
+      const el = document.getElementById('authBtn');
+      if (!el) return;
       if (currentUser) {
         const email = currentUser.email || '';
         const name = currentUser.user_metadata?.name || email.split('@')[0];
-        btn.outerHTML = `<div class="auth-user-info" id="authBtn">
+        el.outerHTML = `<div class="auth-user-info" id="authBtn">
           <span class="auth-user-email">${name}</span>
           <button class="auth-logout-btn" onclick="logoutUser()">로그아웃</button>
         </div>`;
+        // Update mobile menu auth link
+        const mobileAuth = document.querySelector('.mobile-menu-links .mobile-auth-link');
+        if (mobileAuth) {
+          mobileAuth.textContent = name + ' · 로그아웃';
+          mobileAuth.onclick = function(e) { e.preventDefault(); logoutUser(); closeMobileMenu(); };
+        }
       } else {
-        const existing = document.getElementById('authBtn');
-        if (existing && !existing.classList.contains('nav-login')) {
-          existing.outerHTML = `<button class="nav-login" id="authBtn" onclick="openAuthModal()">로그인</button>`;
+        if (!el.classList.contains('nav-auth-group')) {
+          el.outerHTML = `<div class="nav-auth-group" id="authBtn">
+            <button class="nav-signup" onclick="openAuthModal('signup')">회원가입</button>
+            <button class="nav-login" onclick="openAuthModal('login')">로그인</button>
+          </div>`;
+        }
+        // Reset mobile menu auth link
+        const mobileAuth = document.querySelector('.mobile-menu-links .mobile-auth-link');
+        if (mobileAuth) {
+          mobileAuth.textContent = '로그인 / 회원가입';
+          mobileAuth.onclick = function(e) { e.preventDefault(); openAuthModal('login'); closeMobileMenu(); };
         }
       }
     }
 
-    function openAuthModal() {
+    function openAuthModal(mode) {
       if (!supabase) {
         alert('인증 시스템이 아직 설정되지 않았습니다.');
         return;
       }
-      authMode = 'login';
+      authMode = mode === 'signup' ? 'signup' : 'login';
       renderAuthMode();
       document.getElementById('authOverlay').classList.add('open');
       document.getElementById('authError').style.display = 'none';
@@ -3046,6 +3093,24 @@
         options: { redirectTo: window.location.origin }
       });
       if (error) showAuthError(error.message);
+    }
+
+    async function kakaoLogin() {
+      if (!supabase) return;
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'kakao',
+        options: { redirectTo: window.location.origin }
+      });
+      if (error) showAuthError(error.message);
+    }
+
+    function requireAuth(callback) {
+      if (currentUser) {
+        if (typeof callback === 'function') callback();
+        return true;
+      }
+      openAuthModal('login');
+      return false;
     }
 
     async function logoutUser() {
