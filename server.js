@@ -7,6 +7,7 @@ const { execSync } = require('child_process');
 const AnthropicModule = require('@anthropic-ai/sdk');
 const Anthropic = AnthropicModule.default || AnthropicModule;
 const cors = require('cors');
+const pdfParse = require('pdf-parse');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -394,6 +395,247 @@ app.post('/api/analyze', upload.fields([
       errorMsg = 'Claude API 서버가 과부하 상태입니다. 잠시 후 다시 시도해주세요.';
     } else if (error.status === 400) {
       // 400 에러 중 크기 관련 여부 구분
+      if (rawMsg.includes('too large') || rawMsg.includes('exceeds') || rawMsg.includes('maximum allowed size')) {
+        errorMsg = 'PDF 파일이 API 전송 한도를 초과했습니다. PDF를 줄여서 다시 시도해주세요.';
+      } else {
+        errorMsg = `API 요청 오류: ${rawMsg.substring(0, 300)}`;
+      }
+    } else {
+      errorMsg = `분석 중 오류 (${statusCode}): ${rawMsg.substring(0, 300)}`;
+    }
+    lastAnalysis = { status: 'error', timestamp: new Date().toISOString(), result: null, error: errorMsg };
+    sendEvent('error', { message: errorMsg });
+    res.end();
+  } finally {
+    filesToClean.forEach(fp => {
+      try { fs.unlinkSync(fp); } catch(e) {}
+    });
+  }
+});
+
+// ─── 분석서2: 비용 최적화 (교재=텍스트 추출, 시험지=이미지) ───
+app.post('/api/analyze2', upload.fields([
+  { name: 'textbook', maxCount: 1 },
+  { name: 'exam', maxCount: 1 }
+]), async (req, res) => {
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
+    'X-Accel-Buffering': 'no'
+  });
+
+  const sendEvent = (type, data) => {
+    res.write(`data: ${JSON.stringify({ type, ...data })}\n\n`);
+  };
+
+  let filesToClean = [];
+  lastAnalysis = { status: 'processing', timestamp: new Date().toISOString(), result: null, error: null };
+
+  try {
+    if (!req.files || !req.files.textbook || !req.files.exam) {
+      sendEvent('error', { message: '교재 PDF와 시험지 PDF 모두 업로드해주세요.' });
+      res.end();
+      return;
+    }
+
+    const textbookFile = req.files.textbook[0];
+    const examFile = req.files.exam[0];
+    filesToClean = [textbookFile.path, examFile.path];
+
+    const anthropic = getClient();
+
+    const textbookSizeMB = getFileSizeMB(textbookFile.path);
+    const examSizeMB = getFileSizeMB(examFile.path);
+
+    sendEvent('progress', {
+      message: `PDF 확인 완료 (교재: ${textbookSizeMB.toFixed(1)}MB, 시험지: ${examSizeMB.toFixed(1)}MB)`,
+      step: 1, total: 6
+    });
+
+    // === 1단계: 교재 텍스트 추출 (pdf-parse) ===
+    sendEvent('progress', { message: '교재 PDF에서 텍스트 추출 중...', step: 2, total: 6 });
+
+    let textbookText = '';
+    try {
+      const textbookBuffer = fs.readFileSync(textbookFile.path);
+      const pdfData = await pdfParse(textbookBuffer);
+      textbookText = pdfData.text;
+      console.log(`교재 텍스트 추출 완료: ${textbookText.length}자, ${pdfData.numpages}페이지`);
+
+      if (textbookText.length < 100) {
+        sendEvent('progress', { message: '교재 텍스트가 너무 적습니다. 스캔 PDF일 수 있습니다. 이미지 모드로 전환...', step: 2, total: 6 });
+        // 텍스트 추출이 안 되면 기존 방식(이미지)으로 폴백
+        textbookText = null;
+      }
+    } catch (parseErr) {
+      console.error('교재 텍스트 추출 실패:', parseErr.message);
+      sendEvent('progress', { message: '교재 텍스트 추출 실패. 이미지 모드로 전환...', step: 2, total: 6 });
+      textbookText = null;
+    }
+
+    // === 2단계: 시험지 PDF 압축 (이미지이므로 base64 유지) ===
+    sendEvent('progress', { message: '시험지 PDF 최적화 중...', step: 3, total: 6 });
+
+    const exResult = smartCompress(examFile.path, '시험지', sendEvent);
+    let examPath = exResult.path;
+    filesToClean.push(...exResult.cleanups);
+
+    const finalExamB64 = pdfToBase64(examPath);
+
+    // === 3단계: Claude API 호출 ===
+    sendEvent('progress', {
+      message: textbookText
+        ? 'Claude AI 분석 중... (텍스트+이미지 하이브리드 모드, 비용 절약)'
+        : 'Claude AI 분석 중... (이미지 모드)',
+      step: 4, total: 6
+    });
+
+    let content;
+    if (textbookText) {
+      // 비용 최적화: 교재는 텍스트로, 시험지만 이미지로
+      content = [
+        { type: 'text', text: '=== 교재 내용 (텍스트) ===\n\n' + textbookText },
+        { type: 'text', text: '\n\n=== 시험지 PDF ===' },
+        {
+          type: 'document',
+          source: { type: 'base64', media_type: 'application/pdf', data: finalExamB64 }
+        },
+        { type: 'text', text: buildAnalysisPrompt() }
+      ];
+    } else {
+      // 폴백: 교재도 이미지로 (텍스트 추출 실패 시)
+      const tbResult2 = smartCompress(textbookFile.path, '교재', sendEvent);
+      filesToClean.push(...tbResult2.cleanups);
+      const finalTextbookB64 = pdfToBase64(tbResult2.path);
+
+      content = [
+        { type: 'text', text: '=== 교재 PDF ===' },
+        {
+          type: 'document',
+          source: { type: 'base64', media_type: 'application/pdf', data: finalTextbookB64 }
+        },
+        { type: 'text', text: '=== 시험지 PDF ===' },
+        {
+          type: 'document',
+          source: { type: 'base64', media_type: 'application/pdf', data: finalExamB64 }
+        },
+        { type: 'text', text: buildAnalysisPrompt() }
+      ];
+    }
+
+    sendEvent('progress', {
+      message: 'Claude API 응답 대기 중... (1~3분 소요)',
+      step: 5, total: 6
+    });
+
+    const MAX_RETRIES = 5;
+    let analysisResponse;
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        analysisResponse = await anthropic.messages.create({
+          model: MODEL,
+          max_tokens: 8000,
+          messages: [{ role: 'user', content }]
+        });
+        break;
+      } catch (apiErr) {
+        const retryAfter = apiErr.headers?.['retry-after'];
+        console.log(`API 에러 (시도 ${attempt}/${MAX_RETRIES}): status=${apiErr.status}, retry-after=${retryAfter}, message=${(apiErr.message||'').substring(0,200)}`);
+
+        if (apiErr.status === 429 && attempt < MAX_RETRIES) {
+          const waitSec = retryAfter ? Math.min(parseInt(retryAfter) + 5, 300) : attempt * 30;
+          sendEvent('progress', {
+            message: `API 요청 한도 초과. ${waitSec}초 후 재시도합니다... (${attempt}/${MAX_RETRIES})`,
+            step: 5, total: 6
+          });
+          await new Promise(resolve => setTimeout(resolve, waitSec * 1000));
+        } else if ((apiErr.status === 529 || apiErr.status === 503) && attempt < MAX_RETRIES) {
+          const waitSec = retryAfter ? Math.min(parseInt(retryAfter) + 5, 120) : attempt * 15;
+          sendEvent('progress', {
+            message: `서버 과부하. ${waitSec}초 후 재시도합니다... (${attempt}/${MAX_RETRIES})`,
+            step: 5, total: 6
+          });
+          await new Promise(resolve => setTimeout(resolve, waitSec * 1000));
+        } else {
+          throw apiErr;
+        }
+      }
+    }
+
+    // === 결과 파싱 ===
+    sendEvent('progress', { message: '분석 결과 처리 중...', step: 6, total: 6 });
+
+    const resultText = analysisResponse.content[0].text;
+    let analysisResult;
+
+    try {
+      const jsonMatch = resultText.match(/```json\s*([\s\S]*?)\s*```/);
+      if (jsonMatch) {
+        analysisResult = JSON.parse(jsonMatch[1]);
+      } else {
+        const jsonStart = resultText.indexOf('{');
+        const jsonEnd = resultText.lastIndexOf('}');
+        if (jsonStart !== -1 && jsonEnd !== -1) {
+          analysisResult = JSON.parse(resultText.substring(jsonStart, jsonEnd + 1));
+        } else {
+          throw new Error('JSON을 찾을 수 없음');
+        }
+      }
+
+      if (!analysisResult.questions || !Array.isArray(analysisResult.questions)) {
+        throw new Error('응답에 questions 배열이 없습니다');
+      }
+
+      analysisResult.questions = analysisResult.questions.map(q => ({
+        number: q.number || 0,
+        score: Number(q.score) || 0,
+        type: q.type || '미분류',
+        source: q.source || '미확인'
+      }));
+
+      if (!analysisResult.typeSummary || !Array.isArray(analysisResult.typeSummary)) {
+        const typeMap = {};
+        analysisResult.questions.forEach(q => {
+          if (!typeMap[q.type]) typeMap[q.type] = { type: q.type, count: 0, totalScore: 0 };
+          typeMap[q.type].count++;
+          typeMap[q.type].totalScore += Number(q.score) || 0;
+        });
+        analysisResult.typeSummary = Object.values(typeMap);
+        analysisResult.typeSummary.forEach(s => {
+          s.totalScore = Math.round(s.totalScore * 10) / 10;
+        });
+      }
+
+    } catch (parseError) {
+      sendEvent('result', {
+        success: false,
+        rawText: resultText,
+        message: 'JSON 파싱에 실패했습니다. 원본 응답을 표시합니다.'
+      });
+      res.end();
+      return;
+    }
+
+    lastAnalysis = { status: 'done', timestamp: new Date().toISOString(), result: analysisResult, error: null };
+    sendEvent('result', { success: true, data: analysisResult });
+    res.end();
+
+  } catch (error) {
+    console.error('분석2 오류:', error);
+    let errorMsg = '분석 중 오류가 발생했습니다.';
+    const rawMsg = error.message || '';
+    const statusCode = error.status || '';
+
+    if (error.status === 413) {
+      errorMsg = 'PDF 파일이 API 전송 한도를 초과했습니다. PDF를 줄여서 다시 시도해주세요.';
+    } else if (error.status === 401) {
+      errorMsg = 'API 키가 유효하지 않습니다.';
+    } else if (error.status === 429) {
+      errorMsg = 'API 요청 제한에 걸렸습니다. 잠시 후 다시 시도해주세요.';
+    } else if (error.status === 529 || error.status === 503) {
+      errorMsg = 'Claude API 서버가 과부하 상태입니다. 잠시 후 다시 시도해주세요.';
+    } else if (error.status === 400) {
       if (rawMsg.includes('too large') || rawMsg.includes('exceeds') || rawMsg.includes('maximum allowed size')) {
         errorMsg = 'PDF 파일이 API 전송 한도를 초과했습니다. PDF를 줄여서 다시 시도해주세요.';
       } else {

@@ -59,15 +59,35 @@
     body {
       font-family: var(--font-sans);
       color: var(--ink-900);
-      background:
-        radial-gradient(60% 40% at 15% 5%, oklch(0.95 0.04 25 / 0.45), transparent 60%),
-        radial-gradient(50% 35% at 85% 3%, oklch(0.95 0.04 80 / 0.35), transparent 60%),
-        radial-gradient(55% 40% at 90% 50%, oklch(0.95 0.04 240 / 0.25), transparent 60%),
-        radial-gradient(60% 40% at 10% 70%, oklch(0.95 0.04 150 / 0.2), transparent 60%),
-        var(--paper);
-      background-attachment: fixed;
+      background: var(--paper);
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background:
+        radial-gradient(60% 30% at 15% 5%, oklch(0.95 0.04 25 / 0.5), transparent 60%),
+        radial-gradient(50% 25% at 85% 3%, oklch(0.95 0.04 80 / 0.4), transparent 60%),
+        var(--paper);
+    }
+    body::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        radial-gradient(55% 600px at 80% 800px, oklch(0.94 0.04 240 / 0.35), transparent 70%),
+        radial-gradient(50% 500px at 15% 1400px, oklch(0.94 0.04 150 / 0.35), transparent 70%),
+        radial-gradient(60% 600px at 85% 2000px, oklch(0.94 0.04 300 / 0.3), transparent 70%),
+        radial-gradient(50% 500px at 20% 2600px, oklch(0.94 0.04 25 / 0.35), transparent 70%),
+        radial-gradient(55% 500px at 75% 3200px, oklch(0.94 0.04 80 / 0.3), transparent 70%),
+        radial-gradient(50% 500px at 30% 3800px, oklch(0.94 0.04 170 / 0.3), transparent 70%),
+        radial-gradient(55% 600px at 70% 4400px, oklch(0.94 0.04 240 / 0.3), transparent 70%);
     }
     a { color: inherit; text-decoration: none; }
 
@@ -97,7 +117,7 @@
       border-radius: var(--r-pill);
       padding: 8px 8px 8px 16px;
     }
-    .nav .logo { transform: scale(0.83); transform-origin: left center; }
+    .nav .logo { transform: scale(0.75); transform-origin: left center; }
     .nav .nav-links { display: flex; gap: 2px; margin: 0 auto; }
     .nav .nav-link {
       color: var(--ink-500); font-size: 15.5px;
@@ -388,26 +408,32 @@
 
     /* ───────── CTA ───────── */
     .cta-section {
-      background: var(--ink-900); color: var(--paper);
+      background:
+        radial-gradient(60% 60% at 20% 30%, oklch(0.94 0.05 25 / 0.5), transparent 60%),
+        radial-gradient(50% 50% at 80% 70%, oklch(0.93 0.05 240 / 0.4), transparent 60%),
+        radial-gradient(55% 55% at 50% 50%, oklch(0.94 0.04 80 / 0.3), transparent 60%),
+        var(--paper-2);
+      color: var(--ink-900);
       padding: 90px 24px; text-align: center;
       border-radius: 24px;
       margin: 0 24px 40px;
+      border: 1px solid var(--ink-200);
     }
     .cta-section h2 {
       font-family: var(--font-serif); font-size: clamp(44px, 5.5vw, 70px);
       line-height: 1.05; margin: 0 0 18px; font-weight: 400;
-      color: var(--paper); font-style: italic;
+      color: var(--ink-900); font-style: italic;
     }
-    .cta-section p { font-size: 18px; color: rgba(250,248,243,.65); margin: 0 0 32px; }
+    .cta-section p { font-size: 18px; color: var(--ink-500); margin: 0 0 32px; }
     .btn-light {
-      background: var(--paper); color: var(--ink-900);
+      background: var(--ink-900); color: var(--paper);
       border-radius: var(--r-pill); padding: 14px 26px;
       font-size: 15px; font-weight: 500;
       border: none; cursor: pointer;
     }
-    .btn-light:hover { background: var(--white); }
+    .btn-light:hover { background: var(--ink-700); }
     .btn-line {
-      background: transparent; color: var(--paper);
+      background: transparent; color: var(--ink-700);
       padding: 14px 18px; font-size: 15px;
       border: none; cursor: pointer;
     }
@@ -907,6 +933,7 @@
         <span class="nav-link" data-page="mock" onclick="showPage('mock')">모의고사</span>
         <span class="nav-link" data-page="suneung" onclick="showPage('suneung')">수능</span>
         <span class="nav-link" data-page="analyze" onclick="showPage('analyze')">분석서</span>
+        <span class="nav-link" data-page="analyze2" onclick="showPage('analyze2')">분석서2</span>
       </div>
       <button class="nav-login" id="authBtn" onclick="openAuthModal()">로그인</button>
     </nav>
@@ -1199,7 +1226,7 @@
           <span class="wonder">Wonder</span>
           <span class="bridge">BRIDGE</span>
         </div>
-        <p style="font-size:13.5px;color:var(--ink-500);line-height:1.55;margin:16px 0 0;max-width:280px">영어학원 강사를 위한 워크스페이스</p>
+        <p style="font-size:13.5px;color:var(--ink-500);line-height:1.55;margin:16px 0 0;max-width:280px">모든 영어 강사를 위한 워크스페이스</p>
       </div>
       <div>
         <h4>제품</h4>
@@ -1352,6 +1379,121 @@
       </div>
     </div>
 
+  </div>
+
+  <!-- ── 분석서2 (비용 최적화 버전) ── -->
+  <div class="page-analyze" id="pageAnalyze2" style="display:none">
+    <div class="page-head">
+      <div class="page-title-block">
+        <div class="accent"></div>
+        <div>
+          <h1>시험지 분석 <span style="font-size:0.5em;color:var(--sage-ink);background:var(--sage);padding:4px 12px;border-radius:var(--r-pill);vertical-align:middle;font-style:normal;font-family:var(--font-sans)">비용 절약</span></h1>
+          <p>교재 텍스트 추출 + 시험지 이미지 분석으로 API 비용을 절감합니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="upload-row">
+      <div class="upload-card" id="textbookBox2">
+        <input type="file" id="textbookFile2" accept=".pdf">
+        <div class="check">✓</div>
+        <div class="upload-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></svg>
+        </div>
+        <h3>교재 PDF</h3>
+        <p class="hint">텍스트 추출 (비용 절약)</p>
+        <div class="filename" id="textbookName2"></div>
+      </div>
+      <div class="upload-card exam-card" id="examBox2">
+        <input type="file" id="examFile2" accept=".pdf">
+        <div class="check">✓</div>
+        <div class="upload-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+        </div>
+        <h3>시험지 PDF</h3>
+        <p class="hint">이미지 분석 유지</p>
+        <div class="filename" id="examName2"></div>
+      </div>
+    </div>
+
+    <div class="model-row">
+      <button class="model-pill active" id="m2-sonnet" onclick="selectModel2(this,'claude-sonnet-4-6')">Sonnet <span class="label">정밀</span></button>
+      <button class="model-pill" id="m2-haiku" onclick="selectModel2(this,'claude-haiku-4-5-20251001')">Haiku <span class="label">빠르게</span></button>
+    </div>
+
+    <button class="analyze-btn" id="analyzeBtn2" onclick="startAnalysis2()">
+      양쪽 PDF를 업로드하세요 <span class="arrow">→</span>
+    </button>
+
+    <div class="progress-section" id="progressSection2">
+      <div class="progress-bar-wrap">
+        <div class="progress-bar" id="progressBar2"></div>
+      </div>
+      <div class="progress-message">
+        <div class="spinner"></div>
+        <span id="progressMessage2">준비중...</span>
+      </div>
+    </div>
+
+    <div class="error-box" id="errorBox2"></div>
+
+    <div class="result-section" id="resultSection2">
+      <div class="result-duo">
+        <div class="result-panel">
+          <div class="panel-head">
+            <h2>분석 결과 <span class="num-info" id="resultNumInfo2"></span></h2>
+            <div class="actions">
+              <button class="icon-btn" onclick="copyTable('mainTable2', this)" title="복사">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
+          </div>
+          <div id="mainTableContainer2"></div>
+        </div>
+
+        <div class="result-panel">
+          <div class="panel-head">
+            <h2>유형 요약</h2>
+            <div class="actions">
+              <button class="icon-btn" onclick="copyTable('summaryTable2', this)" title="복사">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
+          </div>
+          <div id="summaryTableContainer2"></div>
+        </div>
+      </div>
+
+      <div class="triple-grid">
+        <div class="list-card scores">
+          <div class="panel-head">
+            <h2>배점</h2>
+            <div class="actions"><button class="icon-btn" onclick="copyTable('scoreTable2', this)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button></div>
+          </div>
+          <div id="scoreTableContainer2"></div>
+        </div>
+        <div class="list-card">
+          <div class="panel-head">
+            <h2>유형</h2>
+            <div class="actions"><button class="icon-btn" onclick="copyTable('typeTable2', this)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button></div>
+          </div>
+          <div id="typeTableContainer2"></div>
+        </div>
+        <div class="list-card">
+          <div class="panel-head">
+            <h2>출처</h2>
+            <div class="actions"><button class="icon-btn" onclick="copyTable('sourceTable2', this)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button></div>
+          </div>
+          <div id="sourceTableContainer2"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -1516,6 +1658,7 @@
         if (el) el.style.display = 'none';
       });
       document.getElementById('pageAnalyze').style.display = 'none';
+      document.getElementById('pageAnalyze2').style.display = 'none';
 
       // Show what we need
       if (page === 'home') {
@@ -1525,6 +1668,8 @@
         });
       } else if (page === 'analyze') {
         document.getElementById('pageAnalyze').style.display = 'block';
+      } else if (page === 'analyze2') {
+        document.getElementById('pageAnalyze2').style.display = 'block';
       }
       // textbook, mock, suneung are placeholders for now
 
@@ -1827,6 +1972,200 @@
         sel.removeAllRanges();
         showCopied();
       }
+    }
+
+    // ── 분석서2 File handling ──
+    let selectedModel2 = 'claude-sonnet-4-6';
+    const textbookInput2 = document.getElementById('textbookFile2');
+    const examInput2 = document.getElementById('examFile2');
+    const analyzeBtn2 = document.getElementById('analyzeBtn2');
+
+    function selectModel2(el, model) {
+      selectedModel2 = model;
+      document.querySelectorAll('#pageAnalyze2 .model-pill').forEach(e => e.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    textbookInput2.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        document.getElementById('textbookName2').textContent = file.name;
+        document.getElementById('textbookBox2').classList.add('has-file');
+      }
+      checkReady2();
+    });
+
+    examInput2.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        document.getElementById('examName2').textContent = file.name;
+        document.getElementById('examBox2').classList.add('has-file');
+      }
+      checkReady2();
+    });
+
+    function checkReady2() {
+      const ready = textbookInput2.files.length > 0 && examInput2.files.length > 0;
+      if (ready) {
+        analyzeBtn2.classList.add('ready');
+        analyzeBtn2.innerHTML = '분석 시작 <span class="arrow">→</span>';
+      } else {
+        analyzeBtn2.classList.remove('ready');
+        analyzeBtn2.innerHTML = '양쪽 PDF를 업로드하세요 <span class="arrow">→</span>';
+      }
+    }
+
+    async function startAnalysis2() {
+      if (!analyzeBtn2.classList.contains('ready')) return;
+      const textbook = textbookInput2.files[0];
+      const exam = examInput2.files[0];
+      if (!textbook || !exam) return;
+
+      analyzeBtn2.classList.remove('ready');
+      analyzeBtn2.innerHTML = '분석중... <span class="arrow">→</span>';
+      document.getElementById('progressSection2').style.display = 'block';
+      document.getElementById('resultSection2').style.display = 'none';
+      document.getElementById('errorBox2').style.display = 'none';
+
+      const formData = new FormData();
+      formData.append('textbook', textbook);
+      formData.append('exam', exam);
+
+      try {
+        const response = await fetch('/api/analyze2', {
+          method: 'POST',
+          body: formData
+        });
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) {
+            if (buffer.trim()) {
+              const remaining = buffer.trim();
+              if (remaining.startsWith('data: ')) {
+                try { handleEvent2(JSON.parse(remaining.substring(6))); } catch(e) {}
+              }
+            }
+            break;
+          }
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try { handleEvent2(JSON.parse(line.substring(6))); } catch(e) {}
+            }
+          }
+        }
+      } catch(error) {
+        showError2('연결 오류: ' + error.message);
+      }
+
+      analyzeBtn2.classList.add('ready');
+      analyzeBtn2.innerHTML = '다시 분석하기 <span class="arrow">→</span>';
+    }
+
+    function handleEvent2(event) {
+      switch(event.type) {
+        case 'progress':
+          const pct = Math.round((event.step / event.total) * 100);
+          document.getElementById('progressBar2').style.width = pct + '%';
+          document.getElementById('progressMessage2').textContent = event.message;
+          break;
+        case 'result':
+          document.getElementById('progressSection2').style.display = 'none';
+          if (event.success) {
+            renderResults2(event.data);
+          } else {
+            showError2(event.message);
+            if (event.rawText) {
+              document.getElementById('errorBox2').innerHTML +=
+                '<div class="raw-text">' + escapeHtml(event.rawText) + '</div>';
+            }
+          }
+          break;
+        case 'error':
+          document.getElementById('progressSection2').style.display = 'none';
+          showError2(event.message);
+          break;
+      }
+    }
+
+    function showError2(msg) {
+      const box = document.getElementById('errorBox2');
+      box.style.display = 'block';
+      box.innerHTML = '<strong>오류:</strong> ' + escapeHtml(msg);
+    }
+
+    function renderResults2(data) {
+      const section = document.getElementById('resultSection2');
+      section.style.display = 'block';
+
+      const questions = data.questions || [];
+      const typeSummary = data.typeSummary || [];
+      const e = escapeHtml;
+
+      const totalScore = questions.reduce((s, q) => s + (parseFloat(q.score) || 0), 0);
+      document.getElementById('resultNumInfo2').textContent =
+        `${questions.length}문항 · ${totalScore.toFixed(1)}점`;
+
+      let mainHtml = '<table class="result-table" id="mainTable2"><thead><tr><th>번호</th><th>배점</th><th>유형</th><th>출처</th></tr></thead><tbody>';
+      questions.forEach(q => {
+        mainHtml += `<tr>
+          <td class="num-cell">${e(String(q.number).padStart(2,'0'))}</td>
+          <td class="score-cell">${e(String(q.score))}</td>
+          <td>${getTypePill(q.type)}</td>
+          <td class="source-cell">${e(q.source)}</td>
+        </tr>`;
+      });
+      mainHtml += '</tbody></table>';
+      document.getElementById('mainTableContainer2').innerHTML = mainHtml;
+
+      const maxCount = Math.max(...typeSummary.map(s => s.count), 1);
+      let summaryHtml = '<table class="summary-table" id="summaryTable2"><thead><tr><th style="width:30%">유형</th><th style="width:18%">문항수</th><th>총배점</th></tr></thead><tbody>';
+      typeSummary.forEach(s => {
+        const c = typeColors[s.type] || { bg: 'var(--paper-2)', color: 'var(--ink-700)' };
+        const pct = (s.count / maxCount) * 100;
+        summaryHtml += `<tr>
+          <td>${getTypePill(s.type)}</td>
+          <td>
+            <div class="bar-wrap">
+              <span class="count">${e(String(s.count))}</span>
+              <div class="bar"><div class="bar-fill" style="width:${pct}%;background:${c.color}"></div></div>
+            </div>
+          </td>
+          <td class="total">${e(String(s.totalScore))}</td>
+        </tr>`;
+      });
+      summaryHtml += '</tbody></table>';
+      document.getElementById('summaryTableContainer2').innerHTML = summaryHtml;
+
+      let scoreHtml = '<table class="result-table" id="scoreTable2"><tbody>';
+      questions.forEach((q, i) => {
+        scoreHtml += `<tr><td class="num-cell">${String(i+1).padStart(2,'0')}</td><td class="score-cell">${e(String(q.score))}</td></tr>`;
+      });
+      scoreHtml += '</tbody></table>';
+      document.getElementById('scoreTableContainer2').innerHTML = scoreHtml;
+
+      let typeHtml = '<table class="result-table" id="typeTable2"><tbody>';
+      questions.forEach((q, i) => {
+        typeHtml += `<tr><td class="num-cell">${String(i+1).padStart(2,'0')}</td><td>${getTypePill(q.type)}</td></tr>`;
+      });
+      typeHtml += '</tbody></table>';
+      document.getElementById('typeTableContainer2').innerHTML = typeHtml;
+
+      let sourceHtml = '<table class="result-table" id="sourceTable2"><tbody>';
+      questions.forEach((q, i) => {
+        sourceHtml += `<tr><td class="num-cell">${String(i+1).padStart(2,'0')}</td><td class="source-cell">${e(q.source)}</td></tr>`;
+      });
+      sourceHtml += '</tbody></table>';
+      document.getElementById('sourceTableContainer2').innerHTML = sourceHtml;
     }
 
     // ── Handle initial hash ──
