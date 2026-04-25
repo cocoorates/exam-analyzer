@@ -134,6 +134,42 @@
     .nav .nav-link:hover { background: rgba(20,18,14,.05); color: var(--ink-700); }
     .nav .nav-link.active { color: var(--ink-900); font-weight: 500; }
 
+    /* ───────── Side Nav (scroll state) ───────── */
+    .nav-wrap.scrolled {
+      position: fixed;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+      padding: 0;
+      z-index: 50;
+      pointer-events: auto;
+    }
+    .nav-wrap.scrolled .nav {
+      flex-direction: column;
+      width: auto;
+      padding: 14px 10px;
+      border-radius: 0 20px 20px 0;
+      gap: 2px;
+      background: rgba(255,255,255,.75);
+      box-shadow: 2px 4px 20px rgba(20,18,14,.06);
+    }
+    .nav-wrap.scrolled .nav .logo,
+    .nav-wrap.scrolled .nav .nav-auth-group,
+    .nav-wrap.scrolled .nav .auth-user-info,
+    .nav-wrap.scrolled .nav .nav-hamburger {
+      display: none;
+    }
+    .nav-wrap.scrolled .nav .nav-links {
+      flex-direction: column;
+      gap: 1px;
+      margin: 0;
+    }
+    .nav-wrap.scrolled .nav .nav-link {
+      font-size: 13px;
+      padding: 8px 14px;
+      text-align: center;
+    }
+
     /* ───────── Buttons ───────── */
     .btn {
       font-family: var(--font-sans);
@@ -1671,6 +1707,7 @@
       .nav .nav-links { display: none; }
       .nav-hamburger { display: block; }
       .nav .nav-auth-group, .nav .nav-login, .nav .auth-user-info { display: none; }
+      .nav-wrap.scrolled { display: none; }
       .upload-row { grid-template-columns: 1fr; }
       .triple-grid { grid-template-columns: 1fr; }
       .result-duo { grid-template-columns: 1fr; }
@@ -3120,6 +3157,23 @@
       updateAuthUI();
     }
 
+    // ── Scroll → Side Nav ──
+    (function() {
+      const navWrap = document.getElementById('navWrap');
+      let scrolled = false;
+      const threshold = 120;
+      window.addEventListener('scroll', function() {
+        const y = window.scrollY || window.pageYOffset;
+        if (y > threshold && !scrolled) {
+          navWrap.classList.add('scrolled');
+          scrolled = true;
+        } else if (y <= threshold && scrolled) {
+          navWrap.classList.remove('scrolled');
+          scrolled = false;
+        }
+      }, { passive: true });
+    })();
+
     // ── Mobile Menu ──
     function openMobileMenu() {
       document.getElementById('mobileMenu').classList.add('open');
@@ -3890,9 +3944,9 @@
       filtered.forEach(it => {
         const badge = mkMonthBadge[it.month] || {bg:'var(--sky)',c:'var(--sky-ink)'};
         const isSel = mkSelectedSingle && mkSelectedSingle.key === it.key;
-        const rowStyle = isSel ? 'cursor:pointer;background:var(--lilac);' : 'cursor:pointer;';
+        const rowStyle = isSel ? 'cursor:pointer;background:oklch(0.96 0.02 300 / 0.5);' : 'cursor:pointer;';
         html += `<tr onclick="mkSelectSingle('${it.grade}',${it.year},${it.month},'${it.key}')" style="${rowStyle}">
-          <td><div style="width:16px;height:16px;border-radius:50%;border:2px solid ${isSel?'var(--lilac-ink)':'var(--ink-300)'};display:flex;align-items:center;justify-content:center">${isSel?'<div style="width:8px;height:8px;border-radius:50%;background:var(--lilac-ink)"></div>':''}</div></td>
+          <td><div style="width:16px;height:16px;border-radius:50%;border:2px solid ${isSel?'oklch(0.65 0.10 300)':'var(--ink-300)'};display:flex;align-items:center;justify-content:center">${isSel?'<div style="width:8px;height:8px;border-radius:50%;background:oklch(0.65 0.10 300)"></div>':''}</div></td>
           <td style="font-weight:550;color:var(--ink-900)">${it.grade} ${String(it.year).slice(2)}년 ${it.month}월</td>
           <td><span class="tb-subject-badge" style="background:${badge.bg};color:${badge.c}">${it.grade}</span></td>
           <td>${it.year}년</td>
