@@ -2623,10 +2623,10 @@
 
       <!-- Right: generation options or passage viewer -->
       <div class="tb-options">
-        <!-- Tabs: 문제 출제 vs 원문보기 -->
+        <!-- Tabs: 문제 출제 vs 원문 보기 -->
         <div class="tb-options-tabs" style="display:flex; gap:8px; padding:16px; border-bottom:1px solid var(--ink-100); margin-bottom:16px;">
           <button class="tb-option-tab active" onclick="mkShowTab(this,'options')" style="flex:1; padding:8px 12px; border:none; background:transparent; color:var(--ink-700); border-bottom:2px solid transparent; cursor:pointer; font-weight:500; transition:all 0.2s;">문제 출제</button>
-          <button class="tb-option-tab" onclick="mkShowTab(this,'passages');mkFetchPassages()" style="flex:1; padding:8px 12px; border:none; background:transparent; color:var(--ink-400); border-bottom:2px solid transparent; cursor:pointer; font-weight:500; transition:all 0.2s;">원문보기</button>
+          <button class="tb-option-tab" onclick="mkShowTab(this,'passages');mkFetchPassages()" style="flex:1; padding:8px 12px; border:none; background:transparent; color:var(--ink-400); border-bottom:2px solid transparent; cursor:pointer; font-weight:500; transition:all 0.2s;">원문 보기</button>
         </div>
 
         <!-- Options Panel -->
@@ -3991,7 +3991,7 @@
       mkRender();
       const sel = mkSelectedSingle ? 1 : 0;
       document.getElementById('mkPassageCount').textContent = sel ? '25' : '0';
-      // 원문보기 탭이 활성화 상태면 자동 갱신
+      // 원문 보기 탭이 활성화 상태면 자동 갱신
       const passagesPanel = document.getElementById('mkPassagesPanel');
       if (passagesPanel && passagesPanel.style.display !== 'none') {
         mkFetchPassages();
