@@ -718,6 +718,36 @@
     }
     table.result-table .source-cell .ext { color: var(--ink-400); }
 
+    /* Source color pills */
+    .source-tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: var(--r-pill);
+      font-size: 12.5px;
+      font-weight: 450;
+      line-height: 1.5;
+    }
+    .source-tag.src-external {
+      background: oklch(0.94 0.03 15);
+      color: oklch(0.50 0.12 15);
+    }
+    .source-tag.src-textbook {
+      background: oklch(0.94 0.03 150);
+      color: oklch(0.42 0.08 150);
+    }
+    .source-tag.src-mock {
+      background: oklch(0.94 0.03 240);
+      color: oklch(0.48 0.10 240);
+    }
+    .source-tag.src-suneung {
+      background: oklch(0.93 0.03 300);
+      color: oklch(0.48 0.10 300);
+    }
+    .source-tag.src-other {
+      background: var(--paper-2);
+      color: var(--ink-600, #7a776f);
+    }
+
     /* Type pills */
     .type-pill {
       display: inline-block;
@@ -1840,6 +1870,22 @@
       '연결어':   { bg: 'var(--sage)',   color: 'var(--sage-ink)' }
     };
 
+    function getSourceTag(source) {
+      const s = source || '';
+      const e = escapeHtml;
+      let cls = 'src-other';
+      if (s.includes('외부지문') || s.includes('간접연계')) {
+        cls = 'src-external';
+      } else if (s.includes('교과서') || s.includes('본문') || s.match(/\d+과/)) {
+        cls = 'src-textbook';
+      } else if (s.includes('수능')) {
+        cls = 'src-suneung';
+      } else if (s.match(/고[1-3]/) || s.includes('모의') || s.match(/\d+년\s*\d+월/)) {
+        cls = 'src-mock';
+      }
+      return `<span class="source-tag ${cls}">${e(s)}</span>`;
+    }
+
     function getTypePill(type) {
       const c = typeColors[type] || { bg: 'var(--paper-2)', color: 'var(--ink-700)' };
       return `<span class="type-pill" style="background:${c.bg};color:${c.color}">${escapeHtml(type)}</span>`;
@@ -1865,7 +1911,7 @@
           <td class="num-cell">${e(String(q.number).padStart(2,'0'))}</td>
           <td class="score-cell">${e(String(q.score))}</td>
           <td>${getTypePill(q.type)}</td>
-          <td class="source-cell">${e(q.source)}</td>
+          <td class="source-cell">${getSourceTag(q.source)}</td>
         </tr>`;
       });
       mainHtml += '</tbody></table>';
@@ -1910,7 +1956,7 @@
       // Source table
       let sourceHtml = '<table class="result-table" id="sourceTable"><tbody>';
       questions.forEach((q, i) => {
-        sourceHtml += `<tr><td class="num-cell">${String(i+1).padStart(2,'0')}</td><td class="source-cell">${e(q.source)}</td></tr>`;
+        sourceHtml += `<tr><td class="num-cell">${String(i+1).padStart(2,'0')}</td><td class="source-cell">${getSourceTag(q.source)}</td></tr>`;
       });
       sourceHtml += '</tbody></table>';
       document.getElementById('sourceTableContainer').innerHTML = sourceHtml;
@@ -2121,7 +2167,7 @@
           <td class="num-cell">${e(String(q.number).padStart(2,'0'))}</td>
           <td class="score-cell">${e(String(q.score))}</td>
           <td>${getTypePill(q.type)}</td>
-          <td class="source-cell">${e(q.source)}</td>
+          <td class="source-cell">${getSourceTag(q.source)}</td>
         </tr>`;
       });
       mainHtml += '</tbody></table>';
@@ -2162,7 +2208,7 @@
 
       let sourceHtml = '<table class="result-table" id="sourceTable2"><tbody>';
       questions.forEach((q, i) => {
-        sourceHtml += `<tr><td class="num-cell">${String(i+1).padStart(2,'0')}</td><td class="source-cell">${e(q.source)}</td></tr>`;
+        sourceHtml += `<tr><td class="num-cell">${String(i+1).padStart(2,'0')}</td><td class="source-cell">${getSourceTag(q.source)}</td></tr>`;
       });
       sourceHtml += '</tbody></table>';
       document.getElementById('sourceTableContainer2').innerHTML = sourceHtml;
