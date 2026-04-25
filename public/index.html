@@ -3890,9 +3890,9 @@
       filtered.forEach(it => {
         const badge = mkMonthBadge[it.month] || {bg:'var(--sky)',c:'var(--sky-ink)'};
         const isSel = mkSelectedSingle && mkSelectedSingle.key === it.key;
-        const rowStyle = isSel ? 'cursor:pointer;background:var(--sage);' : 'cursor:pointer;';
+        const rowStyle = isSel ? 'cursor:pointer;background:var(--lilac);' : 'cursor:pointer;';
         html += `<tr onclick="mkSelectSingle('${it.grade}',${it.year},${it.month},'${it.key}')" style="${rowStyle}">
-          <td><div style="width:16px;height:16px;border-radius:50%;border:2px solid ${isSel?'var(--sage-ink)':'var(--ink-300)'};display:flex;align-items:center;justify-content:center">${isSel?'<div style="width:8px;height:8px;border-radius:50%;background:var(--sage-ink)"></div>':''}</div></td>
+          <td><div style="width:16px;height:16px;border-radius:50%;border:2px solid ${isSel?'var(--lilac-ink)':'var(--ink-300)'};display:flex;align-items:center;justify-content:center">${isSel?'<div style="width:8px;height:8px;border-radius:50%;background:var(--lilac-ink)"></div>':''}</div></td>
           <td style="font-weight:550;color:var(--ink-900)">${it.grade} ${String(it.year).slice(2)}년 ${it.month}월</td>
           <td><span class="tb-subject-badge" style="background:${badge.bg};color:${badge.c}">${it.grade}</span></td>
           <td>${it.year}년</td>
