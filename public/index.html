@@ -1490,6 +1490,7 @@
       background: none; border: none;
       cursor: pointer; padding: 8px;
       color: var(--ink-700);
+      margin-left: auto;
     }
     .mobile-menu {
       display: none;
@@ -1546,6 +1547,7 @@
       .stats-strip .stat-item { border-left: none; padding-left: 0; }
       .nav .nav-links { display: none; }
       .nav-hamburger { display: block; }
+      .nav .nav-login { display: none; }
       .upload-row { grid-template-columns: 1fr; }
       .triple-grid { grid-template-columns: 1fr; }
       .result-duo { grid-template-columns: 1fr; }
@@ -1619,6 +1621,8 @@
         <a href="#" onclick="showPage('s8');closeMobileMenu()">시안 8 — Masonry</a>
         <a href="#" onclick="showPage('s9');closeMobileMenu()">시안 9 — Split Pane</a>
         <a href="#" onclick="showPage('s10');closeMobileMenu()">시안 10 — Timeline</a>
+        <div class="mobile-divider"></div>
+        <a href="#" onclick="openAuthModal();closeMobileMenu()" style="font-weight:600;color:var(--ink-700)">로그인 / 회원가입</a>
       </div>
     </div>
   </div>
