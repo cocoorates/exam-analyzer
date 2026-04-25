@@ -466,6 +466,235 @@
     }
 
     /* ═══════════════════════════════════════════════════
+       SUPPLEMENT PAGE (부교재)
+       ═══════════════════════════════════════════════════ */
+    .page-supplement {
+      display: none;
+      max-width: 1180px; margin: 0 auto;
+      padding: 56px 24px 80px;
+    }
+    .sp-tabs {
+      display: flex; gap: 4px;
+      background: rgba(255,255,255,.6);
+      border: 1px solid var(--ink-200);
+      border-radius: var(--r-pill);
+      padding: 4px;
+      margin-bottom: 28px;
+      width: fit-content;
+    }
+    .sp-tab {
+      padding: 9px 20px;
+      border-radius: var(--r-pill);
+      font-size: 14px; font-weight: 500;
+      color: var(--ink-500);
+      cursor: pointer; border: none; background: none;
+      font-family: var(--font-sans);
+      transition: all .15s;
+    }
+    .sp-tab.active {
+      background: var(--ink-900); color: var(--paper);
+    }
+    .sp-tab:hover:not(.active) { color: var(--ink-800); background: rgba(20,18,14,.04); }
+
+    .sp-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .sp-card {
+      background: var(--white);
+      border: 1px solid var(--ink-200);
+      border-radius: var(--r-lg);
+      padding: 0;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .sp-card:hover { border-color: var(--ink-300); box-shadow: var(--shadow-card); transform: translateY(-2px); }
+    .sp-card-color {
+      height: 8px; width: 100%;
+    }
+    .sp-card-body {
+      padding: 20px 20px 18px;
+    }
+    .sp-card-badge {
+      display: inline-block;
+      font-size: 11px; font-weight: 500;
+      padding: 3px 9px;
+      border-radius: var(--r-pill);
+      margin-bottom: 10px;
+    }
+    .sp-card h3 {
+      font-size: 16px; font-weight: 600;
+      margin: 0 0 6px; color: var(--ink-900);
+    }
+    .sp-card-meta {
+      font-size: 13px; color: var(--ink-400);
+      margin-bottom: 14px;
+    }
+    .sp-card-lessons {
+      display: flex; flex-wrap: wrap; gap: 5px;
+    }
+    .sp-lesson-chip {
+      padding: 4px 10px;
+      border-radius: var(--r-pill);
+      font-size: 11.5px;
+      background: var(--paper-2);
+      color: var(--ink-600, #7a776f);
+      border: 1px solid var(--ink-100);
+    }
+    .sp-card.selected {
+      border-color: var(--honey-ink);
+      box-shadow: 0 0 0 1px var(--honey-ink);
+    }
+    .sp-card.selected .sp-card-body::after {
+      content: '✓ 선택됨';
+      display: block;
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--honey-ink);
+      font-weight: 600;
+    }
+
+    /* Bottom bar for supplement */
+    .sp-bottom {
+      position: sticky;
+      bottom: 0;
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid var(--ink-200);
+      padding: 16px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-radius: 16px 16px 0 0;
+      margin: 0 -24px;
+    }
+    .sp-bottom-info {
+      display: flex; align-items: center; gap: 20px;
+    }
+    .sp-bottom-stat {
+      font-size: 14px; color: var(--ink-600, #7a776f);
+    }
+    .sp-bottom-stat strong {
+      color: var(--ink-900); font-weight: 700;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       MOCK EXAM PAGE (모의고사)
+       ═══════════════════════════════════════════════════ */
+    .page-mock {
+      display: none;
+      max-width: 1180px; margin: 0 auto;
+      padding: 56px 24px 80px;
+    }
+    .mk-filter-bar {
+      display: flex; gap: 12px; flex-wrap: wrap;
+      margin-bottom: 24px;
+      align-items: center;
+    }
+    .mk-select {
+      padding: 9px 14px;
+      border: 1px solid var(--ink-200);
+      border-radius: var(--r-md);
+      font-size: 14px;
+      font-family: var(--font-sans);
+      background: var(--white);
+      color: var(--ink-900);
+      cursor: pointer;
+      outline: none;
+      min-width: 120px;
+    }
+    .mk-select:focus { border-color: var(--ink-400); }
+    .mk-timeline {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    .mk-year-group {
+      border-left: 2px solid var(--ink-200);
+      padding-left: 24px;
+      margin-left: 12px;
+      padding-bottom: 8px;
+      position: relative;
+    }
+    .mk-year-dot {
+      width: 10px; height: 10px;
+      background: var(--ink-900);
+      border-radius: 50%;
+      position: absolute;
+      left: -6px;
+      top: 6px;
+    }
+    .mk-year-label {
+      font-size: 18px; font-weight: 700;
+      color: var(--ink-900);
+      margin-bottom: 14px;
+    }
+    .mk-month-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .mk-card {
+      background: var(--white);
+      border: 1px solid var(--ink-200);
+      border-radius: var(--r-md);
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: all .15s;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .mk-card:hover { border-color: var(--ink-400); box-shadow: var(--shadow-card); }
+    .mk-card.selected {
+      border-color: var(--sky-ink);
+      box-shadow: 0 0 0 1px var(--sky-ink);
+      background: oklch(0.97 0.02 240);
+    }
+    .mk-card-month {
+      width: 40px; height: 40px;
+      border-radius: var(--r-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .mk-card-info h4 {
+      font-size: 13.5px; font-weight: 550;
+      margin: 0 0 3px; color: var(--ink-900);
+    }
+    .mk-card-info span {
+      font-size: 12px; color: var(--ink-400);
+    }
+    .mk-card .mk-check {
+      margin-left: auto;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      border: 1.5px solid var(--ink-300);
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s;
+      flex-shrink: 0;
+    }
+    .mk-card.selected .mk-check {
+      background: var(--sky-ink);
+      border-color: var(--sky-ink);
+      color: white;
+    }
+    /* Bottom bar */
+    .mk-bottom {
+      position: sticky;
+      bottom: 0;
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid var(--ink-200);
+      padding: 16px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-radius: 16px 16px 0 0;
+      margin: 0 -24px;
+    }
+
+    /* ═══════════════════════════════════════════════════
        TEXTBOOK PAGE
        ═══════════════════════════════════════════════════ */
     .page-textbook {
@@ -1847,6 +2076,81 @@
     </div>
   </div>
 
+  <!-- ══ 부교재 ══ -->
+  <div class="page-supplement" id="pageSupplement">
+    <div class="page-head">
+      <div class="page-title-block">
+        <div class="accent" style="background:var(--honey-ink)"></div>
+        <div>
+          <h1>부교재 문제은행</h1>
+          <p>수능특강, 수능완성 등 EBS 연계교재와 부교재 지문으로 변형문제를 생성합니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="sp-tabs" id="spTabs">
+      <button class="sp-tab active" onclick="spFilterCat(this,'all')">전체</button>
+      <button class="sp-tab" onclick="spFilterCat(this,'ebs')">EBS 연계</button>
+      <button class="sp-tab" onclick="spFilterCat(this,'grammar')">문법 교재</button>
+      <button class="sp-tab" onclick="spFilterCat(this,'reading')">독해 교재</button>
+      <button class="sp-tab" onclick="spFilterCat(this,'voca')">어휘 교재</button>
+    </div>
+
+    <div class="sp-grid" id="spGrid">
+      <!-- JS 렌더링 -->
+    </div>
+
+    <div class="sp-bottom">
+      <div class="sp-bottom-info">
+        <span class="sp-bottom-stat">선택한 교재: <strong id="spSelCount">0</strong>권</span>
+        <span class="sp-bottom-stat">총 지문: <strong id="spSelPassages">0</strong>개</span>
+      </div>
+      <button class="btn btn-primary" onclick="showPage('analyze')">문제 생성으로 →</button>
+    </div>
+  </div>
+
+  <!-- ══ 모의고사 ══ -->
+  <div class="page-mock" id="pageMock">
+    <div class="page-head">
+      <div class="page-title-block">
+        <div class="accent" style="background:var(--sky-ink)"></div>
+        <div>
+          <h1>모의고사 아카이브</h1>
+          <p>최근 5개년 전국연합 학력평가 및 수능 기출 모의고사를 선택하여 변형문제를 생성합니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mk-filter-bar">
+      <select class="mk-select" id="mkGrade" onchange="mkRender()">
+        <option value="all">전체 학년</option>
+        <option value="고1">고1</option>
+        <option value="고2">고2</option>
+        <option value="고3">고3</option>
+      </select>
+      <select class="mk-select" id="mkYear" onchange="mkRender()">
+        <option value="all">전체 연도</option>
+        <option value="2026">2026년</option>
+        <option value="2025">2025년</option>
+        <option value="2024">2024년</option>
+        <option value="2023">2023년</option>
+        <option value="2022">2022년</option>
+      </select>
+    </div>
+
+    <div class="mk-timeline" id="mkTimeline">
+      <!-- JS 렌더링 -->
+    </div>
+
+    <div class="mk-bottom">
+      <div class="sp-bottom-info">
+        <span class="sp-bottom-stat">선택한 시험: <strong id="mkSelCount">0</strong>회</span>
+        <span class="sp-bottom-stat">총 문항: <strong id="mkSelQ">0</strong>개</span>
+      </div>
+      <button class="btn btn-primary" onclick="showPage('analyze')">문제 생성으로 →</button>
+    </div>
+  </div>
+
   <!-- ══ 교과서 문제은행 ══ -->
   <div class="page-textbook" id="pageTextbook">
     <div class="page-head">
@@ -2203,6 +2507,8 @@
       document.getElementById('pageAnalyze').style.display = 'none';
       document.getElementById('pageAnalyze2').style.display = 'none';
       document.getElementById('pageTextbook').style.display = 'none';
+      document.getElementById('pageSupplement').style.display = 'none';
+      document.getElementById('pageMock').style.display = 'none';
 
       // Show what we need
       if (page === 'home') {
@@ -2216,6 +2522,10 @@
         document.getElementById('pageAnalyze2').style.display = 'block';
       } else if (page === 'textbook') {
         document.getElementById('pageTextbook').style.display = 'block';
+      } else if (page === 'supplement') {
+        document.getElementById('pageSupplement').style.display = 'block';
+      } else if (page === 'mock') {
+        document.getElementById('pageMock').style.display = 'block';
       }
       // placeholder pages (textbook, supplement, mock, suneung) show nothing — that's fine
 
@@ -2729,6 +3039,122 @@
       sourceHtml += '</tbody></table>';
       document.getElementById('sourceTableContainer2').innerHTML = sourceHtml;
     }
+
+    // ── Supplement page logic ──
+    const spData = [
+      { cat: 'ebs', name: '2026 수능특강 영어', desc: 'EBS 연계교재', lessons: 24, color: 'var(--blush)', badgeBg: 'var(--blush)', badgeColor: 'var(--blush-ink)', accent: 'oklch(0.88 0.06 25)' },
+      { cat: 'ebs', name: '2026 수능특강 영어독해연습', desc: 'EBS 연계교재', lessons: 20, color: 'var(--sky)', badgeBg: 'var(--sky)', badgeColor: 'var(--sky-ink)', accent: 'oklch(0.88 0.06 240)' },
+      { cat: 'ebs', name: '2026 수능완성 영어', desc: 'EBS 연계교재', lessons: 18, color: 'var(--lilac)', badgeBg: 'var(--lilac)', badgeColor: 'var(--lilac-ink)', accent: 'oklch(0.88 0.06 300)' },
+      { cat: 'ebs', name: '2025 수능특강 영어', desc: 'EBS 연계교재', lessons: 24, color: 'var(--sage)', badgeBg: 'var(--sage)', badgeColor: 'var(--sage-ink)', accent: 'oklch(0.88 0.06 150)' },
+      { cat: 'ebs', name: '2025 수능완성 영어', desc: 'EBS 연계교재', lessons: 18, color: 'var(--honey)', badgeBg: 'var(--honey)', badgeColor: 'var(--honey-ink)', accent: 'oklch(0.88 0.06 80)' },
+      { cat: 'grammar', name: '그래머존 기본편', desc: '문법 교재', lessons: 30, color: 'var(--mint)', badgeBg: 'var(--mint)', badgeColor: 'var(--mint-ink)', accent: 'oklch(0.88 0.06 170)' },
+      { cat: 'grammar', name: '그래머존 종합편', desc: '문법 교재', lessons: 28, color: 'var(--sage)', badgeBg: 'var(--sage)', badgeColor: 'var(--sage-ink)', accent: 'oklch(0.88 0.06 150)' },
+      { cat: 'reading', name: '리딩파워 유형편', desc: '독해 교재', lessons: 22, color: 'var(--blush)', badgeBg: 'var(--blush)', badgeColor: 'var(--blush-ink)', accent: 'oklch(0.88 0.06 25)' },
+      { cat: 'reading', name: '능률 Reading Expert 1', desc: '독해 교재', lessons: 20, color: 'var(--sky)', badgeBg: 'var(--sky)', badgeColor: 'var(--sky-ink)', accent: 'oklch(0.88 0.06 240)' },
+      { cat: 'voca', name: '워드마스터 수능 2000', desc: '어휘 교재', lessons: 40, color: 'var(--honey)', badgeBg: 'var(--honey)', badgeColor: 'var(--honey-ink)', accent: 'oklch(0.88 0.06 80)' },
+      { cat: 'voca', name: '능률 VOCA 어원편', desc: '어휘 교재', lessons: 30, color: 'var(--lilac)', badgeBg: 'var(--lilac)', badgeColor: 'var(--lilac-ink)', accent: 'oklch(0.88 0.06 300)' },
+    ];
+    let spCatFilter = 'all';
+    let spSelected = new Set();
+
+    function spFilterCat(btn, cat) {
+      spCatFilter = cat;
+      document.querySelectorAll('#spTabs .sp-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      spRender();
+    }
+    function spRender() {
+      const grid = document.getElementById('spGrid');
+      const filtered = spCatFilter === 'all' ? spData : spData.filter(d => d.cat === spCatFilter);
+      grid.innerHTML = filtered.map((d, i) => {
+        const idx = spData.indexOf(d);
+        const sel = spSelected.has(idx) ? ' selected' : '';
+        const lessonsPreview = Array.from({length: Math.min(5, d.lessons)}, (_, j) =>
+          `<span class="sp-lesson-chip">Unit ${j+1}</span>`
+        ).join('') + (d.lessons > 5 ? `<span class="sp-lesson-chip">+${d.lessons-5}</span>` : '');
+
+        return `<div class="sp-card${sel}" onclick="spToggle(${idx})">
+          <div class="sp-card-color" style="background:${d.accent}"></div>
+          <div class="sp-card-body">
+            <span class="sp-card-badge" style="background:${d.badgeBg};color:${d.badgeColor}">${d.desc}</span>
+            <h3>${d.name}</h3>
+            <div class="sp-card-meta">${d.lessons}개 지문 수록</div>
+            <div class="sp-card-lessons">${lessonsPreview}</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+    function spToggle(idx) {
+      if (spSelected.has(idx)) spSelected.delete(idx); else spSelected.add(idx);
+      spRender();
+      spUpdateBottom();
+    }
+    function spUpdateBottom() {
+      document.getElementById('spSelCount').textContent = spSelected.size;
+      let total = 0;
+      spSelected.forEach(i => total += spData[i].lessons);
+      document.getElementById('spSelPassages').textContent = total;
+    }
+    spRender();
+
+    // ── Mock exam page logic ──
+    const mkMonths = [3, 4, 6, 7, 9, 10, 11];
+    const mkMonthNames = {3:'3월',4:'4월',6:'6월',7:'7월',9:'9월',10:'10월',11:'11월(수능)'};
+    const mkColors = {
+      3: {bg:'oklch(0.96 0.02 25)', dot:'var(--blush-ink)'},
+      4: {bg:'oklch(0.96 0.02 80)', dot:'var(--honey-ink)'},
+      6: {bg:'oklch(0.96 0.02 150)', dot:'var(--sage-ink)'},
+      7: {bg:'oklch(0.96 0.02 240)', dot:'var(--sky-ink)'},
+      9: {bg:'oklch(0.96 0.02 300)', dot:'var(--lilac-ink)'},
+      10: {bg:'oklch(0.96 0.02 170)', dot:'var(--mint-ink)'},
+      11: {bg:'oklch(0.96 0.02 0)', dot:'var(--rose-ink)'},
+    };
+    let mkSelected = new Set();
+
+    function mkRender() {
+      const gradeF = document.getElementById('mkGrade').value;
+      const yearF = document.getElementById('mkYear').value;
+      const years = yearF === 'all' ? [2026,2025,2024,2023,2022] : [parseInt(yearF)];
+      const grades = gradeF === 'all' ? ['고1','고2','고3'] : [gradeF];
+
+      const timeline = document.getElementById('mkTimeline');
+      let html = '';
+
+      years.forEach(year => {
+        html += `<div class="mk-year-group">
+          <div class="mk-year-dot"></div>
+          <div class="mk-year-label">${year}년</div>
+          <div class="mk-month-grid">`;
+
+        grades.forEach(grade => {
+          mkMonths.forEach(m => {
+            if (year === 2026 && m > 4) return; // future months
+            const key = `${grade}-${year}-${m}`;
+            const sel = mkSelected.has(key) ? ' selected' : '';
+            const mc = mkColors[m];
+            html += `<div class="mk-card${sel}" onclick="mkToggle('${key}')">
+              <div class="mk-card-month" style="background:${mc.bg};color:${mc.dot}">${m}월</div>
+              <div class="mk-card-info">
+                <h4>${grade} ${mkMonthNames[m]}</h4>
+                <span>45문항 · ${year}학년도</span>
+              </div>
+              <div class="mk-check">${sel ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : ''}</div>
+            </div>`;
+          });
+        });
+
+        html += '</div></div>';
+      });
+
+      timeline.innerHTML = html;
+    }
+    function mkToggle(key) {
+      if (mkSelected.has(key)) mkSelected.delete(key); else mkSelected.add(key);
+      mkRender();
+      document.getElementById('mkSelCount').textContent = mkSelected.size;
+      document.getElementById('mkSelQ').textContent = mkSelected.size * 45;
+    }
+    mkRender();
 
     // ── Textbook page logic ──
     const tbData = [
