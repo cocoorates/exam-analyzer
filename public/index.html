@@ -3897,6 +3897,11 @@
       mkRender();
       const sel = mkSelectedSingle ? 1 : 0;
       document.getElementById('mkPassageCount').textContent = sel ? '25' : '0';
+      // 원문보기 탭이 활성화 상태면 자동 갱신
+      const passagesPanel = document.getElementById('mkPassagesPanel');
+      if (passagesPanel && passagesPanel.style.display !== 'none') {
+        mkFetchPassages();
+      }
     }
     function mkShowTab(btn, tab) {
       // Update button styles
