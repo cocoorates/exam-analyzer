@@ -612,6 +612,11 @@
 
     /* ───────── Result panels ───────── */
     .result-section { display: none; }
+    .result-duo {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+      margin-bottom: 22px;
+    }
+    .result-duo .result-panel { margin-bottom: 0; }
     .result-panel {
       background: var(--white);
       border: 1px solid var(--ink-200);
@@ -875,6 +880,7 @@
       .nav .nav-links { display: none; }
       .upload-row { grid-template-columns: 1fr; }
       .triple-grid { grid-template-columns: 1fr; }
+      .result-duo { grid-template-columns: 1fr; }
       .page-title-block h1 { font-size: 32px; }
     }
   </style>
@@ -889,10 +895,10 @@
         <span class="bridge">BRIDGE</span>
       </div>
       <div class="nav-links">
-        <span class="nav-link" data-page="analyze" onclick="showPage('analyze')">분석서</span>
         <span class="nav-link" data-page="textbook" onclick="showPage('textbook')">교과서</span>
         <span class="nav-link" data-page="mock" onclick="showPage('mock')">모의고사</span>
         <span class="nav-link" data-page="suneung" onclick="showPage('suneung')">수능</span>
+        <span class="nav-link" data-page="analyze" onclick="showPage('analyze')">분석서</span>
       </div>
       <button class="nav-login" id="authBtn" onclick="openAuthModal()">로그인</button>
     </nav>
@@ -1148,7 +1154,7 @@
   </div>
 
   <!-- Stats Strip -->
-  <div class="stats-strip">
+  <div class="stats-strip" id="statsSection">
     <div class="container">
       <div class="stat-item"><div class="stat-num">12,400+</div><div class="stat-lbl">제작된 변형문제</div></div>
       <div class="stat-item"><div class="stat-num">1,200+</div><div class="stat-lbl">사용 중인 영어학원 강사</div></div>
@@ -1280,30 +1286,31 @@
     <div class="error-box" id="errorBox"></div>
 
     <div class="result-section" id="resultSection">
-      <!-- Main result table -->
-      <div class="result-panel">
-        <div class="panel-head">
-          <h2>분석 결과 <span class="num-info" id="resultNumInfo"></span></h2>
-          <div class="actions">
-            <button class="icon-btn" onclick="copyTable('mainTable', this)" title="복사">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            </button>
+      <!-- Main result + Summary side by side -->
+      <div class="result-duo">
+        <div class="result-panel">
+          <div class="panel-head">
+            <h2>분석 결과 <span class="num-info" id="resultNumInfo"></span></h2>
+            <div class="actions">
+              <button class="icon-btn" onclick="copyTable('mainTable', this)" title="복사">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
           </div>
+          <div id="mainTableContainer"></div>
         </div>
-        <div id="mainTableContainer"></div>
-      </div>
 
-      <!-- Summary table -->
-      <div class="result-panel">
-        <div class="panel-head">
-          <h2>유형 요약</h2>
-          <div class="actions">
-            <button class="icon-btn" onclick="copyTable('summaryTable', this)" title="복사">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            </button>
+        <div class="result-panel">
+          <div class="panel-head">
+            <h2>유형 요약</h2>
+            <div class="actions">
+              <button class="icon-btn" onclick="copyTable('summaryTable', this)" title="복사">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              </button>
+            </div>
           </div>
+          <div id="summaryTableContainer"></div>
         </div>
-        <div id="summaryTableContainer"></div>
       </div>
 
       <!-- Triple list -->
@@ -1338,9 +1345,6 @@
       </div>
     </div>
 
-    <div style="text-align:center;padding:28px;font-family:var(--font-mono);font-size:11px;color:var(--ink-400);letter-spacing:0.06em;margin-top:40px;border-top:1px solid var(--ink-200)">
-      © 2026 WonderBridge · 분석 결과는 24시간 내 자동 삭제됩니다
-    </div>
   </div>
 
   <script>
@@ -1496,7 +1500,7 @@
     // ── Page Navigation ──
     let selectedModel = 'claude-sonnet-4-6';
 
-    const homeElements = ['pageHome', 'featuresSection', 'demoSection', 'quoteSection', 'ctaSection', 'footerSection'];
+    const homeElements = ['pageHome', 'featuresSection', 'demoSection', 'statsSection', 'quoteSection', 'ctaSection', 'footerSection'];
 
     function showPage(page, pushState = true) {
       // Hide everything
@@ -1508,14 +1512,10 @@
 
       // Show what we need
       if (page === 'home') {
-        document.getElementById('pageHome').style.display = 'block';
-        document.getElementById('featuresSection').style.display = 'block';
-        document.getElementById('demoSection').style.display = 'block';
-        // stats-strip has no ID wrapping it in home elements, show via CSS
-        document.querySelector('.stats-strip').style.display = 'block';
-        document.getElementById('quoteSection').style.display = 'block';
-        document.getElementById('ctaSection').style.display = 'block';
-        document.getElementById('footerSection').style.display = 'block';
+        homeElements.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = 'block';
+        });
       } else if (page === 'analyze') {
         document.getElementById('pageAnalyze').style.display = 'block';
       }
