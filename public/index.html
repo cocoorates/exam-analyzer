@@ -1844,7 +1844,7 @@
         <article class="feature">
           <div class="accent-bar" style="background:var(--sky)">02 · 모의고사</div>
           <div class="body">
-            <h3>7개년 모의고사 아카이브</h3>
+            <h3>7개년 모의고사</h3>
             <p>평가원·교육청 모의고사 최근 7개년 전 회차 원문과 변형문제를 한 자리에서.</p>
             <span class="more">아카이브 탐색 →</span>
           </div>
@@ -1935,7 +1935,7 @@
     <div class="container">
       <div class="stat-item"><div class="stat-num">12,400+</div><div class="stat-lbl">제작된 변형문제</div></div>
       <div class="stat-item"><div class="stat-num">1,200+</div><div class="stat-lbl">사용 중인 영어학원 강사</div></div>
-      <div class="stat-item"><div class="stat-num">7개년</div><div class="stat-lbl">모의고사 아카이브</div></div>
+      <div class="stat-item"><div class="stat-num">7개년</div><div class="stat-lbl">모의고사</div></div>
       <div class="stat-item"><div class="stat-num">5분</div><div class="stat-lbl">첫 문제지까지</div></div>
     </div>
   </div>
@@ -2248,7 +2248,7 @@
       <div class="page-title-block">
         <div class="accent" style="background:var(--honey-ink)"></div>
         <div>
-          <h1>부교재 문제은행</h1>
+          <h1>부교재</h1>
           <p>수능특강, 수능완성 등 EBS 연계교재와 부교재 지문으로 변형문제를 생성합니다.</p>
         </div>
       </div>
@@ -2307,7 +2307,7 @@
       <div class="page-title-block">
         <div class="accent" style="background:var(--sky-ink)"></div>
         <div>
-          <h1>모의고사 아카이브</h1>
+          <h1>모의고사</h1>
           <p>최근 7개년 전국연합 학력평가 및 수능 기출 모의고사를 선택하여 변형문제를 생성합니다.</p>
         </div>
       </div>
@@ -2316,11 +2316,7 @@
     <div class="tb-left-panel" style="margin-bottom:24px">
       <div class="tb-sidebar">
         <h3>학년</h3>
-        <div class="tb-nav-item active" data-filter="grade" data-val="all" onclick="mkSidebarFilter(this,'grade','all')">
-          <span class="tb-nav-bar" style="background:var(--ink-500)"></span> 전체
-          <span class="nav-count" id="mkCountAll">138</span>
-        </div>
-        <div class="tb-nav-item" data-filter="grade" data-val="고1" onclick="mkSidebarFilter(this,'grade','고1')">
+        <div class="tb-nav-item active" data-filter="grade" data-val="고1" onclick="mkSidebarFilter(this,'grade','고1')">
           <span class="tb-nav-bar" style="background:var(--blush-ink)"></span> 고1
           <span class="nav-count" id="mkCountG1">46</span>
         </div>
@@ -2378,13 +2374,13 @@
     </div>
   </div>
 
-  <!-- ══ 교과서 문제은행 ══ -->
+  <!-- ══ 교과서 ══ -->
   <div class="page-textbook" id="pageTextbook">
     <div class="page-head">
       <div class="page-title-block">
         <div class="accent" style="background:var(--sage-ink)"></div>
         <div>
-          <h1>교과서 문제은행</h1>
+          <h1>교과서</h1>
           <p>교과서 본문 지문을 선택하고, 원하는 유형과 난이도로 문제를 자동 생성합니다.</p>
         </div>
       </div>
@@ -3415,40 +3411,26 @@
       10: {bg:'var(--mint)', c:'var(--mint-ink)'},
       11: {bg:'var(--rose)', c:'var(--rose-ink)'},
     };
-    let mkGradeFilter = 'all';
+    let mkGradeFilter = '고1';
     let mkYearFilter = 'all';
     let mkSearchQuery = '';
     let mkSelected = new Set();
 
     function mkSidebarFilter(el, type, val) {
       if (type === 'grade') {
-        // 학년: 전체 누르면 리셋, 아니면 토글
-        if (val === 'all') {
-          mkGradeFilter = 'all';
-          document.querySelectorAll('#pageMock .tb-sidebar .tb-nav-item[data-filter="grade"]').forEach(n => n.classList.remove('active'));
-          el.classList.add('active');
-        } else {
-          // '전체' 해제
-          const allBtn = document.querySelector('#pageMock .tb-nav-item[data-filter="grade"][data-val="all"]');
-          if (allBtn) allBtn.classList.remove('active');
-          el.classList.toggle('active');
-          // 선택된 학년 수집
-          const activeGrades = [];
-          document.querySelectorAll('#pageMock .tb-nav-item.active[data-filter="grade"]:not([data-val="all"])').forEach(n => activeGrades.push(n.dataset.val));
-          mkGradeFilter = activeGrades.length > 0 ? activeGrades : 'all';
-          // 아무것도 안 선택이면 전체로
-          if (mkGradeFilter === 'all' && allBtn) allBtn.classList.add('active');
-        }
+        // 학년: 단일 선택 (하나만 활성)
+        document.querySelectorAll('#pageMock .tb-sidebar .tb-nav-item[data-filter="grade"]').forEach(n => n.classList.remove('active'));
+        el.classList.add('active');
+        mkGradeFilter = val;
       } else {
-        // 연도: 토글 방식
-        if (val === 'all') {
-          mkYearFilter = 'all';
-          document.querySelectorAll('#pageMock .tb-sidebar .tb-nav-item[data-filter="year"]').forEach(n => n.classList.remove('active'));
+        // 연도: 단일 선택 (토글 — 같은 걸 다시 누르면 해제)
+        const wasActive = el.classList.contains('active');
+        document.querySelectorAll('#pageMock .tb-sidebar .tb-nav-item[data-filter="year"]').forEach(n => n.classList.remove('active'));
+        if (!wasActive) {
+          el.classList.add('active');
+          mkYearFilter = val;
         } else {
-          el.classList.toggle('active');
-          const activeYears = [];
-          document.querySelectorAll('#pageMock .tb-nav-item.active[data-filter="year"]').forEach(n => activeYears.push(n.dataset.val));
-          mkYearFilter = activeYears.length > 0 ? activeYears : 'all';
+          mkYearFilter = 'all';
         }
       }
       mkRender();
@@ -3508,7 +3490,7 @@
         const checked = mkSelected.has(it.key) ? ' checked' : '';
         html += `<tr onclick="mkToggle('${it.key}')" style="cursor:pointer">
           <td><input type="checkbox" onclick="event.stopPropagation();mkToggle('${it.key}')"${checked} style="width:16px;height:16px;accent-color:var(--sage-ink);cursor:pointer"></td>
-          <td style="font-weight:550;color:var(--ink-900)">${it.grade} ${mkMonthNames[it.month]}</td>
+          <td style="font-weight:550;color:var(--ink-900)">${it.grade} ${String(it.year).slice(2)}년 ${it.month}월</td>
           <td><span class="tb-subject-badge" style="background:${badge.bg};color:${badge.c}">${it.grade}</span></td>
           <td>${it.year}년</td>
           <td>${it.month}월</td>
