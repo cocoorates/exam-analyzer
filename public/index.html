@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Dancing+Script:wght@600;700&family=Noto+Sans+KR:wght@300;400;500;600;700&family=Gowun+Batang:wght@400;700&family=Nanum+Myeongjo:wght@400;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 
+  <link rel="stylesheet" href="samples.css">
   <style>
     :root {
       --font-serif: "Instrument Serif", "Times New Roman", serif;
@@ -109,7 +110,7 @@
     }
     .nav {
       display: flex; align-items: center; gap: 4px;
-      width: min(960px, 100%); margin: 0 auto;
+      width: min(1200px, 100%); margin: 0 auto;
       background: rgba(255,255,255,.55);
       backdrop-filter: blur(24px) saturate(150%);
       -webkit-backdrop-filter: blur(24px) saturate(150%);
@@ -1514,6 +1515,17 @@
         <span class="nav-link" data-page="suneung" onclick="showPage('suneung')">수능</span>
         <span class="nav-link" data-page="analyze" onclick="showPage('analyze')">분석서</span>
         <span class="nav-link" data-page="analyze2" onclick="showPage('analyze2')">분석서2</span>
+        <span style="color:var(--ink-200);margin:0 4px">|</span>
+        <span class="nav-link" data-page="s1" onclick="showPage('s1')" style="font-size:13px">1</span>
+        <span class="nav-link" data-page="s2" onclick="showPage('s2')" style="font-size:13px">2</span>
+        <span class="nav-link" data-page="s3" onclick="showPage('s3')" style="font-size:13px">3</span>
+        <span class="nav-link" data-page="s4" onclick="showPage('s4')" style="font-size:13px">4</span>
+        <span class="nav-link" data-page="s5" onclick="showPage('s5')" style="font-size:13px">5</span>
+        <span class="nav-link" data-page="s6" onclick="showPage('s6')" style="font-size:13px">6</span>
+        <span class="nav-link" data-page="s7" onclick="showPage('s7')" style="font-size:13px">7</span>
+        <span class="nav-link" data-page="s8" onclick="showPage('s8')" style="font-size:13px">8</span>
+        <span class="nav-link" data-page="s9" onclick="showPage('s9')" style="font-size:13px">9</span>
+        <span class="nav-link" data-page="s10" onclick="showPage('s10')" style="font-size:13px">10</span>
       </div>
       <button class="nav-login" id="authBtn" onclick="openAuthModal()">로그인</button>
     </nav>
@@ -2076,6 +2088,9 @@
     </div>
   </div>
 
+  <!-- ══ 시안 1~10 컨테이너 ══ -->
+  <div id="samplePagesContainer"></div>
+
   <!-- ══ 부교재 ══ -->
   <div class="page-supplement" id="pageSupplement">
     <div class="page-head">
@@ -2343,6 +2358,7 @@
     </div>
   </div>
 
+  <script src="samples.js"></script>
   <script>
     // ── Supabase Init ──
     let supabase = null;
@@ -2509,6 +2525,11 @@
       document.getElementById('pageTextbook').style.display = 'none';
       document.getElementById('pageSupplement').style.display = 'none';
       document.getElementById('pageMock').style.display = 'none';
+      // Hide all sample pages
+      for (let i = 1; i <= 10; i++) {
+        const el = document.getElementById('pageS' + i);
+        if (el) el.style.display = 'none';
+      }
 
       // Show what we need
       if (page === 'home') {
@@ -2526,6 +2547,10 @@
         document.getElementById('pageSupplement').style.display = 'block';
       } else if (page === 'mock') {
         document.getElementById('pageMock').style.display = 'block';
+      } else if (page.match(/^s\d+$/)) {
+        const num = page.substring(1);
+        const el = document.getElementById('pageS' + num);
+        if (el) el.style.display = 'block';
       }
       // placeholder pages (textbook, supplement, mock, suneung) show nothing — that's fine
 
