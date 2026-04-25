@@ -872,9 +872,9 @@
       border-bottom: 1px solid var(--ink-100);
     }
     .tb-expand-lessons {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
       padding-top: 8px;
     }
     .tb-expand-lesson-card {
@@ -1628,7 +1628,7 @@
       .tb-sidebar h3 { width: 100%; margin-bottom: 4px; }
       .tb-sidebar h3:not(:first-child) { margin-top: 10px; }
       .tb-nav-item { padding: 7px 14px; font-size: 12.5px; }
-      .tb-expand-lessons { grid-template-columns: 1fr 1fr; }
+      .tb-expand-lessons { flex-direction: column; }
       .tb-options { position: static; }
       .s4-layout { grid-template-columns: 1fr; }
       .s9-split { grid-template-columns: 1fr; }
