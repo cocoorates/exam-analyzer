@@ -753,12 +753,10 @@
       background: var(--ink-900); color: var(--paper);
       font-weight: 550;
     }
-    .tb-nav-icon {
-      font-size: 16px; line-height: 1;
+    .tb-nav-bar {
+      width: 4px; height: 22px; border-radius: 2px;
       flex-shrink: 0;
-      transition: transform .2s;
     }
-    .tb-nav-item:hover .tb-nav-icon { transform: scale(1.15); }
     .tb-nav-item .nav-count {
       margin-left: auto; font-size: 11px;
       color: var(--ink-400); font-weight: 500;
@@ -2352,50 +2350,50 @@
         <div class="tb-sidebar">
           <h3>과목</h3>
           <div class="tb-nav-item active" onclick="tbSidebarFilter(this,'subject','all')">
-            <span class="tb-nav-icon">📚</span> 전체
+            <span class="tb-nav-bar" style="background:var(--ink-500)"></span> 전체
             <span class="nav-count">25</span>
           </div>
           <div class="tb-nav-item" onclick="tbSidebarFilter(this,'subject','공통영어1')">
-            <span class="tb-nav-icon">📕</span> 공통영어1
+            <span class="tb-nav-bar" style="background:var(--blush-ink)"></span> 공통영어1
             <span class="nav-count">10</span>
           </div>
           <div class="tb-nav-item" onclick="tbSidebarFilter(this,'subject','공통영어2')">
-            <span class="tb-nav-icon">📗</span> 공통영어2
+            <span class="tb-nav-bar" style="background:var(--sage-ink)"></span> 공통영어2
             <span class="nav-count">5</span>
           </div>
           <div class="tb-nav-item" onclick="tbSidebarFilter(this,'subject','영어')">
-            <span class="tb-nav-icon">📘</span> 영어
+            <span class="tb-nav-bar" style="background:var(--sky-ink)"></span> 영어
             <span class="nav-count">3</span>
           </div>
           <div class="tb-nav-item" onclick="tbSidebarFilter(this,'subject','중2')">
-            <span class="tb-nav-icon">📒</span> 중2
+            <span class="tb-nav-bar" style="background:var(--honey-ink)"></span> 중2
             <span class="nav-count">4</span>
           </div>
           <div class="tb-nav-item" onclick="tbSidebarFilter(this,'subject','중3')">
-            <span class="tb-nav-icon">📓</span> 중3
+            <span class="tb-nav-bar" style="background:var(--lilac-ink)"></span> 중3
             <span class="nav-count">3</span>
           </div>
           <h3>출판사</h3>
           <div class="tb-nav-item" onclick="tbSidebarFilter(this,'publisher','능률')">
-            <span class="tb-nav-icon">🏢</span> 능률
+            <span class="tb-nav-bar" style="background:var(--mint-ink)"></span> 능률
           </div>
           <div class="tb-nav-item" onclick="tbSidebarFilter(this,'publisher','동아')">
-            <span class="tb-nav-icon">🏢</span> 동아
+            <span class="tb-nav-bar" style="background:var(--rose-ink)"></span> 동아
           </div>
           <div class="tb-nav-item" onclick="tbSidebarFilter(this,'publisher','미래엔')">
-            <span class="tb-nav-icon">🏢</span> 미래엔
+            <span class="tb-nav-bar" style="background:var(--sky-ink)"></span> 미래엔
           </div>
           <div class="tb-nav-item" onclick="tbSidebarFilter(this,'publisher','비상')">
-            <span class="tb-nav-icon">🏢</span> 비상
+            <span class="tb-nav-bar" style="background:var(--honey-ink)"></span> 비상
           </div>
           <div class="tb-nav-item" onclick="tbSidebarFilter(this,'publisher','지학사')">
-            <span class="tb-nav-icon">🏢</span> 지학사
+            <span class="tb-nav-bar" style="background:var(--sage-ink)"></span> 지학사
           </div>
           <div class="tb-nav-item" onclick="tbSidebarFilter(this,'publisher','천재')">
-            <span class="tb-nav-icon">🏢</span> 천재
+            <span class="tb-nav-bar" style="background:var(--lilac-ink)"></span> 천재
           </div>
           <div class="tb-nav-item" onclick="tbSidebarFilter(this,'publisher','YBM')">
-            <span class="tb-nav-icon">🏢</span> YBM
+            <span class="tb-nav-bar" style="background:var(--blush-ink)"></span> YBM
           </div>
         </div>
         <div class="tb-table-area">
