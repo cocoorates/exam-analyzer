@@ -110,7 +110,7 @@
     /* ───────── Pill Nav ───────── */
     .nav-wrap {
       padding: 20px 24px 0;
-      position: sticky; top: 14px; z-index: 50;
+      position: relative; z-index: 50;
     }
     .nav {
       display: flex; align-items: center; gap: 4px;
@@ -134,41 +134,47 @@
     .nav .nav-link:hover { background: rgba(20,18,14,.05); color: var(--ink-700); }
     .nav .nav-link.active { color: var(--ink-900); font-weight: 500; }
 
-    /* ───────── Side Nav (scroll state) ───────── */
-    .nav-wrap.scrolled {
+    /* ───────── Side Nav (separate fixed element) ───────── */
+    .side-nav {
       position: fixed;
       top: 50%;
       left: 0;
-      transform: translateY(-50%);
-      padding: 0;
+      transform: translateY(-50%) translateX(-100%);
       z-index: 50;
+      opacity: 0;
+      transition: transform .3s ease, opacity .25s ease;
+      pointer-events: none;
+    }
+    .side-nav.visible {
+      transform: translateY(-50%) translateX(0);
+      opacity: 1;
       pointer-events: auto;
     }
-    .nav-wrap.scrolled .nav {
-      flex-direction: column;
-      width: auto;
-      padding: 14px 10px;
-      border-radius: 0 20px 20px 0;
-      gap: 2px;
-      background: rgba(255,255,255,.75);
-      box-shadow: 2px 4px 20px rgba(20,18,14,.06);
-    }
-    .nav-wrap.scrolled .nav .logo,
-    .nav-wrap.scrolled .nav .nav-auth-group,
-    .nav-wrap.scrolled .nav .auth-user-info,
-    .nav-wrap.scrolled .nav .nav-hamburger {
-      display: none;
-    }
-    .nav-wrap.scrolled .nav .nav-links {
+    .side-nav-inner {
+      display: flex;
       flex-direction: column;
       gap: 1px;
-      margin: 0;
+      padding: 14px 10px;
+      background: rgba(255,255,255,.78);
+      backdrop-filter: blur(20px) saturate(140%);
+      -webkit-backdrop-filter: blur(20px) saturate(140%);
+      border: 1px solid rgba(255,255,255,.5);
+      border-left: none;
+      border-radius: 0 18px 18px 0;
+      box-shadow: 2px 4px 20px rgba(20,18,14,.05);
     }
-    .nav-wrap.scrolled .nav .nav-link {
+    .side-nav-link {
+      color: var(--ink-500);
       font-size: 13px;
-      padding: 8px 14px;
+      padding: 8px 16px;
+      border-radius: var(--r-pill);
+      cursor: pointer;
+      transition: color .15s, background .15s;
       text-align: center;
+      white-space: nowrap;
     }
+    .side-nav-link:hover { background: rgba(20,18,14,.05); color: var(--ink-700); }
+    .side-nav-link.active { color: var(--ink-900); font-weight: 600; }
 
     /* ───────── Buttons ───────── */
     .btn {
@@ -1707,7 +1713,7 @@
       .nav .nav-links { display: none; }
       .nav-hamburger { display: block; }
       .nav .nav-auth-group, .nav .nav-login, .nav .auth-user-info { display: none; }
-      .nav-wrap.scrolled { display: none; }
+      .side-nav { display: none !important; }
       .upload-row { grid-template-columns: 1fr; }
       .triple-grid { grid-template-columns: 1fr; }
       .result-duo { grid-template-columns: 1fr; }
@@ -1753,6 +1759,18 @@
         <button class="nav-login" onclick="openAuthModal('login')">로그인</button>
       </div>
     </nav>
+  </div>
+
+  <!-- Side nav (appears on scroll) -->
+  <div class="side-nav" id="sideNav">
+    <div class="side-nav-inner">
+      <span class="side-nav-link" data-page="textbook" onclick="showPage('textbook')">교과서</span>
+      <span class="side-nav-link" data-page="supplement" onclick="showPage('supplement')">부교재</span>
+      <span class="side-nav-link" data-page="mock" onclick="showPage('mock')">모의고사</span>
+      <span class="side-nav-link" data-page="suneung" onclick="showPage('suneung')">수능</span>
+      <span class="side-nav-link" data-page="analyze" onclick="showPage('analyze')">분석서</span>
+      <span class="side-nav-link" data-page="analyze2" onclick="showPage('analyze2')">분석서2</span>
+    </div>
   </div>
 
   <!-- Mobile menu overlay -->
@@ -3159,17 +3177,16 @@
 
     // ── Scroll → Side Nav ──
     (function() {
-      const navWrap = document.getElementById('navWrap');
-      let scrolled = false;
-      const threshold = 120;
+      const sideNav = document.getElementById('sideNav');
+      let visible = false;
       window.addEventListener('scroll', function() {
         const y = window.scrollY || window.pageYOffset;
-        if (y > threshold && !scrolled) {
-          navWrap.classList.add('scrolled');
-          scrolled = true;
-        } else if (y <= threshold && scrolled) {
-          navWrap.classList.remove('scrolled');
-          scrolled = false;
+        if (y > 1 && !visible) {
+          sideNav.classList.add('visible');
+          visible = true;
+        } else if (y <= 1 && visible) {
+          sideNav.classList.remove('visible');
+          visible = false;
         }
       }, { passive: true });
     })();
@@ -3231,6 +3248,10 @@
 
       // Update nav active state
       document.querySelectorAll('.nav-link').forEach(el => {
+        el.classList.toggle('active', el.dataset.page === page);
+      });
+      // Update side nav active state
+      document.querySelectorAll('.side-nav-link').forEach(el => {
         el.classList.toggle('active', el.dataset.page === page);
       });
 
