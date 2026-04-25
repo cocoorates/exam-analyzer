@@ -1701,8 +1701,13 @@
         document.getElementById('pageAnalyze').style.display = 'block';
       } else if (page === 'analyze2') {
         document.getElementById('pageAnalyze2').style.display = 'block';
+      } else {
+        // placeholder pages (textbook, supplement, mock, suneung) — show home content
+        homeElements.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = 'block';
+        });
       }
-      // textbook, mock, suneung are placeholders for now
 
       // Update nav active state
       document.querySelectorAll('.nav-link').forEach(el => {
@@ -1712,7 +1717,10 @@
       if (pushState) {
         history.pushState({ page }, '', '#' + page);
       }
-      window.scrollTo(0, 0);
+      // Only scroll to top for pages with actual content
+      if (page === 'home' || page === 'analyze' || page === 'analyze2') {
+        window.scrollTo(0, 0);
+      }
     }
 
     window.addEventListener('popstate', (e) => {
