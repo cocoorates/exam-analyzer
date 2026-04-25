@@ -7,7 +7,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Dancing+Script:wght@600;700&family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Dancing+Script:wght@600;700&family=Noto+Sans+KR:wght@300;400;500;600;700&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 
   <style>
@@ -171,8 +171,8 @@
       color: var(--ink-900);
     }
     .hero .lede {
-      font-family: var(--font-sans);
-      font-size: 18.5px; line-height: 1.6; color: var(--ink-500);
+      font-family: "Gowun Batang", "Noto Serif KR", serif;
+      font-size: 18.5px; line-height: 1.7; color: var(--ink-500);
       max-width: 580px; margin: 0 auto 36px;
     }
     .hero .cta-row {
@@ -286,15 +286,15 @@
     }
     .feature:hover { transform: translateY(-3px); box-shadow: var(--shadow-float); }
     .feature .accent-bar {
-      height: 110px; padding: 16px;
+      height: 120px; padding: 20px;
       display: flex; align-items: flex-end;
-      font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
+      font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.08em;
       color: var(--ink-700);
     }
-    .feature .body { padding: 22px 24px 26px; }
-    .feature h3 { font-family: var(--font-serif); font-size: 26px; margin: 0 0 10px; font-weight: 400; }
-    .feature p { font-size: 15.5px; color: var(--ink-500); line-height: 1.55; margin: 0 0 14px; }
-    .feature .more { font-size: 13px; font-weight: 500; cursor: pointer; }
+    .feature .body { padding: 26px 28px 30px; }
+    .feature h3 { font-family: var(--font-serif); font-size: 26px; margin: 0 0 12px; font-weight: 400; white-space: nowrap; }
+    .feature p { font-size: 15.5px; color: var(--ink-500); line-height: 1.6; margin: 0 0 16px; }
+    .feature .more { font-size: 14px; font-weight: 500; cursor: pointer; }
 
     /* ───────── Analyzer demo on landing ───────── */
     .demo-wrap { background: var(--paper-2); padding: 100px 24px; }
@@ -950,11 +950,11 @@
     <div class="hero">
       <div class="eyebrow">
         <span class="star">✦</span>
-        <span class="eyebrow-text">Crafted For All Teacher</span>
+        <span class="eyebrow-text">Crafted for All Teachers</span>
       </div>
       <h1>ALL IN ONE,<br>ONE IN ALL</h1>
       <p class="lede">
-        교과서·모의고사·내신·수능 시험대비를 위한 모든 것<br>
+        교과서 · 모의고사 · 내신 · 수능 시험대비를 위한 모든 것<br>
         수업 준비 시간을 절반으로
       </p>
       <div class="cta-row">
@@ -1066,7 +1066,7 @@
         <article class="feature">
           <div class="accent-bar" style="background:var(--sky)">02 · 모의고사</div>
           <div class="body">
-            <h3>최근 5개년 모의고사 아카이브</h3>
+            <h3>5개년 모의고사 아카이브</h3>
             <p>평가원·교육청 모의고사 최근 5개년 전 회차 원문과 변형문제를 한 자리에서.</p>
             <span class="more">아카이브 탐색 →</span>
           </div>
@@ -1096,7 +1096,6 @@
         </div>
         <div style="display:flex;gap:18px;font-size:12.5px;color:var(--ink-500);flex-wrap:wrap">
           <span>⏱ 평균 12초 / 30문항</span>
-          <span>🔒 24시간 내 자동 삭제</span>
         </div>
       </div>
       <div class="analyzer-preview">
