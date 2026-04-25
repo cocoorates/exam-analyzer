@@ -3,7 +3,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 const AnthropicModule = require('@anthropic-ai/sdk');
 const Anthropic = AnthropicModule.default || AnthropicModule;
 const cors = require('cors');
@@ -32,7 +32,13 @@ const upload = multer({
   }
 });
 
-app.use(cors());
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || '').split(',').filter(Boolean);
+app.use(cors({
+  origin: ALLOWED_ORIGINS.length > 0
+    ? (origin, cb) => (!origin || ALLOWED_ORIGINS.includes(origin) ? cb(null, true) : cb(new Error('CORS blocked')))
+    : true,
+  credentials: true
+}));
 app.use(express.static('public'));
 app.use(express.json({ limit: '50mb' }));
 
@@ -63,9 +69,12 @@ function getBase64SizeMB(base64str) {
 function compressPdf(inputPath, quality = '/ebook') {
   const outputPath = inputPath + '_compressed.pdf';
   try {
-    execSync(`gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=${quality} -dNOPAUSE -dQUIET -dBATCH -sOutputFile="${outputPath}" "${inputPath}"`, {
-      timeout: 120000
-    });
+    execFileSync('gs', [
+      '-sDEVICE=pdfwrite', '-dCompatibilityLevel=1.4',
+      `-dPDFSETTINGS=${quality}`,
+      '-dNOPAUSE', '-dQUIET', '-dBATCH',
+      `-sOutputFile=${outputPath}`, inputPath
+    ], { timeout: 120000 });
     if (fs.existsSync(outputPath) && getFileSizeMB(outputPath) < getFileSizeMB(inputPath)) {
       return outputPath;
     }
@@ -116,9 +125,13 @@ function smartCompress(inputPath, label, sendEvent) {
       sendEvent('progress', { message: `${label} PDF 이미지 해상도 조정 중... (${dpi}DPI)`, step: 2, total: 5 });
       const customPath = inputPath + `_${dpi}dpi.pdf`;
       try {
-        execSync(`gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/screen -dColorImageResolution=${dpi} -dGrayImageResolution=${dpi} -dMonoImageResolution=${dpi} -dDownsampleColorImages=true -dDownsampleGrayImages=true -dNOPAUSE -dQUIET -dBATCH -sOutputFile="${customPath}" "${inputPath}"`, {
-          timeout: 120000
-        });
+        execFileSync('gs', [
+          '-sDEVICE=pdfwrite', '-dCompatibilityLevel=1.4', '-dPDFSETTINGS=/screen',
+          `-dColorImageResolution=${dpi}`, `-dGrayImageResolution=${dpi}`, `-dMonoImageResolution=${dpi}`,
+          '-dDownsampleColorImages=true', '-dDownsampleGrayImages=true',
+          '-dNOPAUSE', '-dQUIET', '-dBATCH',
+          `-sOutputFile=${customPath}`, inputPath
+        ], { timeout: 120000 });
         if (fs.existsSync(customPath) && getFileSizeMB(customPath) < currentMB) {
           cleanups.push(customPath);
           currentPath = customPath;
@@ -398,10 +411,10 @@ app.post('/api/analyze', upload.fields([
       if (rawMsg.includes('too large') || rawMsg.includes('exceeds') || rawMsg.includes('maximum allowed size')) {
         errorMsg = 'PDF 파일이 API 전송 한도를 초과했습니다. PDF를 줄여서 다시 시도해주세요.';
       } else {
-        errorMsg = `API 요청 오류: ${rawMsg.substring(0, 300)}`;
+        errorMsg = 'API 요청 처리 중 오류가 발생했습니다. 다시 시도해주세요.';
       }
     } else {
-      errorMsg = `분석 중 오류 (${statusCode}): ${rawMsg.substring(0, 300)}`;
+      errorMsg = '분석 중 예상치 못한 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
     }
     lastAnalysis = { status: 'error', timestamp: new Date().toISOString(), result: null, error: errorMsg };
     sendEvent('error', { message: errorMsg });
@@ -639,10 +652,10 @@ app.post('/api/analyze2', upload.fields([
       if (rawMsg.includes('too large') || rawMsg.includes('exceeds') || rawMsg.includes('maximum allowed size')) {
         errorMsg = 'PDF 파일이 API 전송 한도를 초과했습니다. PDF를 줄여서 다시 시도해주세요.';
       } else {
-        errorMsg = `API 요청 오류: ${rawMsg.substring(0, 300)}`;
+        errorMsg = 'API 요청 처리 중 오류가 발생했습니다. 다시 시도해주세요.';
       }
     } else {
-      errorMsg = `분석 중 오류 (${statusCode}): ${rawMsg.substring(0, 300)}`;
+      errorMsg = '분석 중 예상치 못한 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
     }
     lastAnalysis = { status: 'error', timestamp: new Date().toISOString(), result: null, error: errorMsg };
     sendEvent('error', { message: errorMsg });
@@ -670,10 +683,7 @@ app.get('/api/config', (req, res) => {
 // 헬스체크
 app.get('/api/health', (req, res) => {
   res.json({
-    status: 'ok',
-    hasApiKey: !!process.env.ANTHROPIC_API_KEY,
-    model: MODEL,
-    version: '3.0.0'
+    status: 'ok'
   });
 });
 
