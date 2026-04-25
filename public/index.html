@@ -2391,11 +2391,7 @@
       <div class="tb-left-panel">
         <div class="tb-sidebar">
           <h3>과목</h3>
-          <div class="tb-nav-item active" onclick="tbSidebarFilter(this,'subject','all')">
-            <span class="tb-nav-bar" style="background:var(--ink-500)"></span> 전체
-            <span class="nav-count">25</span>
-          </div>
-          <div class="tb-nav-item" onclick="tbSidebarFilter(this,'subject','공통영어1')">
+          <div class="tb-nav-item active" onclick="tbSidebarFilter(this,'subject','공통영어1')">
             <span class="tb-nav-bar" style="background:var(--blush-ink)"></span> 공통영어1
             <span class="nav-count">10</span>
           </div>
@@ -3560,22 +3556,40 @@
     const tbLessonCardColors = ['var(--blush)','var(--sky)','var(--sage)','var(--honey)','var(--lilac)','var(--mint)','var(--rose)','var(--blush)'];
     const tbLessonCardInks = ['var(--blush-ink)','var(--sky-ink)','var(--sage-ink)','var(--honey-ink)','var(--lilac-ink)','var(--mint-ink)','var(--rose-ink)','var(--blush-ink)'];
 
-    let tbSubjectFilter = 'all';
+    let tbSubjectFilter = '공통영어1';
     let tbPublisherFilter = 'all';
     let tbSearchQuery = '';
     let tbExpandedRow = null;
 
     function tbSidebarFilter(el, type, val) {
       if (type === 'subject') {
-        tbSubjectFilter = val;
-        tbPublisherFilter = 'all';
+        // 과목: 단일 선택 (하나만 활성, 같은 걸 다시 누르면 해제)
+        const wasActive = el.classList.contains('active');
+        document.querySelectorAll('#pageTextbook .tb-sidebar .tb-nav-item').forEach(n => {
+          // 과목 항목만 해제 (출판사는 유지)
+          const onclick = n.getAttribute('onclick') || '';
+          if (onclick.includes("'subject'")) n.classList.remove('active');
+        });
+        if (!wasActive) {
+          el.classList.add('active');
+          tbSubjectFilter = val;
+        } else {
+          tbSubjectFilter = 'all';
+        }
       } else {
-        tbPublisherFilter = val;
-        tbSubjectFilter = 'all';
+        // 출판사: 단일 선택 (토글)
+        const wasActive = el.classList.contains('active');
+        document.querySelectorAll('#pageTextbook .tb-sidebar .tb-nav-item').forEach(n => {
+          const onclick = n.getAttribute('onclick') || '';
+          if (onclick.includes("'publisher'")) n.classList.remove('active');
+        });
+        if (!wasActive) {
+          el.classList.add('active');
+          tbPublisherFilter = val;
+        } else {
+          tbPublisherFilter = 'all';
+        }
       }
-      // Update active states
-      document.querySelectorAll('.tb-sidebar .tb-nav-item').forEach(n => n.classList.remove('active'));
-      el.classList.add('active');
       tbExpandedRow = null;
       tbRenderTree();
     }
