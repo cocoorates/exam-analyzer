@@ -483,7 +483,8 @@
       transition: border-color .2s, transform .2s, box-shadow .2s;
       cursor: pointer;
     }
-    .upload-card:hover { border-color: var(--ink-400); }
+    .upload-card:hover { border-color: var(--blush-ink); border-style: solid; box-shadow: 0 0 0 1px var(--blush-ink), var(--shadow-card); transform: translateY(-2px); }
+    .upload-card.exam-card:hover { border-color: var(--lilac-ink); box-shadow: 0 0 0 1px var(--lilac-ink), var(--shadow-card); }
     .upload-card.has-file {
       border-style: solid;
       border-color: var(--ink-200);
