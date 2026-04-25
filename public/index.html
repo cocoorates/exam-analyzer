@@ -2769,10 +2769,9 @@
     }
 
     window.addEventListener('popstate', (e) => {
-      const page = (e.state && e.state.page) || 'home';
+      const page = (e.state && e.state.page) || window.location.hash.replace('#','') || 'home';
       showPage(page, false);
     });
-    history.replaceState({ page: 'home' }, '', '#home');
 
     // ── Model selection ──
     function selectModel(el, model) {
@@ -3564,6 +3563,7 @@
     if (initialHash !== 'home') {
       showPage(initialHash, false);
     }
+    history.replaceState({ page: initialHash }, '', '#' + initialHash);
   </script>
 </body>
 </html>
