@@ -1484,6 +1484,59 @@
     .auth-logout-btn:hover { background: var(--ink-100); color: var(--ink-900); }
 
     /* ───────── Responsive ───────── */
+    /* ─── Mobile hamburger ─── */
+    .nav-hamburger {
+      display: none;
+      background: none; border: none;
+      cursor: pointer; padding: 8px;
+      color: var(--ink-700);
+    }
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0,0,0,.3);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+    .mobile-menu.open { display: block; }
+    .mobile-menu-panel {
+      position: absolute;
+      top: 0; right: 0;
+      width: min(320px, 85vw);
+      height: 100%;
+      background: var(--white);
+      padding: 24px;
+      box-shadow: -8px 0 30px rgba(0,0,0,.1);
+      overflow-y: auto;
+    }
+    .mobile-menu-close {
+      background: none; border: none;
+      cursor: pointer; padding: 8px;
+      color: var(--ink-700);
+      float: right;
+    }
+    .mobile-menu-links {
+      padding-top: 48px;
+    }
+    .mobile-menu-links a {
+      display: block;
+      padding: 14px 8px;
+      font-size: 16px;
+      color: var(--ink-700);
+      border-bottom: 1px solid var(--ink-100);
+      text-decoration: none;
+      transition: color .1s;
+    }
+    .mobile-menu-links a:hover,
+    .mobile-menu-links a.active { color: var(--ink-900); font-weight: 600; }
+    .mobile-menu-links .mobile-divider {
+      height: 1px;
+      background: var(--ink-200);
+      margin: 12px 0;
+    }
+
     @media (max-width: 900px) {
       .preview, .demo-grid, .features-grid, .stats-strip .container,
       footer .container { grid-template-columns: 1fr; }
@@ -1492,10 +1545,18 @@
       .preview .recent-grid { grid-template-columns: 1fr; }
       .stats-strip .stat-item { border-left: none; padding-left: 0; }
       .nav .nav-links { display: none; }
+      .nav-hamburger { display: block; }
       .upload-row { grid-template-columns: 1fr; }
       .triple-grid { grid-template-columns: 1fr; }
       .result-duo { grid-template-columns: 1fr; }
       .page-title-block h1 { font-size: 32px; }
+      .tb-layout { grid-template-columns: 1fr; }
+      .tb-options { position: static; }
+      .s4-layout { grid-template-columns: 1fr; }
+      .s9-split { grid-template-columns: 1fr; }
+      .s10-layout { grid-template-columns: 1fr; }
+      .s2-board { grid-template-columns: 1fr 1fr; }
+      .s3-hero-card { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -1527,8 +1588,39 @@
         <span class="nav-link" data-page="s9" onclick="showPage('s9')" style="font-size:13px">9</span>
         <span class="nav-link" data-page="s10" onclick="showPage('s10')" style="font-size:13px">10</span>
       </div>
+      <button class="nav-hamburger" onclick="openMobileMenu()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
       <button class="nav-login" id="authBtn" onclick="openAuthModal()">로그인</button>
     </nav>
+  </div>
+
+  <!-- Mobile menu overlay -->
+  <div class="mobile-menu" id="mobileMenu" onclick="if(event.target===this)closeMobileMenu()">
+    <div class="mobile-menu-panel">
+      <button class="mobile-menu-close" onclick="closeMobileMenu()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div class="mobile-menu-links">
+        <a href="#" onclick="showPage('textbook');closeMobileMenu()">교과서</a>
+        <a href="#" onclick="showPage('supplement');closeMobileMenu()">부교재</a>
+        <a href="#" onclick="showPage('mock');closeMobileMenu()">모의고사</a>
+        <a href="#" onclick="showPage('suneung');closeMobileMenu()">수능</a>
+        <a href="#" onclick="showPage('analyze');closeMobileMenu()">분석서</a>
+        <a href="#" onclick="showPage('analyze2');closeMobileMenu()">분석서2</a>
+        <div class="mobile-divider"></div>
+        <a href="#" onclick="showPage('s1');closeMobileMenu()">시안 1 — Bento</a>
+        <a href="#" onclick="showPage('s2');closeMobileMenu()">시안 2 — Kanban</a>
+        <a href="#" onclick="showPage('s3');closeMobileMenu()">시안 3 — Magazine</a>
+        <a href="#" onclick="showPage('s4');closeMobileMenu()">시안 4 — Table</a>
+        <a href="#" onclick="showPage('s5');closeMobileMenu()">시안 5 — Spotlight</a>
+        <a href="#" onclick="showPage('s6');closeMobileMenu()">시안 6 — Accordion</a>
+        <a href="#" onclick="showPage('s7');closeMobileMenu()">시안 7 — Dashboard</a>
+        <a href="#" onclick="showPage('s8');closeMobileMenu()">시안 8 — Masonry</a>
+        <a href="#" onclick="showPage('s9');closeMobileMenu()">시안 9 — Split Pane</a>
+        <a href="#" onclick="showPage('s10');closeMobileMenu()">시안 10 — Timeline</a>
+      </div>
+    </div>
   </div>
 
   <!-- ═══════ AUTH MODAL ═══════ -->
@@ -2507,6 +2599,16 @@
       await supabase.auth.signOut();
       currentUser = null;
       updateAuthUI();
+    }
+
+    // ── Mobile Menu ──
+    function openMobileMenu() {
+      document.getElementById('mobileMenu').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeMobileMenu() {
+      document.getElementById('mobileMenu').classList.remove('open');
+      document.body.style.overflow = '';
     }
 
     // ── Page Navigation ──
