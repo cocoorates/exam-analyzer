@@ -2316,19 +2316,19 @@
         <h3>학년</h3>
         <div class="tb-nav-item active" onclick="mkSidebarFilter(this,'grade','all')">
           <span class="tb-nav-bar" style="background:var(--ink-500)"></span> 전체
-          <span class="nav-count" id="mkCountAll">105</span>
+          <span class="nav-count" id="mkCountAll">138</span>
         </div>
         <div class="tb-nav-item" onclick="mkSidebarFilter(this,'grade','고1')">
           <span class="tb-nav-bar" style="background:var(--blush-ink)"></span> 고1
-          <span class="nav-count" id="mkCountG1">35</span>
+          <span class="nav-count" id="mkCountG1">46</span>
         </div>
         <div class="tb-nav-item" onclick="mkSidebarFilter(this,'grade','고2')">
           <span class="tb-nav-bar" style="background:var(--sage-ink)"></span> 고2
-          <span class="nav-count" id="mkCountG2">35</span>
+          <span class="nav-count" id="mkCountG2">46</span>
         </div>
         <div class="tb-nav-item" onclick="mkSidebarFilter(this,'grade','고3')">
           <span class="tb-nav-bar" style="background:var(--sky-ink)"></span> 고3
-          <span class="nav-count" id="mkCountG3">35</span>
+          <span class="nav-count" id="mkCountG3">46</span>
         </div>
         <h3>연도</h3>
         <div class="tb-nav-item" onclick="mkSidebarFilter(this,'year','2026')">
@@ -2345,6 +2345,12 @@
         </div>
         <div class="tb-nav-item" onclick="mkSidebarFilter(this,'year','2022')">
           <span class="tb-nav-bar" style="background:var(--blush-ink)"></span> 2022년
+        </div>
+        <div class="tb-nav-item" onclick="mkSidebarFilter(this,'year','2021')">
+          <span class="tb-nav-bar" style="background:var(--sage-ink)"></span> 2021년
+        </div>
+        <div class="tb-nav-item" onclick="mkSidebarFilter(this,'year','2020')">
+          <span class="tb-nav-bar" style="background:var(--sky-ink)"></span> 2020년
         </div>
       </div>
       <div class="tb-table-area">
@@ -3430,7 +3436,7 @@
     }
     function mkRender() {
       const timeline = document.getElementById('mkTimeline');
-      const years = [2026,2025,2024,2023,2022];
+      const years = [2026,2025,2024,2023,2022,2021,2020];
       const grades = ['고1','고2','고3'];
 
       // Build flat list
@@ -3485,7 +3491,7 @@
       timeline.innerHTML = html;
     }
     function mkCheckAll(cb) {
-      const years = [2026,2025,2024,2023,2022];
+      const years = [2026,2025,2024,2023,2022,2021,2020];
       const grades = ['고1','고2','고3'];
       if (cb.checked) {
         years.forEach(y => grades.forEach(g => mkMonths.forEach(m => {
