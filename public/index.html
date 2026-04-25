@@ -709,16 +709,204 @@
       gap: 24px;
       align-items: start;
     }
-    /* Filter tabs */
-    .tb-filter-group { margin-bottom: 16px; }
-    .tb-filter-label {
-      font-size: 12px; color: var(--ink-400); font-weight: 500;
-      letter-spacing: 0.04em; margin-bottom: 8px;
-      display: block;
+    /* ── New: Sidebar + Table layout (left panel) ── */
+    .tb-left-panel {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 0;
+      background: var(--white);
+      border: 1px solid var(--ink-200);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+      min-height: 620px;
     }
-    .tb-filter-row {
-      display: flex; flex-wrap: wrap; gap: 6px;
+    /* Sidebar nav */
+    .tb-sidebar {
+      background: oklch(0.98 0.005 80);
+      border-right: 1px solid var(--ink-100);
+      padding: 20px 0;
+      overflow-y: auto;
     }
+    .tb-sidebar::-webkit-scrollbar { width: 4px; }
+    .tb-sidebar::-webkit-scrollbar-thumb { background: var(--ink-200); border-radius: 4px; }
+    .tb-sidebar h3 {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--ink-400);
+      padding: 0 18px; margin: 0 0 8px;
+    }
+    .tb-sidebar h3:not(:first-child) { margin-top: 20px; }
+    .tb-nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 18px;
+      cursor: pointer;
+      font-size: 13.5px; font-weight: 450;
+      color: var(--ink-700);
+      transition: all .2s ease;
+      position: relative;
+    }
+    .tb-nav-item:hover {
+      background: oklch(0.96 0.01 80 / 0.6);
+      padding-left: 22px;
+      color: var(--ink-900);
+    }
+    .tb-nav-item.active {
+      background: var(--ink-900); color: var(--paper);
+      font-weight: 550;
+    }
+    .tb-nav-item .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      flex-shrink: 0;
+      transition: transform .2s;
+    }
+    .tb-nav-item:hover .dot { transform: scale(1.3); }
+    .tb-nav-item .nav-count {
+      margin-left: auto; font-size: 11px;
+      color: var(--ink-400); font-weight: 500;
+    }
+    .tb-nav-item.active .nav-count { color: var(--ink-300); }
+    /* Search bar above table */
+    .tb-table-area {
+      display: flex; flex-direction: column;
+    }
+    .tb-table-header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--ink-100);
+    }
+    .tb-table-search {
+      position: relative; flex: 1;
+    }
+    .tb-table-search input {
+      width: 100%; padding: 9px 14px 9px 36px;
+      border: 1px solid var(--ink-200);
+      border-radius: var(--r-md);
+      font-size: 13.5px; font-family: var(--font-sans);
+      background: var(--paper);
+      color: var(--ink-900);
+      outline: none;
+      transition: border-color .15s;
+    }
+    .tb-table-search input:focus { border-color: var(--ink-400); }
+    .tb-table-search input::placeholder { color: var(--ink-300); }
+    .tb-table-search .search-icon {
+      position: absolute; left: 11px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--ink-400);
+    }
+    .tb-table-count {
+      font-size: 12.5px; color: var(--ink-400); white-space: nowrap;
+    }
+    /* Table */
+    .tb-main-table {
+      flex: 1; overflow-y: auto;
+    }
+    .tb-main-table::-webkit-scrollbar { width: 5px; }
+    .tb-main-table::-webkit-scrollbar-thumb { background: var(--ink-200); border-radius: 4px; }
+    .tb-main-table table {
+      width: 100%; border-collapse: collapse;
+    }
+    .tb-main-table thead { position: sticky; top: 0; z-index: 1; }
+    .tb-main-table th {
+      padding: 10px 14px;
+      font-size: 12px; font-weight: 600;
+      color: var(--ink-400);
+      text-align: left;
+      background: oklch(0.98 0.005 80);
+      border-bottom: 1px solid var(--ink-200);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    .tb-main-table td {
+      padding: 12px 14px;
+      font-size: 13.5px;
+      color: var(--ink-700);
+      border-bottom: 1px solid var(--ink-100);
+      transition: all .15s;
+    }
+    .tb-main-table tr {
+      transition: all .2s ease;
+      cursor: pointer;
+      position: relative;
+    }
+    .tb-main-table tbody tr:hover {
+      background: oklch(0.97 0.01 80 / 0.6);
+      transform: translateX(2px);
+    }
+    .tb-main-table tbody tr:last-child td { border-bottom: none; }
+    /* Color strip on table rows (S9 style) */
+    .tb-main-table tbody tr td:first-child {
+      position: relative;
+    }
+    .tb-row-strip {
+      position: absolute; left: 0; top: 4px; bottom: 4px;
+      width: 3px; border-radius: 2px;
+    }
+    .tb-book-name-cell {
+      font-weight: 550; color: var(--ink-900);
+      display: flex; align-items: center; gap: 8px;
+      padding-left: 12px;
+    }
+    .tb-subject-badge {
+      font-size: 11px; padding: 3px 9px;
+      border-radius: var(--r-pill);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .tb-lessons-badge {
+      font-size: 12px; color: var(--ink-500);
+      display: flex; align-items: center; gap: 4px;
+    }
+    .tb-passages-num {
+      font-weight: 600; color: var(--ink-800);
+      font-size: 14px;
+    }
+    /* Expand detail (magazine-style hover card) */
+    .tb-main-table tbody tr.expanded {
+      background: oklch(0.97 0.015 80 / 0.4);
+    }
+    .tb-expand-row {
+      display: none;
+    }
+    .tb-expand-row.open {
+      display: table-row;
+    }
+    .tb-expand-cell {
+      padding: 0 14px 16px 28px;
+      border-bottom: 1px solid var(--ink-100);
+    }
+    .tb-expand-lessons {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 8px;
+      padding-top: 8px;
+    }
+    .tb-expand-lesson-card {
+      padding: 10px 14px;
+      background: var(--white);
+      border-radius: var(--r-md);
+      border: 1px solid var(--ink-100);
+      transition: all .2s ease;
+      cursor: pointer;
+    }
+    .tb-expand-lesson-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-card);
+      border-color: var(--ink-300);
+    }
+    .tb-expand-lesson-card h4 {
+      font-size: 13px; font-weight: 550; margin: 0 0 4px;
+      color: var(--ink-900);
+    }
+    .tb-expand-lesson-card span {
+      font-size: 11.5px; color: var(--ink-400);
+    }
+    .tb-expand-lesson-card input[type="checkbox"] {
+      float: right; margin-top: 2px;
+      width: 15px; height: 15px;
+      accent-color: var(--sage-ink);
+      cursor: pointer;
+    }
+    /* Filter chips (kept for compatibility) */
     .tb-chip {
       padding: 6px 14px;
       border-radius: var(--r-pill);
@@ -733,121 +921,6 @@
     .tb-chip.active {
       background: var(--ink-900); color: var(--paper);
       border-color: var(--ink-900);
-    }
-    /* Search */
-    .tb-search {
-      position: relative;
-      margin-bottom: 20px;
-    }
-    .tb-search input {
-      width: 100%; padding: 11px 16px 11px 40px;
-      border: 1px solid var(--ink-200);
-      border-radius: var(--r-md);
-      font-size: 14px; font-family: var(--font-sans);
-      background: var(--white);
-      color: var(--ink-900);
-      outline: none;
-      transition: border-color .15s;
-    }
-    .tb-search input:focus { border-color: var(--ink-400); }
-    .tb-search input::placeholder { color: var(--ink-300); }
-    .tb-search .search-icon {
-      position: absolute; left: 13px; top: 50%;
-      transform: translateY(-50%);
-      color: var(--ink-400);
-    }
-    /* Tree list */
-    .tb-tree {
-      background: var(--white);
-      border: 1px solid var(--ink-200);
-      border-radius: var(--r-lg);
-      overflow: hidden;
-      max-height: 620px;
-      overflow-y: auto;
-    }
-    .tb-tree::-webkit-scrollbar { width: 5px; }
-    .tb-tree::-webkit-scrollbar-thumb { background: var(--ink-200); border-radius: 4px; }
-    .tb-book-item {
-      border-bottom: 1px solid var(--ink-100);
-    }
-    .tb-book-item:last-child { border-bottom: none; }
-    .tb-book-head {
-      display: flex; align-items: center; gap: 10px;
-      padding: 14px 18px;
-      cursor: pointer;
-      transition: background .1s;
-    }
-    .tb-book-head:hover { background: oklch(0.97 0.01 80 / 0.5); }
-    .tb-book-head .caret {
-      width: 18px; height: 18px;
-      color: var(--ink-400);
-      transition: transform .2s;
-      flex-shrink: 0;
-    }
-    .tb-book-head .caret.open { transform: rotate(90deg); }
-    .tb-book-head input[type="checkbox"] {
-      width: 18px; height: 18px;
-      accent-color: var(--sage-ink);
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-    .tb-book-name {
-      font-size: 14.5px; font-weight: 550; color: var(--ink-900);
-      flex: 1;
-    }
-    .tb-book-badge {
-      font-size: 11px; padding: 2px 8px;
-      border-radius: var(--r-pill);
-      background: var(--sky);
-      color: var(--sky-ink);
-      font-weight: 500;
-    }
-    .tb-book-count {
-      font-size: 12.5px; color: var(--ink-400);
-    }
-    .tb-lessons {
-      display: none;
-      padding: 0 18px 12px 54px;
-    }
-    .tb-lessons.open { display: block; }
-    .tb-lesson-row {
-      display: flex; align-items: center; gap: 10px;
-      padding: 7px 0;
-      cursor: pointer;
-    }
-    .tb-lesson-row .caret {
-      width: 16px; height: 16px; color: var(--ink-300);
-      transition: transform .2s; flex-shrink: 0;
-    }
-    .tb-lesson-row .caret.open { transform: rotate(90deg); }
-    .tb-lesson-row input[type="checkbox"] {
-      width: 16px; height: 16px;
-      accent-color: var(--sage-ink);
-      cursor: pointer;
-    }
-    .tb-lesson-name {
-      font-size: 13.5px; font-weight: 500; color: var(--ink-800);
-    }
-    .tb-lesson-count {
-      font-size: 12px; color: var(--ink-400);
-      margin-left: 4px;
-    }
-    .tb-passages {
-      display: none;
-      padding: 2px 0 6px 42px;
-    }
-    .tb-passages.open { display: block; }
-    .tb-passage-row {
-      display: flex; align-items: center; gap: 8px;
-      padding: 5px 0;
-    }
-    .tb-passage-row input[type="checkbox"] {
-      width: 15px; height: 15px;
-      accent-color: var(--sage-ink);
-      cursor: pointer;
-    }
-    .tb-passage-name {
-      font-size: 13px; color: var(--ink-700);
     }
 
     /* Right panel — generation options */
@@ -1553,6 +1626,12 @@
       .result-duo { grid-template-columns: 1fr; }
       .page-title-block h1 { font-size: 32px; }
       .tb-layout { grid-template-columns: 1fr; }
+      .tb-left-panel { grid-template-columns: 1fr; min-height: auto; }
+      .tb-sidebar { border-right: none; border-bottom: 1px solid var(--ink-100); padding: 14px 0; display: flex; flex-wrap: wrap; gap: 4px 0; }
+      .tb-sidebar h3 { width: 100%; margin-bottom: 4px; }
+      .tb-sidebar h3:not(:first-child) { margin-top: 10px; }
+      .tb-nav-item { padding: 7px 14px; font-size: 12.5px; }
+      .tb-expand-lessons { grid-template-columns: 1fr 1fr; }
       .tb-options { position: static; }
       .s4-layout { grid-template-columns: 1fr; }
       .s9-split { grid-template-columns: 1fr; }
@@ -2275,41 +2354,68 @@
     </div>
 
     <div class="tb-layout">
-      <!-- Left: filters + tree -->
-      <div>
-        <div class="tb-filter-group">
-          <span class="tb-filter-label">과목</span>
-          <div class="tb-filter-row" id="tbSubjectFilters">
-            <button class="tb-chip active" onclick="tbFilterSubject(this,'all')">전체</button>
-            <button class="tb-chip" onclick="tbFilterSubject(this,'공통영어1')">공통영어1</button>
-            <button class="tb-chip" onclick="tbFilterSubject(this,'공통영어2')">공통영어2</button>
-            <button class="tb-chip" onclick="tbFilterSubject(this,'영어')">영어</button>
-            <button class="tb-chip" onclick="tbFilterSubject(this,'중2')">중2</button>
-            <button class="tb-chip" onclick="tbFilterSubject(this,'중3')">중3</button>
+      <!-- Left: Sidebar + Table -->
+      <div class="tb-left-panel">
+        <div class="tb-sidebar">
+          <h3>과목</h3>
+          <div class="tb-nav-item active" onclick="tbSidebarFilter(this,'subject','all')">
+            <span class="dot" style="background:var(--ink-500)"></span> 전체
+            <span class="nav-count">25</span>
+          </div>
+          <div class="tb-nav-item" onclick="tbSidebarFilter(this,'subject','공통영어1')">
+            <span class="dot" style="background:var(--blush-ink)"></span> 공통영어1
+            <span class="nav-count">10</span>
+          </div>
+          <div class="tb-nav-item" onclick="tbSidebarFilter(this,'subject','공통영어2')">
+            <span class="dot" style="background:var(--sage-ink)"></span> 공통영어2
+            <span class="nav-count">5</span>
+          </div>
+          <div class="tb-nav-item" onclick="tbSidebarFilter(this,'subject','영어')">
+            <span class="dot" style="background:var(--sky-ink)"></span> 영어
+            <span class="nav-count">3</span>
+          </div>
+          <div class="tb-nav-item" onclick="tbSidebarFilter(this,'subject','중2')">
+            <span class="dot" style="background:var(--honey-ink)"></span> 중2
+            <span class="nav-count">4</span>
+          </div>
+          <div class="tb-nav-item" onclick="tbSidebarFilter(this,'subject','중3')">
+            <span class="dot" style="background:var(--lilac-ink)"></span> 중3
+            <span class="nav-count">3</span>
+          </div>
+          <h3>출판사</h3>
+          <div class="tb-nav-item" onclick="tbSidebarFilter(this,'publisher','능률')">
+            <span class="dot" style="background:var(--mint-ink)"></span> 능률
+          </div>
+          <div class="tb-nav-item" onclick="tbSidebarFilter(this,'publisher','동아')">
+            <span class="dot" style="background:var(--rose-ink)"></span> 동아
+          </div>
+          <div class="tb-nav-item" onclick="tbSidebarFilter(this,'publisher','미래엔')">
+            <span class="dot" style="background:var(--sky-ink)"></span> 미래엔
+          </div>
+          <div class="tb-nav-item" onclick="tbSidebarFilter(this,'publisher','비상')">
+            <span class="dot" style="background:var(--honey-ink)"></span> 비상
+          </div>
+          <div class="tb-nav-item" onclick="tbSidebarFilter(this,'publisher','지학사')">
+            <span class="dot" style="background:var(--sage-ink)"></span> 지학사
+          </div>
+          <div class="tb-nav-item" onclick="tbSidebarFilter(this,'publisher','천재')">
+            <span class="dot" style="background:var(--lilac-ink)"></span> 천재
+          </div>
+          <div class="tb-nav-item" onclick="tbSidebarFilter(this,'publisher','YBM')">
+            <span class="dot" style="background:var(--blush-ink)"></span> YBM
           </div>
         </div>
-        <div class="tb-filter-group">
-          <span class="tb-filter-label">출판사</span>
-          <div class="tb-filter-row" id="tbPublisherFilters">
-            <button class="tb-chip active" onclick="tbFilterPublisher(this,'all')">전체</button>
-            <button class="tb-chip" onclick="tbFilterPublisher(this,'금성')">금성</button>
-            <button class="tb-chip" onclick="tbFilterPublisher(this,'능률')">능률</button>
-            <button class="tb-chip" onclick="tbFilterPublisher(this,'동아')">동아</button>
-            <button class="tb-chip" onclick="tbFilterPublisher(this,'미래엔')">미래엔</button>
-            <button class="tb-chip" onclick="tbFilterPublisher(this,'비상')">비상</button>
-            <button class="tb-chip" onclick="tbFilterPublisher(this,'지학사')">지학사</button>
-            <button class="tb-chip" onclick="tbFilterPublisher(this,'천재')">천재</button>
-            <button class="tb-chip" onclick="tbFilterPublisher(this,'YBM')">YBM</button>
+        <div class="tb-table-area">
+          <div class="tb-table-header">
+            <div class="tb-table-search">
+              <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <input type="text" placeholder="교재 · 단원 검색" id="tbSearchInput" oninput="tbSearch()">
+            </div>
+            <span class="tb-table-count" id="tbTableCount">25개 교과서</span>
           </div>
-        </div>
-
-        <div class="tb-search">
-          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          <input type="text" placeholder="제목 검색" id="tbSearchInput" oninput="tbSearch()">
-        </div>
-
-        <div class="tb-tree" id="tbTree">
-          <!-- JS로 렌더링 -->
+          <div class="tb-main-table" id="tbTree">
+            <!-- JS로 렌더링 -->
+          </div>
         </div>
       </div>
 
@@ -3306,20 +3412,40 @@
       { subject: '공통영어2', publisher: '비상', author: '홍민표', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4','Lesson 5','Lesson 6'], passagesPerLesson: 4 },
     ];
 
+    const tbStripColors = {
+      '공통영어1': 'var(--blush-ink)',
+      '공통영어2': 'var(--sage-ink)',
+      '영어': 'var(--sky-ink)',
+      '중2': 'var(--honey-ink)',
+      '중3': 'var(--lilac-ink)',
+    };
+    const tbBadgeStyles = {
+      '공통영어1': { bg: 'var(--blush)', c: 'var(--blush-ink)' },
+      '공통영어2': { bg: 'var(--sage)', c: 'var(--sage-ink)' },
+      '영어': { bg: 'var(--sky)', c: 'var(--sky-ink)' },
+      '중2': { bg: 'var(--honey)', c: 'var(--honey-ink)' },
+      '중3': { bg: 'var(--lilac)', c: 'var(--lilac-ink)' },
+    };
+    const tbLessonCardColors = ['var(--blush)','var(--sky)','var(--sage)','var(--honey)','var(--lilac)','var(--mint)','var(--rose)','var(--blush)'];
+    const tbLessonCardInks = ['var(--blush-ink)','var(--sky-ink)','var(--sage-ink)','var(--honey-ink)','var(--lilac-ink)','var(--mint-ink)','var(--rose-ink)','var(--blush-ink)'];
+
     let tbSubjectFilter = 'all';
     let tbPublisherFilter = 'all';
     let tbSearchQuery = '';
+    let tbExpandedRow = null;
 
-    function tbFilterSubject(el, val) {
-      tbSubjectFilter = val;
-      document.querySelectorAll('#tbSubjectFilters .tb-chip').forEach(c => c.classList.remove('active'));
+    function tbSidebarFilter(el, type, val) {
+      if (type === 'subject') {
+        tbSubjectFilter = val;
+        tbPublisherFilter = 'all';
+      } else {
+        tbPublisherFilter = val;
+        tbSubjectFilter = 'all';
+      }
+      // Update active states
+      document.querySelectorAll('.tb-sidebar .tb-nav-item').forEach(n => n.classList.remove('active'));
       el.classList.add('active');
-      tbRenderTree();
-    }
-    function tbFilterPublisher(el, val) {
-      tbPublisherFilter = val;
-      document.querySelectorAll('#tbPublisherFilters .tb-chip').forEach(c => c.classList.remove('active'));
-      el.classList.add('active');
+      tbExpandedRow = null;
       tbRenderTree();
     }
     function tbSearch() {
@@ -3339,81 +3465,94 @@
         return true;
       });
 
+      // Update count
+      const countEl = document.getElementById('tbTableCount');
+      if (countEl) countEl.textContent = filtered.length + '개 교과서';
+
       if (filtered.length === 0) {
         container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--ink-400);font-size:14px">검색 결과가 없습니다.</div>';
         return;
       }
 
-      const caretSvg = '<svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>';
+      let html = `<table><thead><tr>
+        <th style="width:30px"><input type="checkbox" onchange="tbCheckAll(this)"></th>
+        <th>교과서</th><th>과목</th><th>출판사</th><th>단원</th><th>지문</th>
+      </tr></thead><tbody>`;
 
-      let html = '';
       filtered.forEach((book, bi) => {
+        const realIdx = tbData.indexOf(book);
         const totalP = book.lessons.length * book.passagesPerLesson;
-        const bookId = `tb-book-${bi}`;
-        html += `<div class="tb-book-item" data-book="${bi}">
-          <div class="tb-book-head" onclick="tbToggleBook('${bookId}')">
-            ${caretSvg}
-            <input type="checkbox" onclick="event.stopPropagation();tbCheckBook(${bi},this)">
-            <span class="tb-book-name">${book.subject} ${book.publisher}(${book.author})</span>
-            <span class="tb-book-badge">교과서</span>
-            <span class="tb-book-count">${totalP} 지문</span>
-          </div>
-          <div class="tb-lessons" id="${bookId}">`;
+        const stripColor = tbStripColors[book.subject] || 'var(--ink-400)';
+        const badge = tbBadgeStyles[book.subject] || { bg: 'var(--sky)', c: 'var(--sky-ink)' };
+        const isExpanded = tbExpandedRow === realIdx;
 
+        html += `<tr onclick="tbToggleExpand(${realIdx})" class="${isExpanded ? 'expanded' : ''}">
+          <td style="position:relative">
+            <span class="tb-row-strip" style="background:${stripColor}"></span>
+            <input type="checkbox" onclick="event.stopPropagation();tbCheckBook(${realIdx},this)" style="width:16px;height:16px;accent-color:var(--sage-ink);cursor:pointer">
+          </td>
+          <td><span class="tb-book-name-cell">${book.publisher}(${book.author})</span></td>
+          <td><span class="tb-subject-badge" style="background:${badge.bg};color:${badge.c}">${book.subject}</span></td>
+          <td>${book.publisher}</td>
+          <td><span class="tb-lessons-badge">${book.lessons.length}개</span></td>
+          <td><span class="tb-passages-num">${totalP}</span></td>
+        </tr>`;
+
+        // Expandable lesson row
+        html += `<tr class="tb-expand-row${isExpanded ? ' open' : ''}" id="tb-expand-${realIdx}">
+          <td colspan="6" class="tb-expand-cell">
+            <div class="tb-expand-lessons">`;
         book.lessons.forEach((lesson, li) => {
-          const lessonId = `${bookId}-L${li}`;
-          html += `<div class="tb-lesson-row" onclick="tbToggleLesson('${lessonId}')">
-              ${caretSvg}
-              <input type="checkbox" onclick="event.stopPropagation();tbCheckLesson(${bi},${li},this)">
-              <span class="tb-lesson-name">${lesson}</span>
-              <span class="tb-lesson-count">${book.passagesPerLesson} 지문</span>
-            </div>
-            <div class="tb-passages" id="${lessonId}">`;
-
-          for (let pi = 1; pi <= book.passagesPerLesson; pi++) {
-            html += `<div class="tb-passage-row">
-                <input type="checkbox" onchange="tbCountSelected()" data-passage="1">
-                <span class="tb-passage-name">${lesson} - 본문_${pi}</span>
-              </div>`;
-          }
-          html += '</div>';
+          const cardColor = tbLessonCardColors[li % tbLessonCardColors.length];
+          const cardInk = tbLessonCardInks[li % tbLessonCardInks.length];
+          html += `<div class="tb-expand-lesson-card" style="border-left:3px solid ${cardInk}" onclick="event.stopPropagation()">
+            <input type="checkbox" onchange="tbCountSelected()" data-passage="1" data-book="${realIdx}" data-lesson="${li}">
+            <h4>${lesson}</h4>
+            <span>${book.passagesPerLesson} 지문</span>
+          </div>`;
         });
-
-        html += '</div></div>';
+        html += `</div></td></tr>`;
       });
+
+      html += '</tbody></table>';
       container.innerHTML = html;
     }
 
-    function tbToggleBook(id) {
-      const el = document.getElementById(id);
-      const caret = el.parentElement.querySelector('.tb-book-head .caret');
-      el.classList.toggle('open');
-      caret.classList.toggle('open');
+    function tbToggleExpand(idx) {
+      if (tbExpandedRow === idx) {
+        tbExpandedRow = null;
+      } else {
+        tbExpandedRow = idx;
+      }
+      tbRenderTree();
     }
-    function tbToggleLesson(id) {
-      const el = document.getElementById(id);
-      const row = el.previousElementSibling;
-      const caret = row.querySelector('.caret');
-      el.classList.toggle('open');
-      caret.classList.toggle('open');
+
+    function tbCheckAll(cb) {
+      document.querySelectorAll('#tbTree input[type="checkbox"]').forEach(c => c.checked = cb.checked);
+      tbCountSelected();
     }
     function tbCheckBook(bi, cb) {
-      const bookEl = cb.closest('.tb-book-item');
-      bookEl.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = cb.checked);
+      // Check all lesson cards for this book
+      const expandRow = document.getElementById('tb-expand-' + bi);
+      if (expandRow) {
+        expandRow.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = cb.checked);
+      }
       tbCountSelected();
-    }
-    function tbCheckLesson(bi, li, cb) {
-      const lessonRow = cb.closest('.tb-lesson-row');
-      const passages = lessonRow.nextElementSibling;
-      if (passages) passages.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = cb.checked);
-      tbCountSelected();
+      event.stopPropagation();
     }
     function tbCountSelected() {
       const checked = document.querySelectorAll('#tbTree input[data-passage]:checked').length;
-      document.getElementById('tbSelectedCount').textContent = checked + '개';
-      document.getElementById('tbPassageCount').textContent = checked;
-      // Estimate ~8 questions per passage
-      const est = checked * 8;
+      // Count total passages from checked lessons
+      let totalPassages = 0;
+      document.querySelectorAll('#tbTree input[data-passage]:checked').forEach(cb => {
+        const bookIdx = parseInt(cb.dataset.book);
+        if (!isNaN(bookIdx) && tbData[bookIdx]) {
+          totalPassages += tbData[bookIdx].passagesPerLesson;
+        }
+      });
+      document.getElementById('tbSelectedCount').textContent = totalPassages + '개';
+      document.getElementById('tbPassageCount').textContent = totalPassages;
+      const est = totalPassages * 8;
       document.getElementById('tbEstimatedQ').innerHTML = est + ' <span style="font-size:13px;font-weight:400;color:var(--ink-400)">/ 1000</span>';
     }
 
