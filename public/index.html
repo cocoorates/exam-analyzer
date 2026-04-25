@@ -1084,6 +1084,36 @@
     }
     .tb-generate-btn:hover { background: var(--ink-700); }
 
+    /* Option tabs for mock exam */
+    .tb-option-tab {
+      transition: color .2s, border-color .2s;
+    }
+    .tb-option-tab.active {
+      color: var(--ink-700) !important;
+      border-bottom: 2px solid var(--ink-700) !important;
+    }
+    .mk-passages-panel {
+      padding: 0;
+    }
+    .mk-passages-panel .passage-card {
+      padding: 16px;
+      border-bottom: 1px solid var(--ink-100);
+    }
+    .mk-passages-panel .passage-card:last-child {
+      border-bottom: none;
+    }
+    .passage-card .passage-qnum {
+      font-size: 12px;
+      color: var(--ink-400);
+      margin-bottom: 6px;
+    }
+    .passage-card .passage-text {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--ink-800);
+      font-family: var(--font-serif);
+    }
+
     /* ═══════════════════════════════════════════════════
        ANALYZE PAGE
        ═══════════════════════════════════════════════════ */
@@ -2254,50 +2284,184 @@
       </div>
     </div>
 
-    <div class="tb-left-panel" style="margin-bottom:24px">
-      <div class="tb-sidebar">
-        <h3>카테고리</h3>
-        <div class="tb-nav-item active" onclick="spSidebarFilter(this,'all')">
-          <span class="tb-nav-bar" style="background:var(--ink-500)"></span> 전체
-          <span class="nav-count" id="spCountAll">12</span>
-        </div>
-        <div class="tb-nav-item" onclick="spSidebarFilter(this,'ebs')">
-          <span class="tb-nav-bar" style="background:var(--blush-ink)"></span> EBS 연계
-          <span class="nav-count" id="spCountEbs">4</span>
-        </div>
-        <div class="tb-nav-item" onclick="spSidebarFilter(this,'grammar')">
-          <span class="tb-nav-bar" style="background:var(--sage-ink)"></span> 문법 교재
-          <span class="nav-count" id="spCountGrammar">3</span>
-        </div>
-        <div class="tb-nav-item" onclick="spSidebarFilter(this,'reading')">
-          <span class="tb-nav-bar" style="background:var(--sky-ink)"></span> 독해 교재
-          <span class="nav-count" id="spCountReading">3</span>
-        </div>
-        <div class="tb-nav-item" onclick="spSidebarFilter(this,'voca')">
-          <span class="tb-nav-bar" style="background:var(--lilac-ink)"></span> 어휘 교재
-          <span class="nav-count" id="spCountVoca">2</span>
-        </div>
-      </div>
-      <div class="tb-table-area">
-        <div class="tb-table-header">
-          <div class="tb-table-search">
-            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-            <input type="text" placeholder="교재 검색" id="spSearchInput" oninput="spSearchFilter()">
+    <div class="tb-layout">
+      <!-- Left: Sidebar + Table -->
+      <div class="tb-left-panel">
+        <div class="tb-sidebar">
+          <h3>카테고리</h3>
+          <div class="tb-nav-item active" onclick="spSidebarFilter(this,'all')">
+            <span class="tb-nav-bar" style="background:var(--ink-500)"></span> 전체
+            <span class="nav-count" id="spCountAll">12</span>
           </div>
-          <span class="tb-table-count" id="spTableCount">12개 교재</span>
+          <div class="tb-nav-item" onclick="spSidebarFilter(this,'ebs')">
+            <span class="tb-nav-bar" style="background:var(--blush-ink)"></span> EBS 연계
+            <span class="nav-count" id="spCountEbs">4</span>
+          </div>
+          <div class="tb-nav-item" onclick="spSidebarFilter(this,'grammar')">
+            <span class="tb-nav-bar" style="background:var(--sage-ink)"></span> 문법 교재
+            <span class="nav-count" id="spCountGrammar">3</span>
+          </div>
+          <div class="tb-nav-item" onclick="spSidebarFilter(this,'reading')">
+            <span class="tb-nav-bar" style="background:var(--sky-ink)"></span> 독해 교재
+            <span class="nav-count" id="spCountReading">3</span>
+          </div>
+          <div class="tb-nav-item" onclick="spSidebarFilter(this,'voca')">
+            <span class="tb-nav-bar" style="background:var(--lilac-ink)"></span> 어휘 교재
+            <span class="nav-count" id="spCountVoca">2</span>
+          </div>
         </div>
-        <div class="tb-main-table" id="spGrid">
-          <!-- JS 렌더링 -->
+        <div class="tb-table-area">
+          <div class="tb-table-header">
+            <div class="tb-table-search">
+              <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <input type="text" placeholder="교재 검색" id="spSearchInput" oninput="spSearchFilter()">
+            </div>
+            <span class="tb-table-count" id="spTableCount">12개 교재</span>
+          </div>
+          <div class="tb-main-table" id="spGrid">
+            <!-- JS 렌더링 -->
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="sp-bottom">
-      <div class="sp-bottom-info">
-        <span class="sp-bottom-stat">선택한 교재: <strong id="spSelCount">0</strong>권</span>
-        <span class="sp-bottom-stat">총 지문: <strong id="spSelPassages">0</strong>개</span>
+      <!-- Right: generation options -->
+      <div class="tb-options">
+        <div class="tb-options-head">
+          <h3>생성 옵션</h3>
+        </div>
+
+        <div class="tb-selected-info">
+          <span>현재 선택한 지문</span>
+          <strong id="spSelectedCount">0개</strong>
+        </div>
+
+        <div class="tb-opt-section">
+          <span class="tb-opt-label">유형 · 난이도</span>
+          <div class="tb-opt-grid">
+            <span class="tb-opt-type">요지</span>
+            <div class="tb-diff-row">
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">고등(상)</button>
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">고등(하)</button>
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">중등</button>
+            </div>
+            <span class="tb-opt-type">주제</span>
+            <div class="tb-diff-row">
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">고등(상)</button>
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">고등(하)</button>
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">중등</button>
+            </div>
+            <span class="tb-opt-type">제목</span>
+            <div class="tb-diff-row">
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">고등(상)</button>
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">고등(하)</button>
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">중등</button>
+            </div>
+            <span class="tb-opt-type">내용 일치</span>
+            <div class="tb-diff-row">
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">고등(상)</button>
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">고등(하)</button>
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">중등</button>
+            </div>
+            <span class="tb-opt-type">내용 불일치</span>
+            <div class="tb-diff-row">
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">고등(상)</button>
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">고등(하)</button>
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">중등</button>
+            </div>
+            <span class="tb-opt-type">빈칸</span>
+            <div class="tb-diff-row">
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">절 빈칸</button>
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">구 빈칸</button>
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">단어 빈칸</button>
+            </div>
+            <span class="tb-opt-type">요약</span>
+            <div class="tb-diff-row">
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">고등(상)</button>
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">고등(하)</button>
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">중등</button>
+            </div>
+            <span class="tb-opt-type">무관한 문장</span>
+            <div class="tb-diff-row">
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">고등(상)</button>
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">고등(하)</button>
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">중등</button>
+            </div>
+            <span class="tb-opt-type">어법</span>
+            <div class="tb-diff-row">
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">밑줄</button>
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">양자택일</button>
+            </div>
+            <span class="tb-opt-type">어휘</span>
+            <div class="tb-diff-row">
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">밑줄</button>
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">양자택일</button>
+            </div>
+            <span class="tb-opt-type">기타</span>
+            <div class="tb-diff-row">
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">함축의미</button>
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">순서</button>
+              <button class="tb-diff-btn" onclick="spToggleDiff(this)">삽입</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="tb-opt-section">
+          <span class="tb-opt-label">빠른 옵션</span>
+          <div class="tb-quick-grid">
+            <div class="tb-quick-card qc-blush" onclick="spQuickSelect('요지')">
+              <div class="qc-type">요지</div>
+              <div class="qc-detail">+ 고등(상)</div>
+            </div>
+            <div class="tb-quick-card qc-sky" onclick="spQuickSelect('주제')">
+              <div class="qc-type">주제</div>
+              <div class="qc-detail">+ 고등(상)</div>
+            </div>
+            <div class="tb-quick-card qc-lilac" onclick="spQuickSelect('빈칸')">
+              <div class="qc-type">빈칸</div>
+              <div class="qc-detail">+ 절 빈칸</div>
+            </div>
+            <div class="tb-quick-card qc-sage" onclick="spQuickSelect('어법')">
+              <div class="qc-type">어법</div>
+              <div class="qc-detail">+ 밑줄</div>
+            </div>
+            <div class="tb-quick-card qc-honey" onclick="spQuickSelect('어휘')">
+              <div class="qc-type">어휘</div>
+              <div class="qc-detail">+ 밑줄</div>
+            </div>
+            <div class="tb-quick-card qc-mint" onclick="spQuickSelect('추가')">
+              <div class="qc-type">+ 추가</div>
+              <div class="qc-detail"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tb-opt-section">
+          <span class="tb-opt-label">문제 배치</span>
+          <div class="tb-layout-tabs">
+            <button class="tb-layout-tab active" onclick="spLayoutTab(this)">지문별</button>
+            <button class="tb-layout-tab" onclick="spLayoutTab(this)">유형별</button>
+            <button class="tb-layout-tab" onclick="spLayoutTab(this)">무작위</button>
+          </div>
+        </div>
+
+        <div class="tb-stats-row">
+          <span>선택한 지문 수</span>
+          <strong id="spPassageCount">0</strong>
+        </div>
+        <div class="tb-stats-row">
+          <span>생성될 예상 문제 수</span>
+          <strong id="spEstimatedQ">0 <span style="font-size:13px;font-weight:400;color:var(--ink-400)">/ 1000</span></strong>
+        </div>
+
+        <div class="tb-quota">
+          <div class="tb-quota-row"><span>보유 Quota</span> <strong>0 Q</strong></div>
+          <div class="tb-quota-row"><span>예상 차감</span> <strong>0 Q</strong></div>
+          <div class="tb-quota-row"><span>생성 후 예상 잔여</span> <strong>0 Q</strong></div>
+          <div class="tb-quota-note">현재 보유 Quota 내에서 생성 가능합니다.</div>
+        </div>
+
+        <button class="tb-generate-btn">문제 생성하기</button>
       </div>
-      <button class="btn btn-primary" onclick="showPage('analyze')">문제 생성으로 →</button>
     </div>
   </div>
 
@@ -2313,64 +2477,214 @@
       </div>
     </div>
 
-    <div class="tb-left-panel" style="margin-bottom:24px">
-      <div class="tb-sidebar">
-        <h3>학년</h3>
-        <div class="tb-nav-item active" data-filter="grade" data-val="고1" onclick="mkSidebarFilter(this,'grade','고1')">
-          <span class="tb-nav-bar" style="background:var(--blush-ink)"></span> 고1
-          <span class="nav-count" id="mkCountG1">46</span>
-        </div>
-        <div class="tb-nav-item" data-filter="grade" data-val="고2" onclick="mkSidebarFilter(this,'grade','고2')">
-          <span class="tb-nav-bar" style="background:var(--sage-ink)"></span> 고2
-          <span class="nav-count" id="mkCountG2">46</span>
-        </div>
-        <div class="tb-nav-item" data-filter="grade" data-val="고3" onclick="mkSidebarFilter(this,'grade','고3')">
-          <span class="tb-nav-bar" style="background:var(--sky-ink)"></span> 고3
-          <span class="nav-count" id="mkCountG3">46</span>
-        </div>
-        <h3>연도</h3>
-        <div class="tb-nav-item" data-filter="year" data-val="2026" onclick="mkSidebarFilter(this,'year','2026')">
-          <span class="tb-nav-bar" style="background:var(--honey-ink)"></span> 2026년
-        </div>
-        <div class="tb-nav-item" data-filter="year" data-val="2025" onclick="mkSidebarFilter(this,'year','2025')">
-          <span class="tb-nav-bar" style="background:var(--lilac-ink)"></span> 2025년
-        </div>
-        <div class="tb-nav-item" data-filter="year" data-val="2024" onclick="mkSidebarFilter(this,'year','2024')">
-          <span class="tb-nav-bar" style="background:var(--mint-ink)"></span> 2024년
-        </div>
-        <div class="tb-nav-item" data-filter="year" data-val="2023" onclick="mkSidebarFilter(this,'year','2023')">
-          <span class="tb-nav-bar" style="background:var(--rose-ink)"></span> 2023년
-        </div>
-        <div class="tb-nav-item" data-filter="year" data-val="2022" onclick="mkSidebarFilter(this,'year','2022')">
-          <span class="tb-nav-bar" style="background:var(--blush-ink)"></span> 2022년
-        </div>
-        <div class="tb-nav-item" data-filter="year" data-val="2021" onclick="mkSidebarFilter(this,'year','2021')">
-          <span class="tb-nav-bar" style="background:var(--sage-ink)"></span> 2021년
-        </div>
-        <div class="tb-nav-item" data-filter="year" data-val="2020" onclick="mkSidebarFilter(this,'year','2020')">
-          <span class="tb-nav-bar" style="background:var(--sky-ink)"></span> 2020년
-        </div>
-      </div>
-      <div class="tb-table-area">
-        <div class="tb-table-header">
-          <div class="tb-table-search">
-            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-            <input type="text" placeholder="학년 · 월 검색" id="mkSearchInput" oninput="mkSearchFilter()">
+    <div class="tb-layout">
+      <!-- Left: Sidebar + Table -->
+      <div class="tb-left-panel">
+        <div class="tb-sidebar">
+          <h3>학년</h3>
+          <div class="tb-nav-item active" data-filter="grade" data-val="고1" onclick="mkSidebarFilter(this,'grade','고1')">
+            <span class="tb-nav-bar" style="background:var(--blush-ink)"></span> 고1
+            <span class="nav-count" id="mkCountG1">46</span>
           </div>
-          <span class="tb-table-count" id="mkTableCount">105개 시험</span>
+          <div class="tb-nav-item" data-filter="grade" data-val="고2" onclick="mkSidebarFilter(this,'grade','고2')">
+            <span class="tb-nav-bar" style="background:var(--sage-ink)"></span> 고2
+            <span class="nav-count" id="mkCountG2">46</span>
+          </div>
+          <div class="tb-nav-item" data-filter="grade" data-val="고3" onclick="mkSidebarFilter(this,'grade','고3')">
+            <span class="tb-nav-bar" style="background:var(--sky-ink)"></span> 고3
+            <span class="nav-count" id="mkCountG3">46</span>
+          </div>
+          <h3>연도</h3>
+          <div class="tb-nav-item" data-filter="year" data-val="2026" onclick="mkSidebarFilter(this,'year','2026')">
+            <span class="tb-nav-bar" style="background:var(--honey-ink)"></span> 2026년
+          </div>
+          <div class="tb-nav-item" data-filter="year" data-val="2025" onclick="mkSidebarFilter(this,'year','2025')">
+            <span class="tb-nav-bar" style="background:var(--lilac-ink)"></span> 2025년
+          </div>
+          <div class="tb-nav-item" data-filter="year" data-val="2024" onclick="mkSidebarFilter(this,'year','2024')">
+            <span class="tb-nav-bar" style="background:var(--mint-ink)"></span> 2024년
+          </div>
+          <div class="tb-nav-item" data-filter="year" data-val="2023" onclick="mkSidebarFilter(this,'year','2023')">
+            <span class="tb-nav-bar" style="background:var(--rose-ink)"></span> 2023년
+          </div>
+          <div class="tb-nav-item" data-filter="year" data-val="2022" onclick="mkSidebarFilter(this,'year','2022')">
+            <span class="tb-nav-bar" style="background:var(--blush-ink)"></span> 2022년
+          </div>
+          <div class="tb-nav-item" data-filter="year" data-val="2021" onclick="mkSidebarFilter(this,'year','2021')">
+            <span class="tb-nav-bar" style="background:var(--sage-ink)"></span> 2021년
+          </div>
+          <div class="tb-nav-item" data-filter="year" data-val="2020" onclick="mkSidebarFilter(this,'year','2020')">
+            <span class="tb-nav-bar" style="background:var(--sky-ink)"></span> 2020년
+          </div>
         </div>
-        <div class="tb-main-table" id="mkTimeline">
-          <!-- JS 렌더링 -->
+        <div class="tb-table-area">
+          <div class="tb-table-header">
+            <div class="tb-table-search">
+              <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <input type="text" placeholder="학년 · 월 검색" id="mkSearchInput" oninput="mkSearchFilter()">
+            </div>
+            <span class="tb-table-count" id="mkTableCount">105개 시험</span>
+          </div>
+          <div class="tb-main-table" id="mkTimeline">
+            <!-- JS 렌더링 -->
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="mk-bottom">
-      <div class="sp-bottom-info">
-        <span class="sp-bottom-stat">선택한 시험: <strong id="mkSelCount">0</strong>회</span>
-        <span class="sp-bottom-stat">총 문항: <strong id="mkSelQ">0</strong>개</span>
+      <!-- Right: generation options or passage viewer -->
+      <div class="tb-options">
+        <!-- Tabs: 생성옵션 vs 원문보기 -->
+        <div class="tb-options-tabs" style="display:flex; gap:8px; padding:16px; border-bottom:1px solid var(--ink-100); margin-bottom:16px;">
+          <button class="tb-option-tab active" onclick="mkShowTab(this,'options')" style="flex:1; padding:8px 12px; border:none; background:transparent; color:var(--ink-700); border-bottom:2px solid transparent; cursor:pointer; font-weight:500; transition:all 0.2s;">생성옵션</button>
+          <button class="tb-option-tab" onclick="mkShowTab(this,'passages')" style="flex:1; padding:8px 12px; border:none; background:transparent; color:var(--ink-400); border-bottom:2px solid transparent; cursor:pointer; font-weight:500; transition:all 0.2s;">원문보기</button>
+        </div>
+
+        <!-- Options Panel -->
+        <div id="mkOptionsPanel" class="mk-options-panel" style="display:block;">
+          <div class="tb-options-head">
+            <h3>생성 옵션</h3>
+          </div>
+
+          <div class="tb-selected-info">
+            <span>현재 선택한 문항</span>
+            <strong id="mkSelectedCount">0개</strong>
+          </div>
+
+          <div class="tb-opt-section">
+            <span class="tb-opt-label">유형 · 난이도</span>
+            <div class="tb-opt-grid">
+              <span class="tb-opt-type">요지</span>
+              <div class="tb-diff-row">
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">고등(상)</button>
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">고등(하)</button>
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">중등</button>
+              </div>
+              <span class="tb-opt-type">주제</span>
+              <div class="tb-diff-row">
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">고등(상)</button>
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">고등(하)</button>
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">중등</button>
+              </div>
+              <span class="tb-opt-type">제목</span>
+              <div class="tb-diff-row">
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">고등(상)</button>
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">고등(하)</button>
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">중등</button>
+              </div>
+              <span class="tb-opt-type">내용 일치</span>
+              <div class="tb-diff-row">
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">고등(상)</button>
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">고등(하)</button>
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">중등</button>
+              </div>
+              <span class="tb-opt-type">내용 불일치</span>
+              <div class="tb-diff-row">
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">고등(상)</button>
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">고등(하)</button>
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">중등</button>
+              </div>
+              <span class="tb-opt-type">빈칸</span>
+              <div class="tb-diff-row">
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">절 빈칸</button>
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">구 빈칸</button>
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">단어 빈칸</button>
+              </div>
+              <span class="tb-opt-type">요약</span>
+              <div class="tb-diff-row">
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">고등(상)</button>
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">고등(하)</button>
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">중등</button>
+              </div>
+              <span class="tb-opt-type">무관한 문장</span>
+              <div class="tb-diff-row">
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">고등(상)</button>
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">고등(하)</button>
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">중등</button>
+              </div>
+              <span class="tb-opt-type">어법</span>
+              <div class="tb-diff-row">
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">밑줄</button>
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">양자택일</button>
+              </div>
+              <span class="tb-opt-type">어휘</span>
+              <div class="tb-diff-row">
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">밑줄</button>
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">양자택일</button>
+              </div>
+              <span class="tb-opt-type">기타</span>
+              <div class="tb-diff-row">
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">함축의미</button>
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">순서</button>
+                <button class="tb-diff-btn" onclick="mkToggleDiff(this)">삽입</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="tb-opt-section">
+            <span class="tb-opt-label">빠른 옵션</span>
+            <div class="tb-quick-grid">
+              <div class="tb-quick-card qc-blush" onclick="mkQuickSelect('요지')">
+                <div class="qc-type">요지</div>
+                <div class="qc-detail">+ 고등(상)</div>
+              </div>
+              <div class="tb-quick-card qc-sky" onclick="mkQuickSelect('주제')">
+                <div class="qc-type">주제</div>
+                <div class="qc-detail">+ 고등(상)</div>
+              </div>
+              <div class="tb-quick-card qc-lilac" onclick="mkQuickSelect('빈칸')">
+                <div class="qc-type">빈칸</div>
+                <div class="qc-detail">+ 절 빈칸</div>
+              </div>
+              <div class="tb-quick-card qc-sage" onclick="mkQuickSelect('어법')">
+                <div class="qc-type">어법</div>
+                <div class="qc-detail">+ 밑줄</div>
+              </div>
+              <div class="tb-quick-card qc-honey" onclick="mkQuickSelect('어휘')">
+                <div class="qc-type">어휘</div>
+                <div class="qc-detail">+ 밑줄</div>
+              </div>
+              <div class="tb-quick-card qc-mint" onclick="mkQuickSelect('추가')">
+                <div class="qc-type">+ 추가</div>
+                <div class="qc-detail"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tb-opt-section">
+            <span class="tb-opt-label">문제 배치</span>
+            <div class="tb-layout-tabs">
+              <button class="tb-layout-tab active" onclick="mkLayoutTab(this)">지문별</button>
+              <button class="tb-layout-tab" onclick="mkLayoutTab(this)">유형별</button>
+              <button class="tb-layout-tab" onclick="mkLayoutTab(this)">무작위</button>
+            </div>
+          </div>
+
+          <div class="tb-stats-row">
+            <span>선택한 문항 수</span>
+            <strong id="mkPassageCount">0</strong>
+          </div>
+          <div class="tb-stats-row">
+            <span>생성될 예상 문제 수</span>
+            <strong id="mkEstimatedQ">0 <span style="font-size:13px;font-weight:400;color:var(--ink-400)">/ 1000</span></strong>
+          </div>
+
+          <div class="tb-quota">
+            <div class="tb-quota-row"><span>보유 Quota</span> <strong>0 Q</strong></div>
+            <div class="tb-quota-row"><span>예상 차감</span> <strong>0 Q</strong></div>
+            <div class="tb-quota-row"><span>생성 후 예상 잔여</span> <strong>0 Q</strong></div>
+            <div class="tb-quota-note">현재 보유 Quota 내에서 생성 가능합니다.</div>
+          </div>
+
+          <button class="tb-generate-btn">문제 생성하기</button>
+        </div>
+
+        <!-- Passages Panel -->
+        <div id="mkPassagesPanel" class="mk-passages-panel" style="display:none; overflow-y:auto; max-height:calc(100vh - 200px);">
+          <div style="padding:16px; text-align:center; color:var(--ink-400); font-size:14px;">
+            시험을 선택하면 원문이 표시됩니다.
+          </div>
+        </div>
       </div>
-      <button class="btn btn-primary" onclick="showPage('analyze')">문제 생성으로 →</button>
     </div>
   </div>
 
@@ -3392,6 +3706,16 @@
       spSelected.forEach(i => total += spData[i].lessons);
       document.getElementById('spSelPassages').textContent = total;
     }
+    function spToggleDiff(btn) {
+      btn.classList.toggle('active');
+    }
+    function spQuickSelect(type) {
+      // Visual feedback only for now
+    }
+    function spLayoutTab(btn) {
+      btn.parentElement.querySelectorAll('.tb-layout-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+    }
     spRender();
 
     // ── Mock exam page logic ──
@@ -3484,7 +3808,8 @@
       filtered.forEach(it => {
         const badge = mkMonthBadge[it.month] || {bg:'var(--sky)',c:'var(--sky-ink)'};
         const checked = mkSelected.has(it.key) ? ' checked' : '';
-        html += `<tr onclick="mkToggle('${it.key}')" style="cursor:pointer">
+        const examId = `${it.grade.slice(-1)}-${it.year}-${it.month}`;
+        html += `<tr onclick="mkToggle('${it.key}'); mkFetchPassages('${examId}')" style="cursor:pointer">
           <td><input type="checkbox" onclick="event.stopPropagation();mkToggle('${it.key}')"${checked} style="width:16px;height:16px;accent-color:var(--sage-ink);cursor:pointer"></td>
           <td style="font-weight:550;color:var(--ink-900)">${it.grade} ${String(it.year).slice(2)}년 ${it.month}월</td>
           <td><span class="tb-subject-badge" style="background:${badge.bg};color:${badge.c}">${it.grade}</span></td>
@@ -3518,6 +3843,100 @@
       document.getElementById('mkSelCount').textContent = mkSelected.size;
       document.getElementById('mkSelQ').textContent = mkSelected.size * 45;
     }
+    function mkShowTab(btn, tab) {
+      // Update button styles
+      document.querySelectorAll('.tb-option-tab').forEach(b => {
+        b.classList.remove('active');
+        b.style.color = 'var(--ink-400)';
+        b.style.borderBottom = '2px solid transparent';
+      });
+      btn.classList.add('active');
+      btn.style.color = 'var(--ink-700)';
+      btn.style.borderBottom = '2px solid var(--ink-700)';
+
+      // Show/hide panels
+      const optionsPanel = document.getElementById('mkOptionsPanel');
+      const passagesPanel = document.getElementById('mkPassagesPanel');
+      if (tab === 'options') {
+        optionsPanel.style.display = 'block';
+        passagesPanel.style.display = 'none';
+      } else {
+        optionsPanel.style.display = 'none';
+        passagesPanel.style.display = 'block';
+      }
+    }
+    function mkToggleDiff(btn) {
+      btn.classList.toggle('active');
+    }
+    function mkQuickSelect(type) {
+      // Visual feedback only for now
+    }
+    function mkLayoutTab(btn) {
+      btn.parentElement.querySelectorAll('.tb-layout-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    let mkCurrentExamId = null;
+    async function mkFetchPassages(examId) {
+      mkCurrentExamId = examId;
+      const panel = document.getElementById('mkPassagesPanel');
+      panel.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ink-400);">지문 로딩 중...</div>';
+
+      try {
+        const supabaseUrl = 'https://qnohnjysnrjznqawwvep.supabase.co';
+        const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFub2huanlzbnJqem5xYXd3dmVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjA3MDMsImV4cCI6MjA5MjY5NjcwM30.O1KXAzfKtF6Ui1iMTg82iwHCIWLVwHHjy-E9N-s82rU';
+
+        const response = await fetch(`${supabaseUrl}/rest/v1/mock_questions?exam_id=eq.${examId}&select=question_number,passage,passage_group&order=question_number`, {
+          method: 'GET',
+          headers: {
+            'apikey': anonKey,
+            'Authorization': `Bearer ${anonKey}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const questions = await response.json();
+
+        if (!questions || questions.length === 0) {
+          panel.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ink-400);">지문이 없습니다.</div>';
+          return;
+        }
+
+        // Group passages by passage_group and deduplicate
+        const passageMap = new Map();
+        questions.forEach(q => {
+          if (q.passage) {
+            const key = q.passage_group || 'default';
+            if (!passageMap.has(key)) {
+              passageMap.set(key, {
+                passage: q.passage,
+                passage_group: q.passage_group,
+                questions: []
+              });
+            }
+            passageMap.get(key).questions.push(q.question_number);
+          }
+        });
+
+        // Render passages
+        let html = '';
+        passageMap.forEach(p => {
+          const qnums = p.questions.sort((a,b) => a - b).join(', ');
+          const groupLabel = p.passage_group ? `[${p.passage_group}]` : '';
+          html += `<div class="passage-card">
+            <div class="passage-qnum">문항: ${qnums} ${groupLabel}</div>
+            <div class="passage-text">${p.passage}</div>
+          </div>`;
+        });
+
+        panel.innerHTML = html;
+      } catch (err) {
+        console.error('Failed to fetch passages:', err);
+        panel.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ink-600);">지문을 불러올 수 없습니다.</div>';
+      }
+    }
+
     mkRender();
 
     // ── Textbook page logic ──
