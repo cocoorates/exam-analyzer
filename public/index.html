@@ -1648,17 +1648,6 @@
         <span class="nav-link" data-page="suneung" onclick="showPage('suneung')">수능</span>
         <span class="nav-link" data-page="analyze" onclick="showPage('analyze')">분석서</span>
         <span class="nav-link" data-page="analyze2" onclick="showPage('analyze2')">분석서2</span>
-        <span style="color:var(--ink-200);margin:0 4px">|</span>
-        <span class="nav-link" data-page="s1" onclick="showPage('s1')" style="font-size:13px">1</span>
-        <span class="nav-link" data-page="s2" onclick="showPage('s2')" style="font-size:13px">2</span>
-        <span class="nav-link" data-page="s3" onclick="showPage('s3')" style="font-size:13px">3</span>
-        <span class="nav-link" data-page="s4" onclick="showPage('s4')" style="font-size:13px">4</span>
-        <span class="nav-link" data-page="s5" onclick="showPage('s5')" style="font-size:13px">5</span>
-        <span class="nav-link" data-page="s6" onclick="showPage('s6')" style="font-size:13px">6</span>
-        <span class="nav-link" data-page="s7" onclick="showPage('s7')" style="font-size:13px">7</span>
-        <span class="nav-link" data-page="s8" onclick="showPage('s8')" style="font-size:13px">8</span>
-        <span class="nav-link" data-page="s9" onclick="showPage('s9')" style="font-size:13px">9</span>
-        <span class="nav-link" data-page="s10" onclick="showPage('s10')" style="font-size:13px">10</span>
       </div>
       <button class="nav-hamburger" onclick="openMobileMenu()">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -1680,17 +1669,6 @@
         <a href="#" onclick="showPage('suneung');closeMobileMenu()">수능</a>
         <a href="#" onclick="showPage('analyze');closeMobileMenu()">분석서</a>
         <a href="#" onclick="showPage('analyze2');closeMobileMenu()">분석서2</a>
-        <div class="mobile-divider"></div>
-        <a href="#" onclick="showPage('s1');closeMobileMenu()">시안 1 — Bento</a>
-        <a href="#" onclick="showPage('s2');closeMobileMenu()">시안 2 — Kanban</a>
-        <a href="#" onclick="showPage('s3');closeMobileMenu()">시안 3 — Magazine</a>
-        <a href="#" onclick="showPage('s4');closeMobileMenu()">시안 4 — Table</a>
-        <a href="#" onclick="showPage('s5');closeMobileMenu()">시안 5 — Spotlight</a>
-        <a href="#" onclick="showPage('s6');closeMobileMenu()">시안 6 — Accordion</a>
-        <a href="#" onclick="showPage('s7');closeMobileMenu()">시안 7 — Dashboard</a>
-        <a href="#" onclick="showPage('s8');closeMobileMenu()">시안 8 — Masonry</a>
-        <a href="#" onclick="showPage('s9');closeMobileMenu()">시안 9 — Split Pane</a>
-        <a href="#" onclick="showPage('s10');closeMobileMenu()">시안 10 — Timeline</a>
         <div class="mobile-divider"></div>
         <a href="#" onclick="openAuthModal();closeMobileMenu()" style="font-weight:600;color:var(--ink-700)">로그인 / 회원가입</a>
       </div>
@@ -2269,16 +2247,42 @@
       </div>
     </div>
 
-    <div class="sp-tabs" id="spTabs">
-      <button class="sp-tab active" onclick="spFilterCat(this,'all')">전체</button>
-      <button class="sp-tab" onclick="spFilterCat(this,'ebs')">EBS 연계</button>
-      <button class="sp-tab" onclick="spFilterCat(this,'grammar')">문법 교재</button>
-      <button class="sp-tab" onclick="spFilterCat(this,'reading')">독해 교재</button>
-      <button class="sp-tab" onclick="spFilterCat(this,'voca')">어휘 교재</button>
-    </div>
-
-    <div class="sp-grid" id="spGrid">
-      <!-- JS 렌더링 -->
+    <div class="tb-left-panel" style="margin-bottom:24px">
+      <div class="tb-sidebar">
+        <h3>카테고리</h3>
+        <div class="tb-nav-item active" onclick="spSidebarFilter(this,'all')">
+          <span class="tb-nav-bar" style="background:var(--ink-500)"></span> 전체
+          <span class="nav-count" id="spCountAll">12</span>
+        </div>
+        <div class="tb-nav-item" onclick="spSidebarFilter(this,'ebs')">
+          <span class="tb-nav-bar" style="background:var(--blush-ink)"></span> EBS 연계
+          <span class="nav-count" id="spCountEbs">4</span>
+        </div>
+        <div class="tb-nav-item" onclick="spSidebarFilter(this,'grammar')">
+          <span class="tb-nav-bar" style="background:var(--sage-ink)"></span> 문법 교재
+          <span class="nav-count" id="spCountGrammar">3</span>
+        </div>
+        <div class="tb-nav-item" onclick="spSidebarFilter(this,'reading')">
+          <span class="tb-nav-bar" style="background:var(--sky-ink)"></span> 독해 교재
+          <span class="nav-count" id="spCountReading">3</span>
+        </div>
+        <div class="tb-nav-item" onclick="spSidebarFilter(this,'voca')">
+          <span class="tb-nav-bar" style="background:var(--lilac-ink)"></span> 어휘 교재
+          <span class="nav-count" id="spCountVoca">2</span>
+        </div>
+      </div>
+      <div class="tb-table-area">
+        <div class="tb-table-header">
+          <div class="tb-table-search">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" placeholder="교재 검색" id="spSearchInput" oninput="spSearchFilter()">
+          </div>
+          <span class="tb-table-count" id="spTableCount">12개 교재</span>
+        </div>
+        <div class="tb-main-table" id="spGrid">
+          <!-- JS 렌더링 -->
+        </div>
+      </div>
     </div>
 
     <div class="sp-bottom">
@@ -2302,25 +2306,54 @@
       </div>
     </div>
 
-    <div class="mk-filter-bar">
-      <select class="mk-select" id="mkGrade" onchange="mkRender()">
-        <option value="all">전체 학년</option>
-        <option value="고1">고1</option>
-        <option value="고2">고2</option>
-        <option value="고3">고3</option>
-      </select>
-      <select class="mk-select" id="mkYear" onchange="mkRender()">
-        <option value="all">전체 연도</option>
-        <option value="2026">2026년</option>
-        <option value="2025">2025년</option>
-        <option value="2024">2024년</option>
-        <option value="2023">2023년</option>
-        <option value="2022">2022년</option>
-      </select>
-    </div>
-
-    <div class="mk-timeline" id="mkTimeline">
-      <!-- JS 렌더링 -->
+    <div class="tb-left-panel" style="margin-bottom:24px">
+      <div class="tb-sidebar">
+        <h3>학년</h3>
+        <div class="tb-nav-item active" onclick="mkSidebarFilter(this,'grade','all')">
+          <span class="tb-nav-bar" style="background:var(--ink-500)"></span> 전체
+          <span class="nav-count" id="mkCountAll">105</span>
+        </div>
+        <div class="tb-nav-item" onclick="mkSidebarFilter(this,'grade','고1')">
+          <span class="tb-nav-bar" style="background:var(--blush-ink)"></span> 고1
+          <span class="nav-count" id="mkCountG1">35</span>
+        </div>
+        <div class="tb-nav-item" onclick="mkSidebarFilter(this,'grade','고2')">
+          <span class="tb-nav-bar" style="background:var(--sage-ink)"></span> 고2
+          <span class="nav-count" id="mkCountG2">35</span>
+        </div>
+        <div class="tb-nav-item" onclick="mkSidebarFilter(this,'grade','고3')">
+          <span class="tb-nav-bar" style="background:var(--sky-ink)"></span> 고3
+          <span class="nav-count" id="mkCountG3">35</span>
+        </div>
+        <h3>연도</h3>
+        <div class="tb-nav-item" onclick="mkSidebarFilter(this,'year','2026')">
+          <span class="tb-nav-bar" style="background:var(--honey-ink)"></span> 2026년
+        </div>
+        <div class="tb-nav-item" onclick="mkSidebarFilter(this,'year','2025')">
+          <span class="tb-nav-bar" style="background:var(--lilac-ink)"></span> 2025년
+        </div>
+        <div class="tb-nav-item" onclick="mkSidebarFilter(this,'year','2024')">
+          <span class="tb-nav-bar" style="background:var(--mint-ink)"></span> 2024년
+        </div>
+        <div class="tb-nav-item" onclick="mkSidebarFilter(this,'year','2023')">
+          <span class="tb-nav-bar" style="background:var(--rose-ink)"></span> 2023년
+        </div>
+        <div class="tb-nav-item" onclick="mkSidebarFilter(this,'year','2022')">
+          <span class="tb-nav-bar" style="background:var(--blush-ink)"></span> 2022년
+        </div>
+      </div>
+      <div class="tb-table-area">
+        <div class="tb-table-header">
+          <div class="tb-table-search">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" placeholder="학년 · 월 검색" id="mkSearchInput" oninput="mkSearchFilter()">
+          </div>
+          <span class="tb-table-count" id="mkTableCount">105개 시험</span>
+        </div>
+        <div class="tb-main-table" id="mkTimeline">
+          <!-- JS 렌더링 -->
+        </div>
+      </div>
     </div>
 
     <div class="mk-bottom">
@@ -3269,47 +3302,78 @@
 
     // ── Supplement page logic ──
     const spData = [
-      { cat: 'ebs', name: '2026 수능특강 영어', desc: 'EBS 연계교재', lessons: 24, color: 'var(--blush)', badgeBg: 'var(--blush)', badgeColor: 'var(--blush-ink)', accent: 'oklch(0.88 0.06 25)' },
-      { cat: 'ebs', name: '2026 수능특강 영어독해연습', desc: 'EBS 연계교재', lessons: 20, color: 'var(--sky)', badgeBg: 'var(--sky)', badgeColor: 'var(--sky-ink)', accent: 'oklch(0.88 0.06 240)' },
-      { cat: 'ebs', name: '2026 수능완성 영어', desc: 'EBS 연계교재', lessons: 18, color: 'var(--lilac)', badgeBg: 'var(--lilac)', badgeColor: 'var(--lilac-ink)', accent: 'oklch(0.88 0.06 300)' },
-      { cat: 'ebs', name: '2025 수능특강 영어', desc: 'EBS 연계교재', lessons: 24, color: 'var(--sage)', badgeBg: 'var(--sage)', badgeColor: 'var(--sage-ink)', accent: 'oklch(0.88 0.06 150)' },
-      { cat: 'ebs', name: '2025 수능완성 영어', desc: 'EBS 연계교재', lessons: 18, color: 'var(--honey)', badgeBg: 'var(--honey)', badgeColor: 'var(--honey-ink)', accent: 'oklch(0.88 0.06 80)' },
-      { cat: 'grammar', name: '그래머존 기본편', desc: '문법 교재', lessons: 30, color: 'var(--mint)', badgeBg: 'var(--mint)', badgeColor: 'var(--mint-ink)', accent: 'oklch(0.88 0.06 170)' },
-      { cat: 'grammar', name: '그래머존 종합편', desc: '문법 교재', lessons: 28, color: 'var(--sage)', badgeBg: 'var(--sage)', badgeColor: 'var(--sage-ink)', accent: 'oklch(0.88 0.06 150)' },
-      { cat: 'reading', name: '리딩파워 유형편', desc: '독해 교재', lessons: 22, color: 'var(--blush)', badgeBg: 'var(--blush)', badgeColor: 'var(--blush-ink)', accent: 'oklch(0.88 0.06 25)' },
-      { cat: 'reading', name: '능률 Reading Expert 1', desc: '독해 교재', lessons: 20, color: 'var(--sky)', badgeBg: 'var(--sky)', badgeColor: 'var(--sky-ink)', accent: 'oklch(0.88 0.06 240)' },
-      { cat: 'voca', name: '워드마스터 수능 2000', desc: '어휘 교재', lessons: 40, color: 'var(--honey)', badgeBg: 'var(--honey)', badgeColor: 'var(--honey-ink)', accent: 'oklch(0.88 0.06 80)' },
-      { cat: 'voca', name: '능률 VOCA 어원편', desc: '어휘 교재', lessons: 30, color: 'var(--lilac)', badgeBg: 'var(--lilac)', badgeColor: 'var(--lilac-ink)', accent: 'oklch(0.88 0.06 300)' },
+      { cat: 'ebs', name: '2026 수능특강 영어', desc: 'EBS 연계', lessons: 24, badgeBg: 'var(--blush)', badgeColor: 'var(--blush-ink)' },
+      { cat: 'ebs', name: '2026 수능특강 영어독해연습', desc: 'EBS 연계', lessons: 20, badgeBg: 'var(--sky)', badgeColor: 'var(--sky-ink)' },
+      { cat: 'ebs', name: '2026 수능완성 영어', desc: 'EBS 연계', lessons: 18, badgeBg: 'var(--lilac)', badgeColor: 'var(--lilac-ink)' },
+      { cat: 'ebs', name: '2025 수능특강 영어', desc: 'EBS 연계', lessons: 24, badgeBg: 'var(--sage)', badgeColor: 'var(--sage-ink)' },
+      { cat: 'ebs', name: '2025 수능완성 영어', desc: 'EBS 연계', lessons: 18, badgeBg: 'var(--honey)', badgeColor: 'var(--honey-ink)' },
+      { cat: 'grammar', name: '그래머존 기본편', desc: '문법', lessons: 30, badgeBg: 'var(--mint)', badgeColor: 'var(--mint-ink)' },
+      { cat: 'grammar', name: '그래머존 종합편', desc: '문법', lessons: 28, badgeBg: 'var(--sage)', badgeColor: 'var(--sage-ink)' },
+      { cat: 'grammar', name: '맨투맨 기본영문법', desc: '문법', lessons: 25, badgeBg: 'var(--blush)', badgeColor: 'var(--blush-ink)' },
+      { cat: 'reading', name: '리딩파워 유형편', desc: '독해', lessons: 22, badgeBg: 'var(--blush)', badgeColor: 'var(--blush-ink)' },
+      { cat: 'reading', name: '능률 Reading Expert 1', desc: '독해', lessons: 20, badgeBg: 'var(--sky)', badgeColor: 'var(--sky-ink)' },
+      { cat: 'reading', name: '천일문 기본', desc: '독해', lessons: 24, badgeBg: 'var(--lilac)', badgeColor: 'var(--lilac-ink)' },
+      { cat: 'voca', name: '워드마스터 수능 2000', desc: '어휘', lessons: 40, badgeBg: 'var(--honey)', badgeColor: 'var(--honey-ink)' },
     ];
+    const spCatBarColors = { ebs: 'var(--blush-ink)', grammar: 'var(--sage-ink)', reading: 'var(--sky-ink)', voca: 'var(--lilac-ink)' };
     let spCatFilter = 'all';
+    let spSearchQuery = '';
     let spSelected = new Set();
 
-    function spFilterCat(btn, cat) {
+    function spSidebarFilter(el, cat) {
       spCatFilter = cat;
-      document.querySelectorAll('#spTabs .sp-tab').forEach(t => t.classList.remove('active'));
-      btn.classList.add('active');
+      document.querySelectorAll('#pageSupplement .tb-sidebar .tb-nav-item').forEach(n => n.classList.remove('active'));
+      el.classList.add('active');
+      spRender();
+    }
+    function spSearchFilter() {
+      spSearchQuery = document.getElementById('spSearchInput').value.trim().toLowerCase();
       spRender();
     }
     function spRender() {
       const grid = document.getElementById('spGrid');
-      const filtered = spCatFilter === 'all' ? spData : spData.filter(d => d.cat === spCatFilter);
-      grid.innerHTML = filtered.map((d, i) => {
-        const idx = spData.indexOf(d);
-        const sel = spSelected.has(idx) ? ' selected' : '';
-        const lessonsPreview = Array.from({length: Math.min(5, d.lessons)}, (_, j) =>
-          `<span class="sp-lesson-chip">Unit ${j+1}</span>`
-        ).join('') + (d.lessons > 5 ? `<span class="sp-lesson-chip">+${d.lessons-5}</span>` : '');
+      let filtered = spData.filter(d => {
+        if (spCatFilter !== 'all' && d.cat !== spCatFilter) return false;
+        if (spSearchQuery && !d.name.toLowerCase().includes(spSearchQuery)) return false;
+        return true;
+      });
 
-        return `<div class="sp-card${sel}" onclick="spToggle(${idx})">
-          <div class="sp-card-color" style="background:${d.accent}"></div>
-          <div class="sp-card-body">
-            <span class="sp-card-badge" style="background:${d.badgeBg};color:${d.badgeColor}">${d.desc}</span>
-            <h3>${d.name}</h3>
-            <div class="sp-card-meta">${d.lessons}개 지문 수록</div>
-            <div class="sp-card-lessons">${lessonsPreview}</div>
-          </div>
-        </div>`;
-      }).join('');
+      const countEl = document.getElementById('spTableCount');
+      if (countEl) countEl.textContent = filtered.length + '개 교재';
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div style="padding:40px;text-align:center;color:var(--ink-400);font-size:14px">검색 결과가 없습니다.</div>';
+        return;
+      }
+
+      let html = `<table><thead><tr>
+        <th style="width:30px"><input type="checkbox" onchange="spCheckAll(this)"></th>
+        <th>교재명</th><th>카테고리</th><th>지문 수</th>
+      </tr></thead><tbody>`;
+
+      filtered.forEach((d) => {
+        const idx = spData.indexOf(d);
+        const barColor = spCatBarColors[d.cat] || 'var(--ink-400)';
+        const checked = spSelected.has(idx) ? ' checked' : '';
+        html += `<tr onclick="spToggle(${idx})" style="cursor:pointer">
+          <td><input type="checkbox" onclick="event.stopPropagation();spToggle(${idx})"${checked} style="width:16px;height:16px;accent-color:var(--sage-ink);cursor:pointer"></td>
+          <td style="font-weight:550;color:var(--ink-900)">${d.name}</td>
+          <td><span class="tb-subject-badge" style="background:${d.badgeBg};color:${d.badgeColor}">${d.desc}</span></td>
+          <td><span class="tb-passages-num">${d.lessons}</span></td>
+        </tr>`;
+      });
+
+      html += '</tbody></table>';
+      grid.innerHTML = html;
+    }
+    function spCheckAll(cb) {
+      if (cb.checked) {
+        spData.forEach((_, i) => spSelected.add(i));
+      } else {
+        spSelected.clear();
+      }
+      spRender();
+      spUpdateBottom();
     }
     function spToggle(idx) {
       if (spSelected.has(idx)) spSelected.delete(idx); else spSelected.add(idx);
@@ -3327,53 +3391,107 @@
     // ── Mock exam page logic ──
     const mkMonths = [3, 4, 6, 7, 9, 10, 11];
     const mkMonthNames = {3:'3월',4:'4월',6:'6월',7:'7월',9:'9월',10:'10월',11:'11월(수능)'};
-    const mkColors = {
-      3: {bg:'oklch(0.96 0.02 25)', dot:'var(--blush-ink)'},
-      4: {bg:'oklch(0.96 0.02 80)', dot:'var(--honey-ink)'},
-      6: {bg:'oklch(0.96 0.02 150)', dot:'var(--sage-ink)'},
-      7: {bg:'oklch(0.96 0.02 240)', dot:'var(--sky-ink)'},
-      9: {bg:'oklch(0.96 0.02 300)', dot:'var(--lilac-ink)'},
-      10: {bg:'oklch(0.96 0.02 170)', dot:'var(--mint-ink)'},
-      11: {bg:'oklch(0.96 0.02 0)', dot:'var(--rose-ink)'},
+    const mkGradeBarColors = { '고1': 'var(--blush-ink)', '고2': 'var(--sage-ink)', '고3': 'var(--sky-ink)' };
+    const mkMonthBadge = {
+      3: {bg:'var(--blush)', c:'var(--blush-ink)'},
+      4: {bg:'var(--honey)', c:'var(--honey-ink)'},
+      6: {bg:'var(--sage)', c:'var(--sage-ink)'},
+      7: {bg:'var(--sky)', c:'var(--sky-ink)'},
+      9: {bg:'var(--lilac)', c:'var(--lilac-ink)'},
+      10: {bg:'var(--mint)', c:'var(--mint-ink)'},
+      11: {bg:'var(--rose)', c:'var(--rose-ink)'},
     };
+    let mkGradeFilter = 'all';
+    let mkYearFilter = 'all';
+    let mkSearchQuery = '';
     let mkSelected = new Set();
 
+    function mkSidebarFilter(el, type, val) {
+      if (type === 'grade') {
+        mkGradeFilter = val;
+        mkYearFilter = 'all';
+      } else {
+        mkYearFilter = val;
+        mkGradeFilter = 'all';
+      }
+      document.querySelectorAll('#pageMock .tb-sidebar .tb-nav-item').forEach(n => n.classList.remove('active'));
+      el.classList.add('active');
+      mkRender();
+    }
+    function mkSearchFilter() {
+      mkSearchQuery = document.getElementById('mkSearchInput').value.trim().toLowerCase();
+      mkRender();
+    }
     function mkRender() {
-      const gradeF = document.getElementById('mkGrade').value;
-      const yearF = document.getElementById('mkYear').value;
-      const years = yearF === 'all' ? [2026,2025,2024,2023,2022] : [parseInt(yearF)];
-      const grades = gradeF === 'all' ? ['고1','고2','고3'] : [gradeF];
-
       const timeline = document.getElementById('mkTimeline');
-      let html = '';
+      const years = [2026,2025,2024,2023,2022];
+      const grades = ['고1','고2','고3'];
 
+      // Build flat list
+      let items = [];
       years.forEach(year => {
-        html += `<div class="mk-year-group">
-          <div class="mk-year-dot"></div>
-          <div class="mk-year-label">${year}년</div>
-          <div class="mk-month-grid">`;
-
         grades.forEach(grade => {
           mkMonths.forEach(m => {
-            if (year === 2026 && m > 4) return; // future months
-            const key = `${grade}-${year}-${m}`;
-            const sel = mkSelected.has(key) ? ' selected' : '';
-            const mc = mkColors[m];
-            html += `<div class="mk-card${sel}" onclick="mkToggle('${key}')">
-              <div class="mk-card-month" style="background:${mc.bg};color:${mc.dot}">${m}월</div>
-              <div class="mk-card-info">
-                <h4>${grade} ${mkMonthNames[m]}</h4>
-                <span>45문항 · ${year}학년도</span>
-              </div>
-              <div class="mk-check">${sel ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : ''}</div>
-            </div>`;
+            if (year === 2026 && m > 4) return;
+            items.push({ grade, year, month: m, key: `${grade}-${year}-${m}` });
           });
         });
-
-        html += '</div></div>';
       });
 
+      // Filter
+      let filtered = items.filter(it => {
+        if (mkGradeFilter !== 'all' && it.grade !== mkGradeFilter) return false;
+        if (mkYearFilter !== 'all' && it.year !== parseInt(mkYearFilter)) return false;
+        if (mkSearchQuery) {
+          const hay = `${it.grade} ${it.year} ${it.month}월 ${mkMonthNames[it.month]}`.toLowerCase();
+          if (!hay.includes(mkSearchQuery)) return false;
+        }
+        return true;
+      });
+
+      const countEl = document.getElementById('mkTableCount');
+      if (countEl) countEl.textContent = filtered.length + '개 시험';
+
+      if (filtered.length === 0) {
+        timeline.innerHTML = '<div style="padding:40px;text-align:center;color:var(--ink-400);font-size:14px">검색 결과가 없습니다.</div>';
+        return;
+      }
+
+      let html = `<table><thead><tr>
+        <th style="width:30px"><input type="checkbox" onchange="mkCheckAll(this)"></th>
+        <th>시험명</th><th>학년</th><th>연도</th><th>월</th><th>문항</th>
+      </tr></thead><tbody>`;
+
+      filtered.forEach(it => {
+        const badge = mkMonthBadge[it.month] || {bg:'var(--sky)',c:'var(--sky-ink)'};
+        const checked = mkSelected.has(it.key) ? ' checked' : '';
+        html += `<tr onclick="mkToggle('${it.key}')" style="cursor:pointer">
+          <td><input type="checkbox" onclick="event.stopPropagation();mkToggle('${it.key}')"${checked} style="width:16px;height:16px;accent-color:var(--sage-ink);cursor:pointer"></td>
+          <td style="font-weight:550;color:var(--ink-900)">${it.grade} ${mkMonthNames[it.month]}</td>
+          <td><span class="tb-subject-badge" style="background:${badge.bg};color:${badge.c}">${it.grade}</span></td>
+          <td>${it.year}년</td>
+          <td>${it.month}월</td>
+          <td><span class="tb-passages-num">45</span></td>
+        </tr>`;
+      });
+
+      html += '</tbody></table>';
       timeline.innerHTML = html;
+    }
+    function mkCheckAll(cb) {
+      const years = [2026,2025,2024,2023,2022];
+      const grades = ['고1','고2','고3'];
+      if (cb.checked) {
+        years.forEach(y => grades.forEach(g => mkMonths.forEach(m => {
+          if (y === 2026 && m > 4) return;
+          mkSelected.add(`${g}-${y}-${m}`);
+        })));
+      } else {
+        mkSelected.clear();
+      }
+      mkRender();
+      document.getElementById('mkSelCount').textContent = mkSelected.size;
+      document.getElementById('mkSelQ').textContent = mkSelected.size * 45;
     }
     function mkToggle(key) {
       if (mkSelected.has(key)) mkSelected.delete(key); else mkSelected.add(key);
