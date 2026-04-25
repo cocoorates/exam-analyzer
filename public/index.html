@@ -153,18 +153,18 @@
       padding: 12px 16px; border-radius: var(--r-pill);
     }
     .btn-ghost:hover { background: rgba(20,18,14,.06); }
-    .nav-auth-group { display: flex; align-items: center; gap: 8px; }
+    .nav-auth-group { display: flex; align-items: center; gap: 6px; }
     .nav-signup {
       background: transparent; color: var(--ink-700);
       border: 1.5px solid var(--ink-200); border-radius: var(--r-pill);
-      padding: 9px 18px; font-size: 13.5px; font-weight: 500;
+      padding: 6px 13px; font-size: 11.5px; font-weight: 500;
       cursor: pointer; transition: all .15s;
     }
     .nav-signup:hover { border-color: var(--ink-400); background: var(--paper-2); transform: translateY(-1px); }
     .nav-login {
       background: var(--ink-900); color: var(--paper);
-      border-radius: var(--r-pill); padding: 10px 20px;
-      font-size: 14.5px; font-weight: 500;
+      border-radius: var(--r-pill); padding: 7px 14px;
+      font-size: 11.5px; font-weight: 500;
       border: none; cursor: pointer;
       transition: all .15s;
     }
@@ -1589,17 +1589,17 @@
       margin-bottom: 14px; display: none;
     }
     .auth-user-info {
-      display: flex; align-items: center; gap: 10px;
+      display: flex; align-items: center; gap: 8px;
     }
     .auth-user-email {
-      font-size: 12px; color: var(--ink-500);
-      max-width: 140px; overflow: hidden;
+      font-size: 11px; color: var(--ink-500);
+      max-width: 120px; overflow: hidden;
       text-overflow: ellipsis; white-space: nowrap;
     }
     .auth-logout-btn {
-      padding: 7px 16px;
+      padding: 5px 11px;
       border-radius: var(--r-pill);
-      font-size: 11px; font-weight: 500;
+      font-size: 10px; font-weight: 500;
       cursor: pointer; transition: all .15s;
       background: transparent; color: var(--ink-500);
       border: 1px solid var(--ink-200);
@@ -2568,7 +2568,7 @@
         <!-- Tabs: 생성옵션 vs 원문보기 -->
         <div class="tb-options-tabs" style="display:flex; gap:8px; padding:16px; border-bottom:1px solid var(--ink-100); margin-bottom:16px;">
           <button class="tb-option-tab active" onclick="mkShowTab(this,'options')" style="flex:1; padding:8px 12px; border:none; background:transparent; color:var(--ink-700); border-bottom:2px solid transparent; cursor:pointer; font-weight:500; transition:all 0.2s;">생성옵션</button>
-          <button class="tb-option-tab" onclick="mkShowTab(this,'passages')" style="flex:1; padding:8px 12px; border:none; background:transparent; color:var(--ink-400); border-bottom:2px solid transparent; cursor:pointer; font-weight:500; transition:all 0.2s;">원문보기</button>
+          <button class="tb-option-tab" onclick="mkShowTab(this,'passages');mkFetchPassages()" style="flex:1; padding:8px 12px; border:none; background:transparent; color:var(--ink-400); border-bottom:2px solid transparent; cursor:pointer; font-weight:500; transition:all 0.2s;">원문보기</button>
         </div>
 
         <!-- Options Panel -->
@@ -3800,6 +3800,7 @@
     let mkYearFilter = 'all';
     let mkSearchQuery = '';
     let mkSelected = new Set();
+    let mkSelectedSingle = null; // {grade, year, month, key} for single-select passage viewing
 
     function mkSidebarFilter(el, type, val) {
       if (type === 'grade') {
@@ -3866,47 +3867,36 @@
       }
 
       let html = `<table><thead><tr>
-        <th style="width:30px"><input type="checkbox" onchange="mkCheckAll(this)"></th>
+        <th style="width:30px"></th>
         <th>시험명</th><th>학년</th><th>연도</th><th>월</th><th>문항</th>
       </tr></thead><tbody>`;
 
       filtered.forEach(it => {
         const badge = mkMonthBadge[it.month] || {bg:'var(--sky)',c:'var(--sky-ink)'};
-        const checked = mkSelected.has(it.key) ? ' checked' : '';
-        const examId = `${it.grade.slice(-1)}-${it.year}-${it.month}`;
-        html += `<tr onclick="mkToggle('${it.key}'); mkFetchPassages('${examId}')" style="cursor:pointer">
-          <td><input type="checkbox" onclick="event.stopPropagation();mkToggle('${it.key}')"${checked} style="width:16px;height:16px;accent-color:var(--sage-ink);cursor:pointer"></td>
+        const isSel = mkSelectedSingle && mkSelectedSingle.key === it.key;
+        const rowStyle = isSel ? 'cursor:pointer;background:var(--sage);' : 'cursor:pointer;';
+        html += `<tr onclick="mkSelectSingle('${it.grade}',${it.year},${it.month},'${it.key}')" style="${rowStyle}">
+          <td><div style="width:16px;height:16px;border-radius:50%;border:2px solid ${isSel?'var(--sage-ink)':'var(--ink-300)'};display:flex;align-items:center;justify-content:center">${isSel?'<div style="width:8px;height:8px;border-radius:50%;background:var(--sage-ink)"></div>':''}</div></td>
           <td style="font-weight:550;color:var(--ink-900)">${it.grade} ${String(it.year).slice(2)}년 ${it.month}월</td>
           <td><span class="tb-subject-badge" style="background:${badge.bg};color:${badge.c}">${it.grade}</span></td>
           <td>${it.year}년</td>
           <td>${it.month}월</td>
-          <td><span class="tb-passages-num">45</span></td>
+          <td><span class="tb-passages-num">25</span></td>
         </tr>`;
       });
 
       html += '</tbody></table>';
       timeline.innerHTML = html;
     }
-    function mkCheckAll(cb) {
-      const years = [2026,2025,2024,2023,2022,2021,2020];
-      const grades = ['고1','고2','고3'];
-      if (cb.checked) {
-        years.forEach(y => grades.forEach(g => mkMonths.forEach(m => {
-          if (y === 2026 && m > 4) return;
-          mkSelected.add(`${g}-${y}-${m}`);
-        })));
+    function mkSelectSingle(grade, year, month, key) {
+      if (mkSelectedSingle && mkSelectedSingle.key === key) {
+        mkSelectedSingle = null;
       } else {
-        mkSelected.clear();
+        mkSelectedSingle = { grade, year, month, key };
       }
       mkRender();
-      document.getElementById('mkSelCount').textContent = mkSelected.size;
-      document.getElementById('mkSelQ').textContent = mkSelected.size * 45;
-    }
-    function mkToggle(key) {
-      if (mkSelected.has(key)) mkSelected.delete(key); else mkSelected.add(key);
-      mkRender();
-      document.getElementById('mkSelCount').textContent = mkSelected.size;
-      document.getElementById('mkSelQ').textContent = mkSelected.size * 45;
+      const sel = mkSelectedSingle ? 1 : 0;
+      document.getElementById('mkPassageCount').textContent = sel ? '25' : '0';
     }
     function mkShowTab(btn, tab) {
       // Update button styles
@@ -3941,57 +3931,59 @@
       btn.classList.add('active');
     }
 
-    let mkCurrentExamId = null;
-    async function mkFetchPassages(examId) {
-      mkCurrentExamId = examId;
+    async function mkFetchPassages() {
       const panel = document.getElementById('mkPassagesPanel');
+      if (!mkSelectedSingle) {
+        panel.innerHTML = '<div style="padding:30px;text-align:center;color:var(--ink-400);font-size:13px;">왼쪽 테이블에서 모의고사를 선택하세요.</div>';
+        return;
+      }
+
+      const { grade, year, month } = mkSelectedSingle;
       panel.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ink-400);">지문 로딩 중...</div>';
 
       try {
         const supabaseUrl = 'https://qnohnjysnrjznqawwvep.supabase.co';
         const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFub2huanlzbnJqem5xYXd3dmVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjA3MDMsImV4cCI6MjA5MjY5NjcwM30.O1KXAzfKtF6Ui1iMTg82iwHCIWLVwHHjy-E9N-s82rU';
+        const headers = { 'apikey': anonKey, 'Authorization': `Bearer ${anonKey}`, 'Content-Type': 'application/json' };
 
-        const response = await fetch(`${supabaseUrl}/rest/v1/mock_questions?exam_id=eq.${examId}&select=question_number,passage,passage_group&order=question_number`, {
-          method: 'GET',
-          headers: {
-            'apikey': anonKey,
-            'Authorization': `Bearer ${anonKey}`,
-            'Content-Type': 'application/json'
-          }
-        });
+        // Step 1: Look up exam UUID by grade/year/month
+        const examRes = await fetch(`${supabaseUrl}/rest/v1/mock_exams?grade=eq.${encodeURIComponent(grade)}&year=eq.${year}&month=eq.${month}&select=id`, { headers });
+        if (!examRes.ok) throw new Error(`Exam lookup failed: ${examRes.status}`);
+        const exams = await examRes.json();
+        if (!exams || exams.length === 0) {
+          panel.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ink-400);">해당 모의고사를 찾을 수 없습니다.</div>';
+          return;
+        }
+        const examUuid = exams[0].id;
 
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const questions = await response.json();
+        // Step 2: Fetch questions by exam UUID
+        const qRes = await fetch(`${supabaseUrl}/rest/v1/mock_questions?exam_id=eq.${examUuid}&select=question_number,passage,passage_group&order=question_number`, { headers });
+        if (!qRes.ok) throw new Error(`Questions fetch failed: ${qRes.status}`);
+        const questions = await qRes.json();
 
         if (!questions || questions.length === 0) {
           panel.innerHTML = '<div style="padding:20px;text-align:center;color:var(--ink-400);">지문이 없습니다.</div>';
           return;
         }
 
-        // Group passages by passage_group and deduplicate
-        const passageMap = new Map();
+        // Group by passage_group, dedup shared passages (41~42, 43~45)
+        const seen = new Set();
+        const passages = [];
         questions.forEach(q => {
-          if (q.passage) {
-            const key = q.passage_group || 'default';
-            if (!passageMap.has(key)) {
-              passageMap.set(key, {
-                passage: q.passage,
-                passage_group: q.passage_group,
-                questions: []
-              });
-            }
-            passageMap.get(key).questions.push(q.question_number);
-          }
+          if (!q.passage) return;
+          const groupKey = q.passage_group && q.passage_group.trim() ? q.passage_group.trim() : String(q.question_number);
+          if (seen.has(groupKey)) return;
+          seen.add(groupKey);
+          passages.push({ label: groupKey, passage: q.passage });
         });
 
-        // Render passages
-        let html = '';
-        passageMap.forEach(p => {
-          const qnums = p.questions.sort((a,b) => a - b).join(', ');
-          const groupLabel = p.passage_group ? `[${p.passage_group}]` : '';
-          html += `<div class="passage-card">
-            <div class="passage-qnum">문항: ${qnums} ${groupLabel}</div>
-            <div class="passage-text">${p.passage}</div>
+        // Render: "번호.\n원문" format
+        let html = `<div style="padding:12px 16px 8px;font-weight:600;font-size:14px;color:var(--ink-800);border-bottom:1px solid var(--ink-100);margin-bottom:4px;">${grade} ${year}년 ${month}월 모의고사</div>`;
+        passages.forEach(p => {
+          const label = p.label.includes('~') ? p.label : p.label + '번';
+          html += `<div class="passage-card" style="padding:14px 16px;border-bottom:1px solid var(--ink-50);">
+            <div style="font-weight:700;font-size:13px;color:var(--sage-ink);margin-bottom:6px;">${label}.</div>
+            <div style="font-size:12.5px;line-height:1.7;color:var(--ink-700);white-space:pre-wrap;">${p.passage}</div>
           </div>`;
         });
 
