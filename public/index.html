@@ -57,7 +57,7 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { overflow-y: scroll; }
-    html, body { margin: 0; padding: 0; }
+    html, body { margin: 0; padding: 0; -webkit-text-size-adjust: 100%; }
     body {
       font-family: var(--font-sans);
       color: var(--ink-900);
@@ -1137,6 +1137,9 @@
     /* Option tabs for mock exam */
     .tb-option-tab {
       transition: color .2s, border-color .2s;
+      font-size: 14px;
+      font-family: inherit;
+      -webkit-text-size-adjust: 100%;
     }
     .tb-option-tab.active {
       color: var(--ink-700) !important;
