@@ -753,12 +753,12 @@
       background: var(--ink-900); color: var(--paper);
       font-weight: 550;
     }
-    .tb-nav-item .dot {
-      width: 8px; height: 8px; border-radius: 50%;
+    .tb-nav-icon {
+      font-size: 16px; line-height: 1;
       flex-shrink: 0;
       transition: transform .2s;
     }
-    .tb-nav-item:hover .dot { transform: scale(1.3); }
+    .tb-nav-item:hover .tb-nav-icon { transform: scale(1.15); }
     .tb-nav-item .nav-count {
       margin-left: auto; font-size: 11px;
       color: var(--ink-400); font-weight: 500;
@@ -833,14 +833,7 @@
       transform: translateX(2px);
     }
     .tb-main-table tbody tr:last-child td { border-bottom: none; }
-    /* Color strip on table rows (S9 style) */
-    .tb-main-table tbody tr td:first-child {
-      position: relative;
-    }
-    .tb-row-strip {
-      position: absolute; left: 0; top: 4px; bottom: 4px;
-      width: 3px; border-radius: 2px;
-    }
+    /* Table first column */
     .tb-book-name-cell {
       font-weight: 550; color: var(--ink-900);
       display: flex; align-items: center; gap: 8px;
@@ -2359,50 +2352,50 @@
         <div class="tb-sidebar">
           <h3>과목</h3>
           <div class="tb-nav-item active" onclick="tbSidebarFilter(this,'subject','all')">
-            <span class="dot" style="background:var(--ink-500)"></span> 전체
+            <span class="tb-nav-icon">📚</span> 전체
             <span class="nav-count">25</span>
           </div>
           <div class="tb-nav-item" onclick="tbSidebarFilter(this,'subject','공통영어1')">
-            <span class="dot" style="background:var(--blush-ink)"></span> 공통영어1
+            <span class="tb-nav-icon">📕</span> 공통영어1
             <span class="nav-count">10</span>
           </div>
           <div class="tb-nav-item" onclick="tbSidebarFilter(this,'subject','공통영어2')">
-            <span class="dot" style="background:var(--sage-ink)"></span> 공통영어2
+            <span class="tb-nav-icon">📗</span> 공통영어2
             <span class="nav-count">5</span>
           </div>
           <div class="tb-nav-item" onclick="tbSidebarFilter(this,'subject','영어')">
-            <span class="dot" style="background:var(--sky-ink)"></span> 영어
+            <span class="tb-nav-icon">📘</span> 영어
             <span class="nav-count">3</span>
           </div>
           <div class="tb-nav-item" onclick="tbSidebarFilter(this,'subject','중2')">
-            <span class="dot" style="background:var(--honey-ink)"></span> 중2
+            <span class="tb-nav-icon">📒</span> 중2
             <span class="nav-count">4</span>
           </div>
           <div class="tb-nav-item" onclick="tbSidebarFilter(this,'subject','중3')">
-            <span class="dot" style="background:var(--lilac-ink)"></span> 중3
+            <span class="tb-nav-icon">📓</span> 중3
             <span class="nav-count">3</span>
           </div>
           <h3>출판사</h3>
           <div class="tb-nav-item" onclick="tbSidebarFilter(this,'publisher','능률')">
-            <span class="dot" style="background:var(--mint-ink)"></span> 능률
+            <span class="tb-nav-icon">🏢</span> 능률
           </div>
           <div class="tb-nav-item" onclick="tbSidebarFilter(this,'publisher','동아')">
-            <span class="dot" style="background:var(--rose-ink)"></span> 동아
+            <span class="tb-nav-icon">🏢</span> 동아
           </div>
           <div class="tb-nav-item" onclick="tbSidebarFilter(this,'publisher','미래엔')">
-            <span class="dot" style="background:var(--sky-ink)"></span> 미래엔
+            <span class="tb-nav-icon">🏢</span> 미래엔
           </div>
           <div class="tb-nav-item" onclick="tbSidebarFilter(this,'publisher','비상')">
-            <span class="dot" style="background:var(--honey-ink)"></span> 비상
+            <span class="tb-nav-icon">🏢</span> 비상
           </div>
           <div class="tb-nav-item" onclick="tbSidebarFilter(this,'publisher','지학사')">
-            <span class="dot" style="background:var(--sage-ink)"></span> 지학사
+            <span class="tb-nav-icon">🏢</span> 지학사
           </div>
           <div class="tb-nav-item" onclick="tbSidebarFilter(this,'publisher','천재')">
-            <span class="dot" style="background:var(--lilac-ink)"></span> 천재
+            <span class="tb-nav-icon">🏢</span> 천재
           </div>
           <div class="tb-nav-item" onclick="tbSidebarFilter(this,'publisher','YBM')">
-            <span class="dot" style="background:var(--blush-ink)"></span> YBM
+            <span class="tb-nav-icon">🏢</span> YBM
           </div>
         </div>
         <div class="tb-table-area">
@@ -3482,13 +3475,11 @@
       filtered.forEach((book, bi) => {
         const realIdx = tbData.indexOf(book);
         const totalP = book.lessons.length * book.passagesPerLesson;
-        const stripColor = tbStripColors[book.subject] || 'var(--ink-400)';
         const badge = tbBadgeStyles[book.subject] || { bg: 'var(--sky)', c: 'var(--sky-ink)' };
         const isExpanded = tbExpandedRow === realIdx;
 
         html += `<tr onclick="tbToggleExpand(${realIdx})" class="${isExpanded ? 'expanded' : ''}">
-          <td style="position:relative">
-            <span class="tb-row-strip" style="background:${stripColor}"></span>
+          <td>
             <input type="checkbox" onclick="event.stopPropagation();tbCheckBook(${realIdx},this)" style="width:16px;height:16px;accent-color:var(--sage-ink);cursor:pointer">
           </td>
           <td><span class="tb-book-name-cell">${book.publisher}(${book.author})</span></td>
