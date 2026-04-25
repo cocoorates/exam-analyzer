@@ -754,8 +754,10 @@
       color: var(--ink-900);
     }
     .tb-nav-item.active {
-      background: var(--ink-900); color: var(--paper);
+      background: oklch(0.94 0.03 240 / 0.5);
+      color: var(--ink-900);
       font-weight: 550;
+      border-right: 3px solid var(--sky-ink);
     }
     .tb-nav-bar {
       width: 4px; height: 22px; border-radius: 2px;
@@ -765,7 +767,7 @@
       margin-left: auto; font-size: 11px;
       color: var(--ink-400); font-weight: 500;
     }
-    .tb-nav-item.active .nav-count { color: var(--ink-300); }
+    .tb-nav-item.active .nav-count { color: var(--sky-ink); }
     /* Search bar above table */
     .tb-table-area {
       display: flex; flex-direction: column;
@@ -1740,7 +1742,7 @@
       <div class="meta">
         <span>✓ 5분 안에 첫 문제지</span>
         <span>✓ 영어 강사 1,200+ 이용 중</span>
-        <span>✓ 모의고사 최근 5개년 전 회차 수록</span>
+        <span>✓ 모의고사 최근 7개년 전 회차 수록</span>
       </div>
     </div>
 
@@ -1828,7 +1830,7 @@
       <div class="section-head">
         <div class="kicker">FEATURES</div>
         <h2>필요한 문제는,<br>이미 여기에.</h2>
-        <p>교과서 본문부터 최근 5개년 모의고사 변형문제까지<br>양질의 자료가 시험대비의 격을 바꿉니다.</p>
+        <p>교과서 본문부터 최근 7개년 모의고사 변형문제까지<br>양질의 자료가 시험대비의 격을 바꿉니다.</p>
       </div>
       <div class="features-grid">
         <article class="feature">
@@ -1842,8 +1844,8 @@
         <article class="feature">
           <div class="accent-bar" style="background:var(--sky)">02 · 모의고사</div>
           <div class="body">
-            <h3>5개년 모의고사 아카이브</h3>
-            <p>평가원·교육청 모의고사 최근 5개년 전 회차 원문과 변형문제를 한 자리에서.</p>
+            <h3>7개년 모의고사 아카이브</h3>
+            <p>평가원·교육청 모의고사 최근 7개년 전 회차 원문과 변형문제를 한 자리에서.</p>
             <span class="more">아카이브 탐색 →</span>
           </div>
         </article>
@@ -1933,7 +1935,7 @@
     <div class="container">
       <div class="stat-item"><div class="stat-num">12,400+</div><div class="stat-lbl">제작된 변형문제</div></div>
       <div class="stat-item"><div class="stat-num">1,200+</div><div class="stat-lbl">사용 중인 영어학원 강사</div></div>
-      <div class="stat-item"><div class="stat-num">5개년</div><div class="stat-lbl">모의고사 아카이브</div></div>
+      <div class="stat-item"><div class="stat-num">7개년</div><div class="stat-lbl">모의고사 아카이브</div></div>
       <div class="stat-item"><div class="stat-num">5분</div><div class="stat-lbl">첫 문제지까지</div></div>
     </div>
   </div>
@@ -2306,7 +2308,7 @@
         <div class="accent" style="background:var(--sky-ink)"></div>
         <div>
           <h1>모의고사 아카이브</h1>
-          <p>최근 5개년 전국연합 학력평가 및 수능 기출 모의고사를 선택하여 변형문제를 생성합니다.</p>
+          <p>최근 7개년 전국연합 학력평가 및 수능 기출 모의고사를 선택하여 변형문제를 생성합니다.</p>
         </div>
       </div>
     </div>
@@ -2314,42 +2316,42 @@
     <div class="tb-left-panel" style="margin-bottom:24px">
       <div class="tb-sidebar">
         <h3>학년</h3>
-        <div class="tb-nav-item active" onclick="mkSidebarFilter(this,'grade','all')">
+        <div class="tb-nav-item active" data-filter="grade" data-val="all" onclick="mkSidebarFilter(this,'grade','all')">
           <span class="tb-nav-bar" style="background:var(--ink-500)"></span> 전체
           <span class="nav-count" id="mkCountAll">138</span>
         </div>
-        <div class="tb-nav-item" onclick="mkSidebarFilter(this,'grade','고1')">
+        <div class="tb-nav-item" data-filter="grade" data-val="고1" onclick="mkSidebarFilter(this,'grade','고1')">
           <span class="tb-nav-bar" style="background:var(--blush-ink)"></span> 고1
           <span class="nav-count" id="mkCountG1">46</span>
         </div>
-        <div class="tb-nav-item" onclick="mkSidebarFilter(this,'grade','고2')">
+        <div class="tb-nav-item" data-filter="grade" data-val="고2" onclick="mkSidebarFilter(this,'grade','고2')">
           <span class="tb-nav-bar" style="background:var(--sage-ink)"></span> 고2
           <span class="nav-count" id="mkCountG2">46</span>
         </div>
-        <div class="tb-nav-item" onclick="mkSidebarFilter(this,'grade','고3')">
+        <div class="tb-nav-item" data-filter="grade" data-val="고3" onclick="mkSidebarFilter(this,'grade','고3')">
           <span class="tb-nav-bar" style="background:var(--sky-ink)"></span> 고3
           <span class="nav-count" id="mkCountG3">46</span>
         </div>
         <h3>연도</h3>
-        <div class="tb-nav-item" onclick="mkSidebarFilter(this,'year','2026')">
+        <div class="tb-nav-item" data-filter="year" data-val="2026" onclick="mkSidebarFilter(this,'year','2026')">
           <span class="tb-nav-bar" style="background:var(--honey-ink)"></span> 2026년
         </div>
-        <div class="tb-nav-item" onclick="mkSidebarFilter(this,'year','2025')">
+        <div class="tb-nav-item" data-filter="year" data-val="2025" onclick="mkSidebarFilter(this,'year','2025')">
           <span class="tb-nav-bar" style="background:var(--lilac-ink)"></span> 2025년
         </div>
-        <div class="tb-nav-item" onclick="mkSidebarFilter(this,'year','2024')">
+        <div class="tb-nav-item" data-filter="year" data-val="2024" onclick="mkSidebarFilter(this,'year','2024')">
           <span class="tb-nav-bar" style="background:var(--mint-ink)"></span> 2024년
         </div>
-        <div class="tb-nav-item" onclick="mkSidebarFilter(this,'year','2023')">
+        <div class="tb-nav-item" data-filter="year" data-val="2023" onclick="mkSidebarFilter(this,'year','2023')">
           <span class="tb-nav-bar" style="background:var(--rose-ink)"></span> 2023년
         </div>
-        <div class="tb-nav-item" onclick="mkSidebarFilter(this,'year','2022')">
+        <div class="tb-nav-item" data-filter="year" data-val="2022" onclick="mkSidebarFilter(this,'year','2022')">
           <span class="tb-nav-bar" style="background:var(--blush-ink)"></span> 2022년
         </div>
-        <div class="tb-nav-item" onclick="mkSidebarFilter(this,'year','2021')">
+        <div class="tb-nav-item" data-filter="year" data-val="2021" onclick="mkSidebarFilter(this,'year','2021')">
           <span class="tb-nav-bar" style="background:var(--sage-ink)"></span> 2021년
         </div>
-        <div class="tb-nav-item" onclick="mkSidebarFilter(this,'year','2020')">
+        <div class="tb-nav-item" data-filter="year" data-val="2020" onclick="mkSidebarFilter(this,'year','2020')">
           <span class="tb-nav-bar" style="background:var(--sky-ink)"></span> 2020년
         </div>
       </div>
@@ -3420,14 +3422,35 @@
 
     function mkSidebarFilter(el, type, val) {
       if (type === 'grade') {
-        mkGradeFilter = val;
-        mkYearFilter = 'all';
+        // 학년: 전체 누르면 리셋, 아니면 토글
+        if (val === 'all') {
+          mkGradeFilter = 'all';
+          document.querySelectorAll('#pageMock .tb-sidebar .tb-nav-item[data-filter="grade"]').forEach(n => n.classList.remove('active'));
+          el.classList.add('active');
+        } else {
+          // '전체' 해제
+          const allBtn = document.querySelector('#pageMock .tb-nav-item[data-filter="grade"][data-val="all"]');
+          if (allBtn) allBtn.classList.remove('active');
+          el.classList.toggle('active');
+          // 선택된 학년 수집
+          const activeGrades = [];
+          document.querySelectorAll('#pageMock .tb-nav-item.active[data-filter="grade"]:not([data-val="all"])').forEach(n => activeGrades.push(n.dataset.val));
+          mkGradeFilter = activeGrades.length > 0 ? activeGrades : 'all';
+          // 아무것도 안 선택이면 전체로
+          if (mkGradeFilter === 'all' && allBtn) allBtn.classList.add('active');
+        }
       } else {
-        mkYearFilter = val;
-        mkGradeFilter = 'all';
+        // 연도: 토글 방식
+        if (val === 'all') {
+          mkYearFilter = 'all';
+          document.querySelectorAll('#pageMock .tb-sidebar .tb-nav-item[data-filter="year"]').forEach(n => n.classList.remove('active'));
+        } else {
+          el.classList.toggle('active');
+          const activeYears = [];
+          document.querySelectorAll('#pageMock .tb-nav-item.active[data-filter="year"]').forEach(n => activeYears.push(n.dataset.val));
+          mkYearFilter = activeYears.length > 0 ? activeYears : 'all';
+        }
       }
-      document.querySelectorAll('#pageMock .tb-sidebar .tb-nav-item').forEach(n => n.classList.remove('active'));
-      el.classList.add('active');
       mkRender();
     }
     function mkSearchFilter() {
@@ -3452,8 +3475,14 @@
 
       // Filter
       let filtered = items.filter(it => {
-        if (mkGradeFilter !== 'all' && it.grade !== mkGradeFilter) return false;
-        if (mkYearFilter !== 'all' && it.year !== parseInt(mkYearFilter)) return false;
+        if (mkGradeFilter !== 'all') {
+          const grades = Array.isArray(mkGradeFilter) ? mkGradeFilter : [mkGradeFilter];
+          if (!grades.includes(it.grade)) return false;
+        }
+        if (mkYearFilter !== 'all') {
+          const yrs = Array.isArray(mkYearFilter) ? mkYearFilter : [mkYearFilter];
+          if (!yrs.includes(String(it.year))) return false;
+        }
         if (mkSearchQuery) {
           const hay = `${it.grade} ${it.year} ${it.month}월 ${mkMonthNames[it.month]}`.toLowerCase();
           if (!hay.includes(mkSearchQuery)) return false;
