@@ -4041,13 +4041,20 @@
 
     async function mkFetchPassages() {
       const panel = document.getElementById('mkPassagesPanel');
+      // Lock panel height before changing content to prevent layout shift
+      const prevHeight = panel.offsetHeight;
+      if (prevHeight > 0) panel.style.minHeight = prevHeight + 'px';
+
       if (!mkSelectedSingle) {
         panel.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;min-height:200px;color:var(--ink-400);font-size:13px;">왼쪽 테이블에서 모의고사를 선택하세요.</div>';
+        panel.style.minHeight = '';
         return;
       }
 
       const { grade, year, month } = mkSelectedSingle;
+      const scrollY = window.scrollY;
       panel.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;min-height:200px;color:var(--ink-400);font-size:13px;">지문 로딩 중...</div>';
+      window.scrollTo(0, scrollY);
 
       try {
         const supabaseUrl = 'https://qnohnjysnrjznqawwvep.supabase.co';
@@ -4096,9 +4103,13 @@
         });
 
         panel.innerHTML = html;
+        panel.style.minHeight = '';
+        window.scrollTo(0, scrollY);
       } catch (err) {
         console.error('Failed to fetch passages:', err);
         panel.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;min-height:200px;color:var(--ink-400);font-size:13px;">지문을 불러올 수 없습니다.</div>';
+        panel.style.minHeight = '';
+        window.scrollTo(0, scrollY);
       }
     }
 
