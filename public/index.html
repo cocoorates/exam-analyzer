@@ -1212,7 +1212,7 @@
     .passage-card-row .passage-ko {
       max-height: 0;
       overflow: hidden;
-      transition: max-height 0.35s ease, padding 0.35s ease, opacity 0.25s ease;
+      transition: max-height 0.35s cubic-bezier(0, 1, 0, 1), padding 0.3s ease, opacity 0.25s ease;
       opacity: 0;
       padding: 0 16px;
       background: linear-gradient(135deg, oklch(0.97 0.01 80 / 0.5), oklch(0.97 0.015 150 / 0.3));
@@ -1224,9 +1224,10 @@
       white-space: pre-wrap;
     }
     .mk-translation-open .passage-card-row .passage-ko {
-      max-height: 2000px;
+      max-height: 5000px;
       opacity: 1;
       padding: 14px 16px;
+      transition: max-height 0.5s cubic-bezier(1, 0, 1, 0), padding 0.3s ease, opacity 0.3s ease 0.05s;
     }
     .mk-trans-toggle {
       display: flex;
@@ -4440,8 +4441,9 @@
         // Render passages with translations (vertical expand)
         passages.forEach(p => {
           const label = p.label;
+          const safeTrans = (p.translation || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
           const transInner = p.translation
-            ? `<div style="font-weight:700;font-size:12px;color:var(--honey-ink);margin-bottom:6px;">해석</div><div>${p.translation}</div>`
+            ? `<div style="font-weight:700;font-size:12px;color:var(--honey-ink);margin-bottom:6px;">해석</div><div style="white-space:pre-wrap;">${safeTrans}</div>`
             : `<div style="color:var(--ink-300);font-size:12px;font-style:italic;">해석이 준비되지 않았습니다.</div>`;
           html += `<div class="passage-card" style="border-bottom:1px solid var(--ink-100);">
             <div class="passage-card-row">
@@ -4942,8 +4944,9 @@
             formattedText = formatDialogueSpeakers(formattedText);
           }
 
+          const safeKo = (p.passage_ko || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
           const transInner = p.passage_ko
-            ? `<div style="font-weight:700;font-size:12px;color:var(--honey-ink);margin-bottom:6px;">해석</div><div>${p.passage_ko}</div>`
+            ? `<div style="font-weight:700;font-size:12px;color:var(--honey-ink);margin-bottom:6px;">해석</div><div style="white-space:pre-wrap;">${safeKo}</div>`
             : `<div style="color:var(--ink-300);font-size:12px;font-style:italic;">해석이 준비되지 않았습니다.</div>`;
 
           html += subtitleHeader;
