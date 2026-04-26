@@ -2958,148 +2958,157 @@
         </div>
       </div>
 
-      <!-- Right: 원문/해석 패널 -->
-      <div class="tb-options" id="tbPassagePanel">
-        <div style="display:flex;align-items:center;justify-content:center;height:100%;min-height:200px;color:var(--ink-400);font-size:13px;">왼쪽 테이블에서 교과서를 선택하세요.</div>
-      </div>
-
-      <!-- Right: generation options (hidden for now) -->
-      <div class="tb-options" style="display:none">
-        <div class="tb-options-head">
-          <h3>문제 출제</h3>
+      <!-- Right: generation options + passage viewer (tabs) -->
+      <div class="tb-options">
+        <!-- Tabs: 문제 출제 vs 원문 보기 -->
+        <div class="tb-options-tabs" style="display:flex; gap:8px; padding:16px; border-bottom:1px solid var(--ink-100); margin-bottom:16px;">
+          <button class="tb-option-tab active" onclick="tbShowTab(this,'options')" style="flex:1; padding:8px 12px; border:none; background:transparent; color:var(--ink-700); border-bottom:2px solid transparent; cursor:pointer; font-weight:500; transition:all 0.2s;">문제 출제</button>
+          <button class="tb-option-tab" onclick="tbShowTab(this,'passages');tbFetchCurrentPassages()" style="flex:1; padding:8px 12px; border:none; background:transparent; color:var(--ink-400); border-bottom:2px solid transparent; cursor:pointer; font-weight:500; transition:all 0.2s;">원문 보기</button>
         </div>
 
-        <div class="tb-selected-info">
-          <span>현재 선택한 지문</span>
-          <strong id="tbSelectedCount">0개</strong>
-        </div>
+        <!-- Options Panel -->
+        <div id="tbOptionsPanel" style="display:block;">
+          <div class="tb-options-head">
+            <h3>문제 출제</h3>
+          </div>
 
-        <div class="tb-opt-section">
-          <span class="tb-opt-label">유형 · 난이도</span>
-          <div class="tb-opt-grid">
-            <span class="tb-opt-type">요지</span>
-            <div class="tb-diff-row">
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">상</button>
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">중</button>
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">하</button>
-            </div>
-            <span class="tb-opt-type">주제</span>
-            <div class="tb-diff-row">
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">상</button>
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">중</button>
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">하</button>
-            </div>
-            <span class="tb-opt-type">제목</span>
-            <div class="tb-diff-row">
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">상</button>
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">중</button>
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">하</button>
-            </div>
-            <span class="tb-opt-type">내용 일치</span>
-            <div class="tb-diff-row">
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">상</button>
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">중</button>
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">하</button>
-            </div>
-            <span class="tb-opt-type">내용 불일치</span>
-            <div class="tb-diff-row">
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">상</button>
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">중</button>
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">하</button>
-            </div>
-            <span class="tb-opt-type">빈칸</span>
-            <div class="tb-diff-row">
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">절 빈칸</button>
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">구 빈칸</button>
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">단어 빈칸</button>
-            </div>
-            <span class="tb-opt-type">요약</span>
-            <div class="tb-diff-row">
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">상</button>
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">중</button>
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">하</button>
-            </div>
-            <span class="tb-opt-type">무관한 문장</span>
-            <div class="tb-diff-row">
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">상</button>
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">중</button>
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">하</button>
-            </div>
-            <span class="tb-opt-type">어법</span>
-            <div class="tb-diff-row">
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">밑줄</button>
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">양자택일</button>
-            </div>
-            <span class="tb-opt-type">어휘</span>
-            <div class="tb-diff-row">
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">밑줄</button>
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">양자택일</button>
-            </div>
-            <span class="tb-opt-type">기타</span>
-            <div class="tb-diff-row">
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">함축의미</button>
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">순서</button>
-              <button class="tb-diff-btn" onclick="tbToggleDiff(this)">삽입</button>
+          <div class="tb-selected-info">
+            <span>현재 선택한 지문</span>
+            <strong id="tbSelectedCount">0개</strong>
+          </div>
+
+          <div class="tb-opt-section">
+            <span class="tb-opt-label">유형 · 난이도</span>
+            <div class="tb-opt-grid">
+              <span class="tb-opt-type">요지</span>
+              <div class="tb-diff-row">
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">상</button>
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">중</button>
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">하</button>
+              </div>
+              <span class="tb-opt-type">주제</span>
+              <div class="tb-diff-row">
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">상</button>
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">중</button>
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">하</button>
+              </div>
+              <span class="tb-opt-type">제목</span>
+              <div class="tb-diff-row">
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">상</button>
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">중</button>
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">하</button>
+              </div>
+              <span class="tb-opt-type">내용 일치</span>
+              <div class="tb-diff-row">
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">상</button>
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">중</button>
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">하</button>
+              </div>
+              <span class="tb-opt-type">내용 불일치</span>
+              <div class="tb-diff-row">
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">상</button>
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">중</button>
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">하</button>
+              </div>
+              <span class="tb-opt-type">빈칸</span>
+              <div class="tb-diff-row">
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">절 빈칸</button>
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">구 빈칸</button>
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">단어 빈칸</button>
+              </div>
+              <span class="tb-opt-type">요약</span>
+              <div class="tb-diff-row">
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">상</button>
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">중</button>
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">하</button>
+              </div>
+              <span class="tb-opt-type">무관한 문장</span>
+              <div class="tb-diff-row">
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">상</button>
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">중</button>
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">하</button>
+              </div>
+              <span class="tb-opt-type">어법</span>
+              <div class="tb-diff-row">
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">밑줄</button>
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">양자택일</button>
+              </div>
+              <span class="tb-opt-type">어휘</span>
+              <div class="tb-diff-row">
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">밑줄</button>
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">양자택일</button>
+              </div>
+              <span class="tb-opt-type">기타</span>
+              <div class="tb-diff-row">
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">함축의미</button>
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">순서</button>
+                <button class="tb-diff-btn" onclick="tbToggleDiff(this)">삽입</button>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="tb-opt-section">
-          <span class="tb-opt-label">빠른 옵션</span>
-          <div class="tb-quick-grid">
-            <div class="tb-quick-card qc-blush" onclick="tbQuickSelect('요지')">
-              <div class="qc-type">요지</div>
-              <div class="qc-detail">+ 상</div>
-            </div>
-            <div class="tb-quick-card qc-sky" onclick="tbQuickSelect('주제')">
-              <div class="qc-type">주제</div>
-              <div class="qc-detail">+ 상</div>
-            </div>
-            <div class="tb-quick-card qc-lilac" onclick="tbQuickSelect('빈칸')">
-              <div class="qc-type">빈칸</div>
-              <div class="qc-detail">+ 절 빈칸</div>
-            </div>
-            <div class="tb-quick-card qc-sage" onclick="tbQuickSelect('어법')">
-              <div class="qc-type">어법</div>
-              <div class="qc-detail">+ 밑줄</div>
-            </div>
-            <div class="tb-quick-card qc-honey" onclick="tbQuickSelect('어휘')">
-              <div class="qc-type">어휘</div>
-              <div class="qc-detail">+ 밑줄</div>
-            </div>
-            <div class="tb-quick-card qc-mint" onclick="tbQuickSelect('추가')">
-              <div class="qc-type">+ 추가</div>
-              <div class="qc-detail"></div>
+          <div class="tb-opt-section">
+            <span class="tb-opt-label">빠른 옵션</span>
+            <div class="tb-quick-grid">
+              <div class="tb-quick-card qc-blush" onclick="tbQuickSelect('요지')">
+                <div class="qc-type">요지</div>
+                <div class="qc-detail">+ 상</div>
+              </div>
+              <div class="tb-quick-card qc-sky" onclick="tbQuickSelect('주제')">
+                <div class="qc-type">주제</div>
+                <div class="qc-detail">+ 상</div>
+              </div>
+              <div class="tb-quick-card qc-lilac" onclick="tbQuickSelect('빈칸')">
+                <div class="qc-type">빈칸</div>
+                <div class="qc-detail">+ 절 빈칸</div>
+              </div>
+              <div class="tb-quick-card qc-sage" onclick="tbQuickSelect('어법')">
+                <div class="qc-type">어법</div>
+                <div class="qc-detail">+ 밑줄</div>
+              </div>
+              <div class="tb-quick-card qc-honey" onclick="tbQuickSelect('어휘')">
+                <div class="qc-type">어휘</div>
+                <div class="qc-detail">+ 밑줄</div>
+              </div>
+              <div class="tb-quick-card qc-mint" onclick="tbQuickSelect('추가')">
+                <div class="qc-type">+ 추가</div>
+                <div class="qc-detail"></div>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="tb-opt-section">
-          <span class="tb-opt-label">문제 배치</span>
-          <div class="tb-layout-tabs">
-            <button class="tb-layout-tab active" onclick="tbLayoutTab(this)">지문별</button>
-            <button class="tb-layout-tab" onclick="tbLayoutTab(this)">유형별</button>
-            <button class="tb-layout-tab" onclick="tbLayoutTab(this)">무작위</button>
+          <div class="tb-opt-section">
+            <span class="tb-opt-label">문제 배치</span>
+            <div class="tb-layout-tabs">
+              <button class="tb-layout-tab active" onclick="tbLayoutTab(this)">지문별</button>
+              <button class="tb-layout-tab" onclick="tbLayoutTab(this)">유형별</button>
+              <button class="tb-layout-tab" onclick="tbLayoutTab(this)">무작위</button>
+            </div>
           </div>
+
+          <div class="tb-stats-row">
+            <span>선택한 지문 수</span>
+            <strong id="tbPassageCount">0</strong>
+          </div>
+          <div class="tb-stats-row">
+            <span>생성될 예상 문제 수</span>
+            <strong id="tbEstimatedQ">0 <span style="font-size:13px;font-weight:400;color:var(--ink-400)">/ 1000</span></strong>
+          </div>
+
+          <div class="tb-quota">
+            <div class="tb-quota-row"><span>보유 Quota</span> <strong>0 Q</strong></div>
+            <div class="tb-quota-row"><span>예상 차감</span> <strong>0 Q</strong></div>
+            <div class="tb-quota-row"><span>생성 후 예상 잔여</span> <strong>0 Q</strong></div>
+            <div class="tb-quota-note">현재 보유 Quota 내에서 생성 가능합니다.</div>
+          </div>
+
+          <button class="tb-generate-btn" onclick="requireAuth()">문제 생성하기</button>
         </div>
 
-        <div class="tb-stats-row">
-          <span>선택한 지문 수</span>
-          <strong id="tbPassageCount">0</strong>
+        <!-- Passage Panel -->
+        <div id="tbPassagePanel" style="display:none;">
+          <div style="display:flex;align-items:center;justify-content:center;height:100%;min-height:200px;color:var(--ink-400);font-size:13px;">왼쪽 테이블에서 교과서를 선택하세요.</div>
         </div>
-        <div class="tb-stats-row">
-          <span>생성될 예상 문제 수</span>
-          <strong id="tbEstimatedQ">0 <span style="font-size:13px;font-weight:400;color:var(--ink-400)">/ 1000</span></strong>
-        </div>
-
-        <div class="tb-quota">
-          <div class="tb-quota-row"><span>보유 Quota</span> <strong>0 Q</strong></div>
-          <div class="tb-quota-row"><span>예상 차감</span> <strong>0 Q</strong></div>
-          <div class="tb-quota-row"><span>생성 후 예상 잔여</span> <strong>0 Q</strong></div>
-          <div class="tb-quota-note">현재 보유 Quota 내에서 생성 가능합니다.</div>
-        </div>
-
-        <button class="tb-generate-btn" onclick="requireAuth()">문제 생성하기</button>
       </div>
     </div>
   </div>
@@ -4473,15 +4482,16 @@
 
     // ── Textbook page logic ──
     const tbData = [
-      { subject: '공통영어1', publisher: 'NE능률', author: '민병천', lessons: ['Lesson 2','Lesson 3'] },
-      { subject: '공통영어1', publisher: 'YBM', author: '김은형', lessons: ['Lesson 1','Lesson 4'] },
+      { subject: '공통영어1', publisher: 'NE능률', author: '민병천', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4','Special Lesson1','Special Lesson2'] },
+      { subject: '공통영어1', publisher: 'NE능률', author: '오선영', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4','Special Lesson'] },
+      { subject: '공통영어1', publisher: 'YBM', author: '김은형', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4','Project 1','Project 2'] },
       { subject: '공통영어1', publisher: 'YBM', author: '박준언', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4'] },
-      { subject: '공통영어1', publisher: '동아', author: '이병민', lessons: ['Lesson 2','Lesson 3','Lesson 4'] },
-      { subject: '공통영어1', publisher: '미래엔', author: '김성연', lessons: ['Lesson 2','Lesson 3'] },
-      { subject: '공통영어1', publisher: '비상', author: '홍민표', lessons: ['Lesson 1','Lesson 3','Lesson 4'] },
+      { subject: '공통영어1', publisher: '동아', author: '이병민', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4','Special Lesson'] },
+      { subject: '공통영어1', publisher: '미래엔', author: '김성연', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4'] },
+      { subject: '공통영어1', publisher: '비상', author: '홍민표', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4'] },
       { subject: '공통영어1', publisher: '지학사', author: '신상근', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4'] },
       { subject: '공통영어1', publisher: '천재', author: '강상구', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4'] },
-      { subject: '공통영어1', publisher: '천재', author: '조수경', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4'] },
+      { subject: '공통영어1', publisher: '천재', author: '조수경', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4','Special Lesson'] },
     ];
 
     const tbStripColors = {
@@ -4652,13 +4662,53 @@
       btn.classList.add('active');
     }
 
+    // ── Textbook tab switching ──
+    function tbShowTab(btn, tab) {
+      const parent = btn.closest('.tb-options');
+      parent.querySelectorAll('.tb-option-tab').forEach(t => {
+        t.classList.remove('active');
+        t.style.color = 'var(--ink-400)';
+        t.style.borderBottom = '2px solid transparent';
+      });
+      btn.classList.add('active');
+      btn.style.color = 'var(--ink-700)';
+      btn.style.borderBottom = '2px solid var(--ink-700)';
+
+      document.getElementById('tbOptionsPanel').style.display = tab === 'options' ? 'block' : 'none';
+      document.getElementById('tbPassagePanel').style.display = tab === 'passages' ? 'block' : 'none';
+    }
+
+    function tbFetchCurrentPassages() {
+      if (tbSelectedBook) {
+        tbLoadPassages(tbSelectedBook.publisher, tbSelectedBook.author, tbSelectedBook.lesson);
+      }
+    }
+
     // ── Textbook passage viewer ──
     let tbTranslationOpen = true;
     let tbSelectedBook = null;
 
+    function tbLessonToNum(lesson) {
+      if (lesson.startsWith('Special Lesson')) {
+        const num = lesson.replace('Special Lesson', '').trim();
+        return num ? 100 + parseInt(num) : 100;
+      }
+      if (lesson.startsWith('Project')) {
+        const num = lesson.replace('Project', '').trim();
+        return num ? 200 + parseInt(num) : 201;
+      }
+      return parseInt(lesson.replace(/\D/g, ''));
+    }
+
     async function tbLoadPassages(publisher, author, lesson) {
       const panel = document.getElementById('tbPassagePanel');
       if (!panel) return;
+
+      // Auto-switch to passages tab
+      const tabBtns = panel.closest('.tb-options').querySelectorAll('.tb-option-tab');
+      if (tabBtns.length >= 2) {
+        tbShowTab(tabBtns[1], 'passages');
+      }
 
       panel.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;min-height:200px;color:var(--ink-400);font-size:13px;">불러오는 중...</div>';
 
@@ -4669,7 +4719,7 @@
         const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFub2huanlzbnJqem5xYXd3dmVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjA3MDMsImV4cCI6MjA5MjY5NjcwM30.O1KXAzfKtF6Ui1iMTg82iwHCIWLVwHHjy-E9N-s82rU';
         const headers = { 'apikey': anonKey, 'Authorization': `Bearer ${anonKey}`, 'Content-Type': 'application/json' };
 
-        const lessonNum = parseInt(lesson.replace(/\D/g, ''));
+        const lessonNum = tbLessonToNum(lesson);
         const url = `${supabaseUrl}/rest/v1/textbook_passages?publisher=eq.${encodeURIComponent(publisher)}&author=eq.${encodeURIComponent(author)}&lesson=eq.${lessonNum}&select=passage_order,passage_en,passage_ko&order=passage_order`;
 
         const res = await fetch(url, { headers });
