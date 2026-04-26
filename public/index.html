@@ -4086,7 +4086,7 @@
           if (!yrs.includes(String(it.year))) return false;
         }
         if (mkSearchQuery) {
-          const hay = `${it.grade} ${it.year} ${it.month}월 ${mkMonthNames[it.month]}`.toLowerCase();
+          const hay = `${it.grade} ${it.year} ${it.year}년 ${String(it.year).slice(2)}년 ${it.month}월 ${mkMonthNames[it.month]}`.toLowerCase();
           if (!hay.includes(mkSearchQuery)) return false;
         }
         return true;
@@ -4102,7 +4102,7 @@
 
       let html = `<table><thead><tr>
         <th style="width:30px"></th>
-        <th>시험명</th><th>학년</th><th>연도</th><th>월</th><th>문항</th>
+        <th>모의고사</th><th>학년</th><th>연도</th><th>월</th>
       </tr></thead><tbody>`;
 
       filtered.forEach(it => {
@@ -4115,7 +4115,6 @@
           <td><span class="tb-subject-badge" style="background:${badge.bg};color:${badge.c}">${it.grade}</span></td>
           <td>${it.year}년</td>
           <td>${it.month}월</td>
-          <td><span class="tb-passages-num">25</span></td>
         </tr>`;
       });
 
