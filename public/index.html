@@ -4221,21 +4221,22 @@
           hideTimer = null;
         }, 1000);
       }
+      let scrollEndTimer = null;
       panel.addEventListener('scroll', () => {
         updateThumb();
-        if (exitedLeft) {
-          // 왼쪽으로 벗어난 상태 — 스크롤해도 스크롤바 안 보임, thumb만 업데이트
-          return;
-        }
-        if (mouseInZone || rightPadding) {
-          clearTimeout(hideTimer);
-          hideTimer = null;
-          track.classList.add('visible');
-        } else {
-          // 스크롤 중 보이되, 기존 hide 타이머가 있으면 건드리지 않음
-          track.classList.add('visible');
-          if (!hideTimer) hideBar();
-        }
+        // 스크롤 중에는 항상 스크롤바 보이기 (exitedLeft 여부 무관)
+        track.classList.add('visible');
+        // 스크롤 중이니까 hide 타이머 취소
+        clearTimeout(hideTimer);
+        hideTimer = null;
+        // 스크롤 끝 감지: 150ms 동안 scroll 이벤트 없으면 스크롤 끝
+        clearTimeout(scrollEndTimer);
+        scrollEndTimer = setTimeout(() => {
+          // 스크롤 멈춤 — 마우스가 스크롤바 존 안이면 유지, 아니면 1초 후 숨김
+          if (!mouseInZone && !rightPadding) {
+            hideBar();
+          }
+        }, 150);
       });
 
       // Show when mouse near right edge
