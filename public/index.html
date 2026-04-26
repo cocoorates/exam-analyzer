@@ -4183,10 +4183,14 @@
       function updateThumb() {
         const { scrollTop, scrollHeight, clientHeight } = panel;
         if (scrollHeight <= clientHeight) { track.classList.remove('visible'); return; }
-        const ratio = clientHeight / scrollHeight;
-        const thumbH = Math.max(ratio * clientHeight, 30);
+        // Offset scrollbar below sticky header
+        const header = panel.querySelector('.mk-passages-header');
+        const headerH = header ? header.offsetHeight : 0;
+        const trackHeight = clientHeight - headerH;
+        const ratio = trackHeight / scrollHeight;
+        const thumbH = Math.max(ratio * trackHeight, 30);
         const maxScroll = scrollHeight - clientHeight;
-        const thumbTop = (scrollTop / maxScroll) * (clientHeight - thumbH);
+        const thumbTop = headerH + (scrollTop / maxScroll) * (trackHeight - thumbH);
         thumb.style.height = thumbH + 'px';
         thumb.style.top = thumbTop + 'px';
       }
@@ -4211,7 +4215,7 @@
       wrap.addEventListener('mousemove', (e) => {
         const rect = wrap.getBoundingClientRect();
         const dist = rect.right - e.clientX;
-        if (dist <= 20 && dist >= 0) {
+        if (dist <= 26 && dist >= 0) {
           nearEdge = true;
           showBar();
         } else {
@@ -4223,7 +4227,7 @@
 
       // Hover effect on track area
       track.addEventListener('mouseenter', () => { nearEdge = true; track.classList.add('hovered'); clearTimeout(hideTimer); showBar(); });
-      track.addEventListener('mouseleave', () => { track.classList.remove('hovered'); });
+      track.addEventListener('mouseleave', () => { nearEdge = false; track.classList.remove('hovered'); hideBar(); });
 
       wrap.addEventListener('mouseleave', () => { nearEdge = false; if (!dragging) hideBar(); });
 
@@ -4257,9 +4261,12 @@
       track.addEventListener('click', (e) => {
         if (e.target === thumb) return;
         const rect = track.getBoundingClientRect();
-        const clickY = e.clientY - rect.top;
+        const header = panel.querySelector('.mk-passages-header');
+        const headerH = header ? header.offsetHeight : 0;
+        const clickY = e.clientY - rect.top - headerH;
         const { scrollHeight, clientHeight } = panel;
-        const ratio = clickY / clientHeight;
+        const trackHeight = clientHeight - headerH;
+        const ratio = Math.max(0, clickY / trackHeight);
         panel.scrollTop = ratio * (scrollHeight - clientHeight);
         updateThumb();
       });
