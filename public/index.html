@@ -4211,7 +4211,7 @@
       wrap.addEventListener('mousemove', (e) => {
         const rect = wrap.getBoundingClientRect();
         const dist = rect.right - e.clientX;
-        if (dist <= 22 && dist >= -2) {
+        if (dist <= 20 && dist >= 0) {
           nearEdge = true;
           showBar();
         } else {
