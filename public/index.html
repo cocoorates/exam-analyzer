@@ -2887,9 +2887,14 @@
         </div>
 
         <!-- Passages Panel -->
-        <div id="mkPassagesPanel" class="mk-passages-panel" style="display:none; overflow-y:auto; max-height:calc(100vh - 200px);">
+        <div id="mkPassagesWrap" class="mk-passages-wrap" style="display:none; position:relative;">
+          <div id="mkPassagesPanel" class="mk-passages-panel" style="overflow-y:auto; max-height:calc(100vh - 200px);">
           <div style="padding:16px; text-align:center; color:var(--ink-400); font-size:14px;">
             시험을 선택하면 원문이 표시됩니다.
+          </div>
+        </div>
+          <div id="mkScrollbar" class="mk-custom-scrollbar">
+            <div class="mk-custom-scrollbar-thumb"></div>
           </div>
         </div>
       </div>
@@ -4120,8 +4125,8 @@
       });
       document.getElementById('mkPassageCount').textContent = mkSelectedSingle ? '25' : '0';
       // 원문 보기 탭이 활성화 상태면 자동 갱신
-      const passagesPanel = document.getElementById('mkPassagesPanel');
-      if (passagesPanel && passagesPanel.style.display !== 'none') {
+      const passagesWrap = document.getElementById('mkPassagesWrap');
+      if (passagesWrap && passagesWrap.style.display !== 'none') {
         mkFetchPassages();
       }
     }
@@ -4138,17 +4143,17 @@
 
       // Show/hide panels
       const optionsPanel = document.getElementById('mkOptionsPanel');
-      const passagesPanel = document.getElementById('mkPassagesPanel');
+      const passagesWrap = document.getElementById('mkPassagesWrap');
       if (tab === 'options') {
         optionsPanel.style.display = 'block';
-        passagesPanel.style.display = 'none';
+        passagesWrap.style.display = 'none';
         // Close translation panel when switching to options
         mkTranslationOpen = false;
         const layout = document.querySelector('.page-mock .tb-layout');
         if (layout) layout.classList.remove('mk-translation-open');
       } else {
         optionsPanel.style.display = 'none';
-        passagesPanel.style.display = 'block';
+        passagesWrap.style.display = 'block';
       }
     }
     function mkToggleDiff(btn) {
@@ -4167,14 +4172,8 @@
     // Custom scrollbar for passages panel
     (function() {
       const panel = document.getElementById('mkPassagesPanel');
-
-      // Create custom scrollbar elements
-      const track = document.createElement('div');
-      track.className = 'mk-custom-scrollbar';
-      const thumb = document.createElement('div');
-      thumb.className = 'mk-custom-scrollbar-thumb';
-      track.appendChild(thumb);
-      panel.appendChild(track);
+      const track = document.getElementById('mkScrollbar');
+      const thumb = track.querySelector('.mk-custom-scrollbar-thumb');
 
       let hideTimer = null;
       let dragging = false;
@@ -4206,8 +4205,9 @@
       panel.addEventListener('scroll', () => { showBar(); hideBar(); });
 
       // Show when mouse near right edge (within 20px)
-      panel.addEventListener('mousemove', (e) => {
-        const rect = panel.getBoundingClientRect();
+      const wrap = document.getElementById('mkPassagesWrap');
+      wrap.addEventListener('mousemove', (e) => {
+        const rect = wrap.getBoundingClientRect();
         const dist = rect.right - e.clientX;
         if (dist <= 20 && dist >= 0) {
           showBar();
@@ -4221,7 +4221,7 @@
       track.addEventListener('mouseenter', () => { track.classList.add('hovered'); clearTimeout(hideTimer); });
       track.addEventListener('mouseleave', () => { if (!dragging) { track.classList.remove('hovered'); hideBar(); } });
 
-      panel.addEventListener('mouseleave', () => { if (!dragging) hideBar(); });
+      wrap.addEventListener('mouseleave', () => { if (!dragging) hideBar(); });
 
       // Drag scrolling
       thumb.addEventListener('mousedown', (e) => {
