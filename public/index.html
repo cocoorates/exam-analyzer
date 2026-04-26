@@ -853,7 +853,7 @@
     }
     /* Table */
     .tb-main-table {
-      flex: 1; overflow-y: auto;
+      flex: 1; overflow-y: auto; overflow-x: hidden;
     }
     .tb-main-table::-webkit-scrollbar { width: 5px; }
     .tb-main-table::-webkit-scrollbar-thumb { background: var(--ink-200); border-radius: 4px; }
@@ -885,7 +885,6 @@
     }
     .tb-main-table tbody tr:hover {
       background: oklch(0.97 0.01 80 / 0.6);
-      transform: translateX(2px);
     }
     .tb-main-table tbody tr:last-child td { border-bottom: none; }
     /* Table first column */
