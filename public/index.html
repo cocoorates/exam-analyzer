@@ -4197,47 +4197,32 @@
 
       let lastMouseX = 0;
       let lastMouseY = 0;
-      let scrollHideTimer = null;
+      // mouseInZone: set true/false ONLY by mousemove/mouseleave
+      // This is the authoritative source of whether mouse is in the 26px zone
+      let mouseInZone = false;
 
-      function isNearEdge() {
-        if (lastMouseX === 0 && lastMouseY === 0) return false;
-        const rect = wrap.getBoundingClientRect();
-        const dist = rect.right - lastMouseX;
-        return dist <= 26 && dist >= 0 && lastMouseY >= rect.top && lastMouseY <= rect.bottom;
-      }
       function showBar() {
         clearTimeout(hideTimer);
-        clearTimeout(scrollHideTimer);
-        scrollHideTimer = null;
         updateThumb();
         track.classList.add('visible');
       }
       function hideBar() {
         if (dragging) return;
         clearTimeout(hideTimer);
-        clearTimeout(scrollHideTimer);
-        scrollHideTimer = null;
         hideTimer = setTimeout(() => { track.classList.remove('visible'); track.classList.remove('hovered'); }, 800);
       }
       panel.addEventListener('scroll', () => {
         updateThumb();
-        if (isNearEdge()) {
-          // Mouse is near scrollbar — show and keep visible, cancel any pending hide
-          clearTimeout(scrollHideTimer);
+        if (mouseInZone) {
+          // Mouse is in the 26px zone (confirmed by mousemove) — keep visible
           clearTimeout(hideTimer);
           track.classList.add('visible');
         } else {
-          // Mouse is NOT near scrollbar — show thumb briefly, then hide
+          // Mouse is outside — show thumb briefly then hide
           track.classList.add('visible');
-          // Only set timer if not already pending (don't reset on every scroll tick)
-          if (!scrollHideTimer) {
-            scrollHideTimer = setTimeout(() => {
-              scrollHideTimer = null;
-              if (!isNearEdge() && !dragging) {
-                track.classList.remove('visible');
-                track.classList.remove('hovered');
-              }
-            }, 800);
+          // Don't clear existing hideTimer — let it run
+          if (!hideTimer) {
+            hideBar();
           }
         }
       });
@@ -4249,7 +4234,7 @@
         const rect = wrap.getBoundingClientRect();
         const dist = rect.right - e.clientX;
         if (dist <= 26 && dist >= 0) {
-          clearTimeout(hideTimer);
+          mouseInZone = true;
           showBar();
           if (dist <= 14) {
             track.classList.add('hovered');
@@ -4257,6 +4242,7 @@
             track.classList.remove('hovered');
           }
         } else {
+          mouseInZone = false;
           track.classList.remove('hovered');
           hideBar();
         }
@@ -4265,6 +4251,7 @@
       wrap.addEventListener('mouseleave', () => {
         lastMouseX = 0;
         lastMouseY = 0;
+        mouseInZone = false;
         track.classList.remove('hovered');
         if (!dragging) hideBar();
       });
