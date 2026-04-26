@@ -1148,17 +1148,13 @@
     }
     .mk-passages-panel {
       padding: 0;
-      scrollbar-width: thin;
-      scrollbar-color: transparent transparent;
+      overflow-y: scroll !important;
     }
-    .mk-passages-panel:hover {
-      scrollbar-color: var(--ink-200) transparent;
-    }
-    .mk-passages-panel::-webkit-scrollbar { width: 4px; }
+    .mk-passages-panel::-webkit-scrollbar { width: 6px; }
     .mk-passages-panel::-webkit-scrollbar-track { background: transparent; }
-    .mk-passages-panel::-webkit-scrollbar-thumb { background: transparent; border-radius: 4px; transition: background 0.2s; }
-    .mk-passages-panel:hover::-webkit-scrollbar-thumb { background: var(--ink-200); }
-    .mk-passages-panel:hover::-webkit-scrollbar-thumb:hover { background: var(--ink-400); }
+    .mk-passages-panel::-webkit-scrollbar-thumb { background: transparent; border-radius: 3px; }
+    .mk-passages-panel.scrollbar-visible::-webkit-scrollbar-thumb { background: var(--ink-200); }
+    .mk-passages-panel.scrollbar-active::-webkit-scrollbar-thumb { background: var(--ink-400); }
     .mk-passages-header {
       position: sticky;
       top: 0;
@@ -4141,6 +4137,41 @@
     }
 
     let mkTranslationOpen = false;
+
+    // Scrollbar: show when mouse near right edge, highlight on direct hover
+    (function() {
+      const panel = document.getElementById('mkPassagesPanel');
+      let scrollTimer = null;
+      // Show scrollbar while scrolling
+      panel.addEventListener('scroll', () => {
+        panel.classList.add('scrollbar-visible');
+        clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(() => {
+          if (!panel.classList.contains('scrollbar-active')) {
+            panel.classList.remove('scrollbar-visible');
+          }
+        }, 1200);
+      });
+      // Show/highlight when mouse near right edge (within 20px)
+      panel.addEventListener('mousemove', (e) => {
+        const rect = panel.getBoundingClientRect();
+        const distFromRight = rect.right - e.clientX;
+        if (distFromRight <= 20) {
+          panel.classList.add('scrollbar-visible');
+          if (distFromRight <= 8) {
+            panel.classList.add('scrollbar-active');
+          } else {
+            panel.classList.remove('scrollbar-active');
+          }
+        } else {
+          panel.classList.remove('scrollbar-active');
+          if (!scrollTimer) panel.classList.remove('scrollbar-visible');
+        }
+      });
+      panel.addEventListener('mouseleave', () => {
+        panel.classList.remove('scrollbar-visible', 'scrollbar-active');
+      });
+    })();
 
     function mkToggleTranslation() {
       mkTranslationOpen = !mkTranslationOpen;
