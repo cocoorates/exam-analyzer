@@ -4711,9 +4711,11 @@
 
         panel.innerHTML = html;
 
-        // Apply translation visibility
-        if (!tbTranslationOpen) {
-          panel.querySelectorAll('.passage-ko').forEach(el => el.style.display = 'none');
+        // Apply translation visibility via class
+        if (tbTranslationOpen) {
+          panel.classList.add('mk-translation-open');
+        } else {
+          panel.classList.remove('mk-translation-open');
         }
       } catch (err) {
         console.error('Failed to fetch textbook passages:', err);
@@ -4725,9 +4727,10 @@
       tbTranslationOpen = !tbTranslationOpen;
       const toggle = document.getElementById('tbTransToggle');
       if (toggle) toggle.classList.toggle('active', tbTranslationOpen);
-      document.querySelectorAll('#tbPassagePanel .passage-ko').forEach(el => {
-        el.style.display = tbTranslationOpen ? '' : 'none';
-      });
+      const panel = document.getElementById('tbPassagePanel');
+      if (panel) {
+        panel.classList.toggle('mk-translation-open', tbTranslationOpen);
+      }
     }
 
     // Initial render
