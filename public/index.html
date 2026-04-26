@@ -4171,6 +4171,7 @@
     // Custom scrollbar for passages panel
     (function() {
       const panel = document.getElementById('mkPassagesPanel');
+      const wrap = document.getElementById('mkPassagesWrap');
       const track = document.getElementById('mkScrollbar');
       const thumb = track.querySelector('.mk-custom-scrollbar-thumb');
 
@@ -4194,32 +4195,54 @@
         thumb.style.top = thumbTop + 'px';
       }
 
-      function showBar() {
-        clearTimeout(hideTimer);
-        updateThumb();
-        track.classList.add('visible');
-      }
       let lastMouseX = 0;
       let lastMouseY = 0;
+      let scrollHideTimer = null;
+
       function isNearEdge() {
+        if (lastMouseX === 0 && lastMouseY === 0) return false;
         const rect = wrap.getBoundingClientRect();
         const dist = rect.right - lastMouseX;
         return dist <= 26 && dist >= 0 && lastMouseY >= rect.top && lastMouseY <= rect.bottom;
       }
+      function showBar() {
+        clearTimeout(hideTimer);
+        clearTimeout(scrollHideTimer);
+        scrollHideTimer = null;
+        updateThumb();
+        track.classList.add('visible');
+      }
       function hideBar() {
         if (dragging) return;
         clearTimeout(hideTimer);
+        clearTimeout(scrollHideTimer);
+        scrollHideTimer = null;
         hideTimer = setTimeout(() => { track.classList.remove('visible'); track.classList.remove('hovered'); }, 800);
       }
-
-      // Show on scroll — always check current mouse position
       panel.addEventListener('scroll', () => {
-        showBar();
-        if (!isNearEdge()) hideBar();
+        updateThumb();
+        if (isNearEdge()) {
+          // Mouse is near scrollbar — show and keep visible, cancel any pending hide
+          clearTimeout(scrollHideTimer);
+          clearTimeout(hideTimer);
+          track.classList.add('visible');
+        } else {
+          // Mouse is NOT near scrollbar — show thumb briefly, then hide
+          track.classList.add('visible');
+          // Only set timer if not already pending (don't reset on every scroll tick)
+          if (!scrollHideTimer) {
+            scrollHideTimer = setTimeout(() => {
+              scrollHideTimer = null;
+              if (!isNearEdge() && !dragging) {
+                track.classList.remove('visible');
+                track.classList.remove('hovered');
+              }
+            }, 800);
+          }
+        }
       });
 
       // Show when mouse near right edge
-      const wrap = document.getElementById('mkPassagesWrap');
       wrap.addEventListener('mousemove', (e) => {
         lastMouseX = e.clientX;
         lastMouseY = e.clientY;
