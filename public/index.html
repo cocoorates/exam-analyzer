@@ -4789,7 +4789,7 @@
           'where','when','note','example','step','tip','fact','result','reason','question',
           'answer','warning','conclusion','summary','source','reference','resilience','digital footprints'];
         if (excludes.includes(lower)) return match;
-        return prefix + '<span style="font-weight:600;color:var(--ink-800);">' + trimmed + ':</span> ';
+        return prefix + '<span style="font-weight:600;color:var(--ink-800);">' + trimmed + '</span> : ';
       });
     }
 
