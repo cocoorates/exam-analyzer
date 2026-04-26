@@ -1165,9 +1165,6 @@
       transition: opacity 0.2s;
       pointer-events: none;
     }
-    .mk-custom-scrollbar.visible .mk-custom-scrollbar-thumb {
-      pointer-events: auto;
-    }
     .mk-custom-scrollbar.visible {
       opacity: 1;
     }
@@ -4240,8 +4237,11 @@
         if (!dragging) hideBar();
       });
 
-      // Drag scrolling
-      thumb.addEventListener('mousedown', (e) => {
+      // Drag scrolling — detect mousedown in scrollbar zone
+      wrap.addEventListener('mousedown', (e) => {
+        const rect = wrap.getBoundingClientRect();
+        const dist = rect.right - e.clientX;
+        if (dist > 14 || dist < 0) return;
         e.preventDefault();
         dragging = true;
         dragStartY = e.clientY;
@@ -4267,8 +4267,10 @@
       });
 
       // Click on track to jump
-      track.addEventListener('click', (e) => {
-        if (e.target === thumb) return;
+      wrap.addEventListener('click', (e) => {
+        const wrapRect = wrap.getBoundingClientRect();
+        const dist = wrapRect.right - e.clientX;
+        if (dist > 14 || dist < 0) return;
         const rect = track.getBoundingClientRect();
         const header = panel.querySelector('.mk-passages-header');
         const headerH = header ? header.offsetHeight : 0;
