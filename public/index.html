@@ -3093,8 +3093,13 @@
         </div>
 
         <!-- Passage Panel -->
-        <div id="tbPassagePanel" style="display:none;">
-          <div style="display:flex;align-items:center;justify-content:center;height:100%;min-height:200px;color:var(--ink-400);font-size:13px;">왼쪽 테이블에서 교과서를 선택하세요.</div>
+        <div id="tbPassagesWrap" class="mk-passages-wrap" style="display:none; position:relative;">
+          <div id="tbPassagePanel" class="mk-passages-panel" style="overflow-y:auto; max-height:calc(100vh - 200px);">
+            <div style="display:flex;align-items:center;justify-content:center;height:100%;min-height:200px;color:var(--ink-400);font-size:13px;">왼쪽 테이블에서 교과서를 선택하세요.</div>
+          </div>
+          <div id="tbScrollbar" class="mk-custom-scrollbar">
+            <div class="mk-custom-scrollbar-thumb"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -4476,6 +4481,57 @@
       { subject: '공통영어1', publisher: '천재', author: '조수경', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4','Special Lesson'] },
     ];
 
+    // Lesson titles extracted from HWP files
+    const tbTitles = {
+      'NE능률|민병천|Lesson 1': "Don't Let Anger Be Your Boss",
+      'NE능률|민병천|Lesson 2': 'Turning Ideas into Reality',
+      'NE능률|민병천|Lesson 3': 'Timing Is Everything',
+      'NE능률|민병천|Lesson 4': 'AI: Opportunity or Threat?',
+      'NE능률|민병천|Special Lesson1': 'The Golden Windows',
+      'NE능률|민병천|Special Lesson2': 'A Journey into a Magical World',
+      'NE능률|오선영|Lesson 1': 'Discovering Yourself through Challenges',
+      'NE능률|오선영|Lesson 2': 'Talk It Out, Help Is Here',
+      'NE능률|오선영|Lesson 3': 'Letters to Nature',
+      'NE능률|오선영|Lesson 4': 'Pictures Worth a Thousand Words',
+      'NE능률|오선영|Special Lesson': 'Two Thanksgiving Day Gentlemen',
+      'YBM|김은형|Lesson 1': 'The Magic of Believing That You Can Grow',
+      'YBM|김은형|Lesson 2': 'Arles, the City of Light and Art',
+      'YBM|김은형|Lesson 3': 'Why Fashion Needs to Be More Sustainable',
+      'YBM|김은형|Lesson 4': 'Fake or Fact, That Is the Question',
+      'YBM|김은형|Project 1': 'Digital Devices and Physical Health',
+      'YBM|김은형|Project 2': 'Cooking and Eating for the Planet',
+      'YBM|박준언|Lesson 1': 'The Magic of Morning Pages',
+      'YBM|박준언|Lesson 2': 'The Mind of an Octopus',
+      'YBM|박준언|Lesson 3': 'English or Englishes?',
+      'YBM|박준언|Lesson 4': 'Artificial Intelligence and the Arts',
+      '동아|이병민|Lesson 1': 'When Were You the Bravest?',
+      '동아|이병민|Lesson 2': 'Great Opening Lines',
+      '동아|이병민|Lesson 3': 'Wishful Recycling',
+      '동아|이병민|Lesson 4': 'Why You Buy What You Buy',
+      '동아|이병민|Special Lesson': 'Eureka! An Idea Is Born',
+      '미래엔|김성연|Lesson 1': 'The Power of Friendliness: Soft but Strong',
+      '미래엔|김성연|Lesson 2': 'Gathering of the Whakapapa',
+      '미래엔|김성연|Lesson 3': 'Tuning Out: The Science of Noise-Cancellation',
+      '미래엔|김성연|Lesson 4': 'A Better Future for Coffee Waste',
+      '비상|홍민표|Lesson 1': 'Letters from Recent Graduates',
+      '비상|홍민표|Lesson 2': 'Odd Pairings That Work',
+      '비상|홍민표|Lesson 3': 'My Octopus Teacher',
+      '비상|홍민표|Lesson 4': 'Wheels of Adventures',
+      '지학사|신상근|Lesson 1': 'Getting Off to a Good Start',
+      '지학사|신상근|Lesson 2': "It's All Greek to Me",
+      '지학사|신상근|Lesson 3': 'The Chemistry of Happiness',
+      '지학사|신상근|Lesson 4': 'London Delights',
+      '천재|강상구|Lesson 1': "Logan's Speech",
+      '천재|강상구|Lesson 2': 'Mapping Our Voices',
+      '천재|강상구|Lesson 3': 'A Trip to the Netherlands',
+      '천재|강상구|Lesson 4': 'Art & Our Environment',
+      '천재|조수경|Lesson 1': 'Understanding Your Behavior',
+      '천재|조수경|Lesson 2': 'How Fashion Items Got Their Names',
+      '천재|조수경|Lesson 3': 'A Korean Chief in Nigeria',
+      '천재|조수경|Lesson 4': 'Save Coral Reefs',
+      '천재|조수경|Special Lesson': 'Secrets of Numbers in Nature',
+    };
+
     const tbStripColors = {
       '공통영어1': 'var(--blush-ink)',
       '공통영어2': 'var(--sage-ink)',
@@ -4583,9 +4639,10 @@
           const pubEsc = book.publisher.replace(/'/g, "\\'");
           const authEsc = book.author.replace(/'/g, "\\'");
           const lessonEsc = lesson.replace(/'/g, "\\'");
-          html += `<div class="tb-expand-lesson-card" style="border-left:3px solid ${cardInk};cursor:pointer" onclick="event.stopPropagation();tbLoadPassages('${pubEsc}','${authEsc}','${lessonEsc}')">
-            <h4>${lesson}</h4>
-            <span style="font-size:11px;color:var(--ink-400)">원문 · 해석 보기</span>
+          const titleKey = `${book.publisher}|${book.author}|${lesson}`;
+          const lessonTitle = tbTitles[titleKey] || '';
+          html += `<div class="tb-expand-lesson-card" style="border-left:3px solid ${cardInk};cursor:pointer;margin-left:12px;padding:6px 12px;" onclick="event.stopPropagation();tbLoadPassages('${pubEsc}','${authEsc}','${lessonEsc}')">
+            <h4 style="margin:0;font-size:13px;">${lesson}${lessonTitle ? ' <span style=\"font-weight:400;color:var(--ink-500);font-size:12px;\">— ' + lessonTitle + '</span>' : ''}</h4>
           </div>`;
         });
         html += `</div></td></tr>`;
@@ -4657,7 +4714,7 @@
       btn.style.borderBottom = '2px solid var(--ink-700)';
 
       document.getElementById('tbOptionsPanel').style.display = tab === 'options' ? 'block' : 'none';
-      document.getElementById('tbPassagePanel').style.display = tab === 'passages' ? 'block' : 'none';
+      document.getElementById('tbPassagesWrap').style.display = tab === 'passages' ? 'block' : 'none';
     }
 
     function tbFetchCurrentPassages() {
@@ -4682,12 +4739,34 @@
       return parseInt(lesson.replace(/\D/g, ''));
     }
 
+    // Helper: detect subtitle (short, no period, single line, English)
+    function isSubtitle(text) {
+      if (!text) return false;
+      const t = text.trim();
+      if (t.length > 60 || t.length < 5) return false;
+      if (t.includes('\n')) return false;
+      if (t.endsWith('.') && t.split('.').length > 2) return false;
+      // Check if mostly English (low Korean ratio)
+      const ko = [...t].filter(c => c >= '가' && c <= '힣').length;
+      if (ko / t.length > 0.3) return false;
+      // Check: no lowercase start (subtitles are title-cased or all-caps)
+      // But allow "Q&A:" style
+      return true;
+    }
+
+    // Helper: remove "by Author" lines from passage text
+    function cleanPassageText(text) {
+      if (!text) return text;
+      return text.replace(/^by\s+[A-Z][A-Za-z\s.'-]+$/gm, '').trim();
+    }
+
     async function tbLoadPassages(publisher, author, lesson) {
       const panel = document.getElementById('tbPassagePanel');
       if (!panel) return;
 
       // Auto-switch to passages tab
-      const tabBtns = panel.closest('.tb-options').querySelectorAll('.tb-option-tab');
+      const wrap = document.getElementById('tbPassagesWrap');
+      const tabBtns = wrap.closest('.tb-options').querySelectorAll('.tb-option-tab');
       if (tabBtns.length >= 2) {
         tbShowTab(tabBtns[1], 'passages');
       }
@@ -4714,9 +4793,14 @@
         }
 
         const hasTranslations = passages.some(p => p.passage_ko);
+        const titleKey = `${publisher}|${author}|${lesson}`;
+        const lessonTitle = tbTitles[titleKey] || '';
 
         let html = `<div class="mk-passages-header">`;
         html += `<div style="padding:12px 16px 8px;font-weight:600;font-size:14px;color:var(--ink-800);border-bottom:1px solid var(--ink-100);">${publisher}(${author}) ${lesson}</div>`;
+        if (lessonTitle) {
+          html += `<div style="padding:10px 16px;text-align:center;font-weight:700;font-size:15px;color:var(--ink-900);border-bottom:1px solid var(--ink-100);font-family:var(--font-serif);letter-spacing:0.3px;">${lessonTitle}</div>`;
+        }
 
         if (hasTranslations) {
           html += `<div class="mk-trans-toggle ${tbTranslationOpen ? 'active' : ''}" id="tbTransToggle" onclick="tbToggleTranslation()">
@@ -4726,22 +4810,37 @@
         }
         html += `</div>`;
 
+        let passageNum = 0;
         passages.forEach((p, i) => {
-          const transInner = p.passage_ko
-            ? `<div style="font-weight:700;font-size:12px;color:var(--honey-ink);margin-bottom:6px;">해석</div><div>${p.passage_ko}</div>`
-            : `<div style="color:var(--ink-300);font-size:12px;font-style:italic;">해석이 준비되지 않았습니다.</div>`;
-          html += `<div class="passage-card" style="border-bottom:1px solid var(--ink-100);">
-            <div class="passage-card-row">
-              <div class="passage-en">
-                <div style="font-weight:700;font-size:13px;color:var(--sage-ink);margin-bottom:6px;">본문 ${p.passage_order}</div>
-                <div style="font-size:12.5px;line-height:1.7;color:var(--ink-700);white-space:pre-wrap;">${p.passage_en}</div>
+          const enText = cleanPassageText(p.passage_en);
+          const isSub = isSubtitle(enText);
+
+          if (isSub) {
+            // Render as subtitle: bold, centered, no passage number
+            html += `<div style="padding:12px 16px 4px;text-align:center;font-weight:700;font-size:13.5px;color:var(--ink-800);border-bottom:1px solid var(--ink-50);">${enText}</div>`;
+            // Also show Korean subtitle if exists
+            if (p.passage_ko) {
+              html += `<div class="passage-ko-subtitle" style="max-height:0;overflow:hidden;transition:max-height 0.35s ease,padding 0.35s ease,opacity 0.25s ease;opacity:0;padding:0 16px;text-align:center;font-weight:600;font-size:12.5px;color:var(--ink-600);border-bottom:1px solid var(--ink-100);">${p.passage_ko}</div>`;
+            }
+          } else {
+            passageNum++;
+            const transInner = p.passage_ko
+              ? `<div style="font-weight:700;font-size:12px;color:var(--honey-ink);margin-bottom:6px;">해석</div><div>${p.passage_ko}</div>`
+              : `<div style="color:var(--ink-300);font-size:12px;font-style:italic;">해석이 준비되지 않았습니다.</div>`;
+            html += `<div class="passage-card" style="border-bottom:1px solid var(--ink-100);">
+              <div class="passage-card-row">
+                <div class="passage-en">
+                  <div style="font-weight:700;font-size:13px;color:var(--sage-ink);margin-bottom:6px;">본문 ${passageNum}</div>
+                  <div style="font-size:12.5px;line-height:1.7;color:var(--ink-700);white-space:pre-wrap;">${enText}</div>
+                </div>
+                <div class="passage-ko">${transInner}</div>
               </div>
-              <div class="passage-ko">${transInner}</div>
-            </div>
-          </div>`;
+            </div>`;
+          }
         });
 
         panel.innerHTML = html;
+        panel.scrollTop = 0;
 
         // Apply translation visibility via class
         if (tbTranslationOpen) {
@@ -4749,6 +4848,9 @@
         } else {
           panel.classList.remove('mk-translation-open');
         }
+
+        // Initialize scrollbar for textbook passages
+        tbInitScrollbar();
       } catch (err) {
         console.error('Failed to fetch textbook passages:', err);
         panel.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;min-height:200px;color:var(--ink-400);font-size:13px;">지문을 불러올 수 없습니다.</div>';
@@ -4762,7 +4864,54 @@
       const panel = document.getElementById('tbPassagePanel');
       if (panel) {
         panel.classList.toggle('mk-translation-open', tbTranslationOpen);
+        // Also toggle subtitle translations
+        panel.querySelectorAll('.passage-ko-subtitle').forEach(el => {
+          if (tbTranslationOpen) {
+            el.style.maxHeight = '200px';
+            el.style.opacity = '1';
+            el.style.padding = '4px 16px 8px';
+          } else {
+            el.style.maxHeight = '0';
+            el.style.opacity = '0';
+            el.style.padding = '0 16px';
+          }
+        });
       }
+    }
+
+    // Textbook scrollbar (reusable init)
+    function tbInitScrollbar() {
+      const panel = document.getElementById('tbPassagePanel');
+      const wrap = document.getElementById('tbPassagesWrap');
+      const track = document.getElementById('tbScrollbar');
+      if (!panel || !wrap || !track) return;
+      const thumb = track.querySelector('.mk-custom-scrollbar-thumb');
+
+      let hideTimer = null;
+      function updateThumb() {
+        const { scrollTop, scrollHeight, clientHeight } = panel;
+        if (scrollHeight <= clientHeight) { track.classList.remove('visible'); return; }
+        const header = panel.querySelector('.mk-passages-header');
+        const headerH = header ? header.offsetHeight + 6 : 0;
+        const trackHeight = clientHeight - headerH;
+        const ratio = trackHeight / scrollHeight;
+        const thumbH = Math.max(ratio * trackHeight, 30);
+        const maxScroll = scrollHeight - clientHeight;
+        const thumbTop = headerH + (scrollTop / maxScroll) * (trackHeight - thumbH);
+        thumb.style.height = thumbH + 'px';
+        thumb.style.top = thumbTop + 'px';
+      }
+      function showBar() { clearTimeout(hideTimer); updateThumb(); track.classList.add('visible'); }
+      function hideBar() { clearTimeout(hideTimer); hideTimer = setTimeout(() => { track.classList.remove('visible'); track.classList.remove('hovered'); }, 1000); }
+      panel.addEventListener('scroll', () => { updateThumb(); track.classList.add('visible'); clearTimeout(hideTimer); hideTimer = setTimeout(() => hideBar(), 150); });
+      wrap.addEventListener('mousemove', (e) => {
+        const rect = wrap.getBoundingClientRect();
+        const dist = rect.right - e.clientX;
+        if (dist <= 26 && dist >= 0) { showBar(); if (dist <= 14) track.classList.add('hovered'); else track.classList.remove('hovered'); }
+        else { track.classList.remove('hovered'); if (dist >= 35) hideBar(); }
+      });
+      wrap.addEventListener('mouseleave', () => { track.classList.remove('hovered'); hideBar(); });
+      new ResizeObserver(() => updateThumb()).observe(panel);
     }
 
     // Initial render
