@@ -4860,7 +4860,9 @@
         let subtitleCount = 0; // Track standalone subtitle passages (additional titles)
         passages.forEach((p, i) => {
           const enText = cleanPassageText(p.passage_en);
-          const isSub = isSubtitle(enText);
+          // Check subtitle on RAW text (before cleaning), not cleaned text
+          // Because cleaning can remove lines (e.g. <그림>) turning multi-line into single-line
+          const isSub = isSubtitle(p.passage_en);
 
           if (isSub) {
             subtitleCount++;
