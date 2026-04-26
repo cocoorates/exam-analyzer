@@ -4197,10 +4197,7 @@
 
       let lastMouseX = 0;
       let lastMouseY = 0;
-      // mouseInZone: mouse is in the 26px scrollbar zone
-      // mouseInWrap: mouse is anywhere inside the wrap panel
       let mouseInZone = false;
-      let mouseInWrap = false;
 
       function showBar() {
         clearTimeout(hideTimer);
@@ -4215,15 +4212,9 @@
       panel.addEventListener('scroll', () => {
         updateThumb();
         if (mouseInZone) {
-          // Mouse is in the 26px zone — full visibility, cancel hide
-          clearTimeout(hideTimer);
-          track.classList.add('visible');
-        } else if (mouseInWrap) {
-          // Mouse is in wrap but outside 26px — show faded, don't hide
           clearTimeout(hideTimer);
           track.classList.add('visible');
         } else {
-          // Mouse is outside wrap — show briefly then hide
           track.classList.add('visible');
           if (!hideTimer) {
             hideBar();
@@ -4232,10 +4223,10 @@
       });
 
       // Show when mouse near right edge
+      const tbOptionsPanel = wrap.closest('.tb-options');
       wrap.addEventListener('mousemove', (e) => {
         lastMouseX = e.clientX;
         lastMouseY = e.clientY;
-        mouseInWrap = true;
         const rect = wrap.getBoundingClientRect();
         const dist = rect.right - e.clientX;
         if (dist <= 26 && dist >= 0) {
@@ -4247,20 +4238,39 @@
             track.classList.remove('hovered');
           }
         } else {
-          // 26px 밖이지만 wrap 안 — 옅은 상태 유지, 사라지지 않음
+          // 왼쪽으로 벗어남 (dist > 26) — 사라지게
           mouseInZone = false;
           track.classList.remove('hovered');
+          hideBar();
         }
       });
 
-      wrap.addEventListener('mouseleave', () => {
+      wrap.addEventListener('mouseleave', (e) => {
+        mouseInZone = false;
+        track.classList.remove('hovered');
+        // 오른쪽으로 벗어났는지 확인 (wrap 오른쪽 끝 너머 but 패널 테두리 안)
+        const wrapRect = wrap.getBoundingClientRect();
+        const tbRect = tbOptionsPanel ? tbOptionsPanel.getBoundingClientRect() : wrapRect;
+        if (e.clientX > wrapRect.right && e.clientX <= tbRect.right) {
+          // 오른쪽 padding 영역 — 옅은 상태 유지, 사라지지 않음
+          // tb-options의 mouseleave에서 사라지게 처리
+          return;
+        }
         lastMouseX = 0;
         lastMouseY = 0;
-        mouseInZone = false;
-        mouseInWrap = false;
-        track.classList.remove('hovered');
         if (!dragging) hideBar();
       });
+
+      // 패널 오른쪽 테두리선 밖으로 나가면 사라짐
+      if (tbOptionsPanel) {
+        tbOptionsPanel.addEventListener('mouseleave', () => {
+          lastMouseX = 0;
+          lastMouseY = 0;
+          mouseInZone = false;
+          track.classList.remove('hovered');
+          if (!dragging) hideBar();
+        });
+      }
 
       // Drag scrolling — detect mousedown in scrollbar zone
       wrap.addEventListener('mousedown', (e) => {
