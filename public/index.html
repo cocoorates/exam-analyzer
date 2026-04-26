@@ -4187,7 +4187,7 @@
         if (scrollHeight <= clientHeight) { track.classList.remove('visible'); return; }
         // Offset scrollbar below sticky header
         const header = panel.querySelector('.mk-passages-header');
-        const headerH = header ? header.offsetHeight : 0;
+        const headerH = header ? header.offsetHeight + 6 : 0;
         const trackHeight = clientHeight - headerH;
         const ratio = trackHeight / scrollHeight;
         const thumbH = Math.max(ratio * trackHeight, 30);
