@@ -1148,13 +1148,39 @@
     }
     .mk-passages-panel {
       padding: 0;
-      overflow-y: scroll !important;
+      position: relative;
     }
-    .mk-passages-panel::-webkit-scrollbar { width: 6px; }
-    .mk-passages-panel::-webkit-scrollbar-track { background: transparent; }
-    .mk-passages-panel::-webkit-scrollbar-thumb { background: transparent; border-radius: 3px; }
-    .mk-passages-panel.scrollbar-visible::-webkit-scrollbar-thumb { background: var(--ink-200); }
-    .mk-passages-panel.scrollbar-active::-webkit-scrollbar-thumb { background: var(--ink-400); }
+    /* Hide native scrollbar completely */
+    .mk-passages-panel { -ms-overflow-style: none; scrollbar-width: none; }
+    .mk-passages-panel::-webkit-scrollbar { display: none; }
+    /* Custom scrollbar track */
+    .mk-custom-scrollbar {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 14px;
+      height: 100%;
+      z-index: 20;
+      opacity: 0;
+      transition: opacity 0.25s;
+      pointer-events: none;
+    }
+    .mk-custom-scrollbar.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .mk-custom-scrollbar-thumb {
+      position: absolute;
+      right: 2px;
+      width: 5px;
+      border-radius: 3px;
+      background: rgba(0,0,0,0.22);
+      transition: background 0.15s, width 0.15s, right 0.15s;
+      cursor: default;
+    }
+    .mk-custom-scrollbar.hovered .mk-custom-scrollbar-thumb {
+      background: rgba(0,0,0,0.40);
+    }
     .mk-passages-header {
       position: sticky;
       top: 0;
@@ -4138,39 +4164,104 @@
 
     let mkTranslationOpen = false;
 
-    // Scrollbar: show when mouse near right edge, highlight on direct hover
+    // Custom scrollbar for passages panel
     (function() {
       const panel = document.getElementById('mkPassagesPanel');
-      let scrollTimer = null;
-      // Show scrollbar while scrolling
-      panel.addEventListener('scroll', () => {
-        panel.classList.add('scrollbar-visible');
-        clearTimeout(scrollTimer);
-        scrollTimer = setTimeout(() => {
-          if (!panel.classList.contains('scrollbar-active')) {
-            panel.classList.remove('scrollbar-visible');
-          }
-        }, 1200);
-      });
-      // Show/highlight when mouse near right edge (within 20px)
+
+      // Create custom scrollbar elements
+      const track = document.createElement('div');
+      track.className = 'mk-custom-scrollbar';
+      const thumb = document.createElement('div');
+      thumb.className = 'mk-custom-scrollbar-thumb';
+      track.appendChild(thumb);
+      panel.appendChild(track);
+
+      let hideTimer = null;
+      let dragging = false;
+      let dragStartY = 0;
+      let dragStartScroll = 0;
+
+      function updateThumb() {
+        const { scrollTop, scrollHeight, clientHeight } = panel;
+        if (scrollHeight <= clientHeight) { track.classList.remove('visible'); return; }
+        const ratio = clientHeight / scrollHeight;
+        const thumbH = Math.max(ratio * clientHeight, 30);
+        const maxScroll = scrollHeight - clientHeight;
+        const thumbTop = (scrollTop / maxScroll) * (clientHeight - thumbH);
+        thumb.style.height = thumbH + 'px';
+        thumb.style.top = thumbTop + 'px';
+      }
+
+      function showBar() {
+        clearTimeout(hideTimer);
+        updateThumb();
+        track.classList.add('visible');
+      }
+      function hideBar() {
+        if (dragging) return;
+        hideTimer = setTimeout(() => { track.classList.remove('visible'); track.classList.remove('hovered'); }, 800);
+      }
+
+      // Show on scroll
+      panel.addEventListener('scroll', () => { showBar(); hideBar(); });
+
+      // Show when mouse near right edge (within 20px)
       panel.addEventListener('mousemove', (e) => {
         const rect = panel.getBoundingClientRect();
-        const distFromRight = rect.right - e.clientX;
-        if (distFromRight <= 20) {
-          panel.classList.add('scrollbar-visible');
-          if (distFromRight <= 8) {
-            panel.classList.add('scrollbar-active');
-          } else {
-            panel.classList.remove('scrollbar-active');
-          }
-        } else {
-          panel.classList.remove('scrollbar-active');
-          if (!scrollTimer) panel.classList.remove('scrollbar-visible');
+        const dist = rect.right - e.clientX;
+        if (dist <= 20 && dist >= 0) {
+          showBar();
+          clearTimeout(hideTimer);
+        } else if (!dragging) {
+          hideBar();
         }
       });
-      panel.addEventListener('mouseleave', () => {
-        panel.classList.remove('scrollbar-visible', 'scrollbar-active');
+
+      // Hover effect on track area
+      track.addEventListener('mouseenter', () => { track.classList.add('hovered'); clearTimeout(hideTimer); });
+      track.addEventListener('mouseleave', () => { if (!dragging) { track.classList.remove('hovered'); hideBar(); } });
+
+      panel.addEventListener('mouseleave', () => { if (!dragging) hideBar(); });
+
+      // Drag scrolling
+      thumb.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        dragging = true;
+        dragStartY = e.clientY;
+        dragStartScroll = panel.scrollTop;
+        document.body.style.userSelect = 'none';
       });
+      window.addEventListener('mousemove', (e) => {
+        if (!dragging) return;
+        const { scrollHeight, clientHeight } = panel;
+        const ratio = clientHeight / scrollHeight;
+        const thumbH = Math.max(ratio * clientHeight, 30);
+        const trackH = clientHeight - thumbH;
+        const maxScroll = scrollHeight - clientHeight;
+        const dy = e.clientY - dragStartY;
+        panel.scrollTop = dragStartScroll + (dy / trackH) * maxScroll;
+        updateThumb();
+      });
+      window.addEventListener('mouseup', () => {
+        if (!dragging) return;
+        dragging = false;
+        document.body.style.userSelect = '';
+        hideBar();
+      });
+
+      // Click on track to jump
+      track.addEventListener('click', (e) => {
+        if (e.target === thumb) return;
+        const rect = track.getBoundingClientRect();
+        const clickY = e.clientY - rect.top;
+        const { scrollHeight, clientHeight } = panel;
+        const ratio = clickY / clientHeight;
+        panel.scrollTop = ratio * (scrollHeight - clientHeight);
+        updateThumb();
+      });
+
+      // Observe panel resize
+      new ResizeObserver(() => updateThumb()).observe(panel);
     })();
 
     function mkToggleTranslation() {
