@@ -4196,14 +4196,15 @@
         updateThumb();
         track.classList.add('visible');
       }
-      let trackHovered = false;
+      let nearEdge = false;
       function hideBar() {
-        if (dragging || trackHovered) return;
+        if (dragging || nearEdge) return;
+        clearTimeout(hideTimer);
         hideTimer = setTimeout(() => { track.classList.remove('visible'); track.classList.remove('hovered'); }, 800);
       }
 
       // Show on scroll
-      panel.addEventListener('scroll', () => { showBar(); hideBar(); });
+      panel.addEventListener('scroll', () => { showBar(); if (!nearEdge) hideBar(); });
 
       // Show when mouse near right edge (within 20px)
       const wrap = document.getElementById('mkPassagesWrap');
@@ -4211,18 +4212,20 @@
         const rect = wrap.getBoundingClientRect();
         const dist = rect.right - e.clientX;
         if (dist <= 20 && dist >= 0) {
+          nearEdge = true;
           showBar();
-          clearTimeout(hideTimer);
-        } else if (!dragging) {
-          hideBar();
+        } else {
+          nearEdge = false;
+          track.classList.remove('hovered');
+          if (!dragging) hideBar();
         }
       });
 
       // Hover effect on track area
-      track.addEventListener('mouseenter', () => { trackHovered = true; track.classList.add('hovered'); clearTimeout(hideTimer); showBar(); });
-      track.addEventListener('mouseleave', () => { trackHovered = false; if (!dragging) { track.classList.remove('hovered'); hideBar(); } });
+      track.addEventListener('mouseenter', () => { nearEdge = true; track.classList.add('hovered'); clearTimeout(hideTimer); showBar(); });
+      track.addEventListener('mouseleave', () => { track.classList.remove('hovered'); });
 
-      wrap.addEventListener('mouseleave', () => { if (!dragging) hideBar(); });
+      wrap.addEventListener('mouseleave', () => { nearEdge = false; if (!dragging) hideBar(); });
 
       // Drag scrolling
       thumb.addEventListener('mousedown', (e) => {
