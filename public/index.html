@@ -3968,7 +3968,7 @@
         const badge = mkMonthBadge[it.month] || {bg:'var(--sky)',c:'var(--sky-ink)'};
         const isSel = mkSelectedSingle && mkSelectedSingle.key === it.key;
         const rowStyle = isSel ? 'cursor:pointer;background:oklch(0.96 0.02 300 / 0.5);' : 'cursor:pointer;';
-        html += `<tr onclick="mkSelectSingle('${it.grade}',${it.year},${it.month},'${it.key}')" style="${rowStyle}">
+        html += `<tr data-key="${it.key}" onclick="mkSelectSingle('${it.grade}',${it.year},${it.month},'${it.key}')" style="${rowStyle}">
           <td><div style="width:16px;height:16px;border-radius:50%;border:2px solid ${isSel?'oklch(0.65 0.10 300)':'var(--ink-300)'};display:flex;align-items:center;justify-content:center">${isSel?'<div style="width:8px;height:8px;border-radius:50%;background:oklch(0.65 0.10 300)"></div>':''}</div></td>
           <td style="font-weight:550;color:var(--ink-900)">${it.grade} ${String(it.year).slice(2)}년 ${it.month}월</td>
           <td><span class="tb-subject-badge" style="background:${badge.bg};color:${badge.c}">${it.grade}</span></td>
@@ -3982,14 +3982,24 @@
       timeline.innerHTML = html;
     }
     function mkSelectSingle(grade, year, month, key) {
-      if (mkSelectedSingle && mkSelectedSingle.key === key) {
+      const prevKey = mkSelectedSingle ? mkSelectedSingle.key : null;
+      if (prevKey === key) {
         mkSelectedSingle = null;
       } else {
         mkSelectedSingle = { grade, year, month, key };
       }
-      mkRender();
-      const sel = mkSelectedSingle ? 1 : 0;
-      document.getElementById('mkPassageCount').textContent = sel ? '25' : '0';
+      // Update row styles in-place (no full re-render)
+      document.querySelectorAll('#mkTimeline tbody tr').forEach(tr => {
+        const rowKey = tr.dataset.key;
+        const isSel = mkSelectedSingle && mkSelectedSingle.key === rowKey;
+        tr.style.background = isSel ? 'oklch(0.96 0.02 300 / 0.5)' : '';
+        const radio = tr.querySelector('td:first-child div');
+        if (radio) {
+          radio.style.borderColor = isSel ? 'oklch(0.65 0.10 300)' : 'var(--ink-300)';
+          radio.innerHTML = isSel ? '<div style="width:8px;height:8px;border-radius:50%;background:oklch(0.65 0.10 300)"></div>' : '';
+        }
+      });
+      document.getElementById('mkPassageCount').textContent = mkSelectedSingle ? '25' : '0';
       // 원문 보기 탭이 활성화 상태면 자동 갱신
       const passagesPanel = document.getElementById('mkPassagesPanel');
       if (passagesPanel && passagesPanel.style.display !== 'none') {
