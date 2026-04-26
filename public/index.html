@@ -4199,40 +4199,49 @@
         updateThumb();
         track.classList.add('visible');
       }
-      let nearEdge = false;
+      let lastMouseX = 0;
+      let lastMouseY = 0;
+      function isNearEdge() {
+        const rect = wrap.getBoundingClientRect();
+        const dist = rect.right - lastMouseX;
+        return dist <= 26 && dist >= 0 && lastMouseY >= rect.top && lastMouseY <= rect.bottom;
+      }
       function hideBar() {
-        if (dragging || nearEdge) return;
+        if (dragging) return;
         clearTimeout(hideTimer);
         hideTimer = setTimeout(() => { track.classList.remove('visible'); track.classList.remove('hovered'); }, 800);
       }
 
-      // Show on scroll
-      panel.addEventListener('scroll', () => { showBar(); if (!nearEdge) hideBar(); });
+      // Show on scroll — always check current mouse position
+      panel.addEventListener('scroll', () => {
+        showBar();
+        if (!isNearEdge()) hideBar();
+      });
 
       // Show when mouse near right edge
       const wrap = document.getElementById('mkPassagesWrap');
       wrap.addEventListener('mousemove', (e) => {
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
         const rect = wrap.getBoundingClientRect();
         const dist = rect.right - e.clientX;
         if (dist <= 26 && dist >= 0) {
-          nearEdge = true;
           clearTimeout(hideTimer);
           showBar();
-          // Hover highlight when very close to scrollbar
           if (dist <= 14) {
             track.classList.add('hovered');
           } else {
             track.classList.remove('hovered');
           }
-        } else if (nearEdge) {
-          nearEdge = false;
+        } else {
           track.classList.remove('hovered');
           hideBar();
         }
       });
 
       wrap.addEventListener('mouseleave', () => {
-        nearEdge = false;
+        lastMouseX = 0;
+        lastMouseY = 0;
         track.classList.remove('hovered');
         if (!dragging) hideBar();
       });
