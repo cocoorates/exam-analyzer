@@ -4196,8 +4196,9 @@
         updateThumb();
         track.classList.add('visible');
       }
+      let trackHovered = false;
       function hideBar() {
-        if (dragging) return;
+        if (dragging || trackHovered) return;
         hideTimer = setTimeout(() => { track.classList.remove('visible'); track.classList.remove('hovered'); }, 800);
       }
 
@@ -4218,8 +4219,8 @@
       });
 
       // Hover effect on track area
-      track.addEventListener('mouseenter', () => { track.classList.add('hovered'); clearTimeout(hideTimer); });
-      track.addEventListener('mouseleave', () => { if (!dragging) { track.classList.remove('hovered'); hideBar(); } });
+      track.addEventListener('mouseenter', () => { trackHovered = true; track.classList.add('hovered'); clearTimeout(hideTimer); showBar(); });
+      track.addEventListener('mouseleave', () => { trackHovered = false; if (!dragging) { track.classList.remove('hovered'); hideBar(); } });
 
       wrap.addEventListener('mouseleave', () => { if (!dragging) hideBar(); });
 
