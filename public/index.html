@@ -1147,6 +1147,12 @@
     .mk-passages-panel {
       padding: 0;
     }
+    .mk-passages-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: white;
+    }
     .mk-passages-panel .passage-card {
       padding: 16px;
       border-bottom: 1px solid var(--ink-100);
@@ -4191,8 +4197,9 @@
         // Check if any translations exist
         const hasTranslations = passages.some(p => p.translation);
 
-        // Render header with translation toggle
-        let html = `<div style="padding:12px 16px 8px;font-weight:600;font-size:14px;color:var(--ink-800);border-bottom:1px solid var(--ink-100);">${grade} ${year}년 ${month}월 모의고사</div>`;
+        // Render header with translation toggle (sticky)
+        let html = `<div class="mk-passages-header">`;
+        html += `<div style="padding:12px 16px 8px;font-weight:600;font-size:14px;color:var(--ink-800);border-bottom:1px solid var(--ink-100);">${grade} ${year}년 ${month}월 모의고사</div>`;
 
         if (hasTranslations) {
           html += `<div class="mk-trans-toggle ${mkTranslationOpen ? 'active' : ''}" id="mkTransToggle" onclick="mkToggleTranslation()">
@@ -4200,6 +4207,7 @@
             <span>해석 보기</span>
           </div>`;
         }
+        html += `</div>`;
 
         // Render passages with translations side by side
         passages.forEach(p => {
