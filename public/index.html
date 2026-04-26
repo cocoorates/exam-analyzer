@@ -4051,16 +4051,29 @@
       const years = [2026,2025,2024,2023,2022,2021,2020];
       const grades = ['고1','고2','고3'];
 
-      // Build flat list
+      // Build flat list — 학년 전체일 때 고1→고2→고3 순, 각 학년 내 연도 내림차순
       let items = [];
-      years.forEach(year => {
+      if (mkGradeFilter === 'all') {
+        // 학년별 그룹: 고1 전체 → 고2 전체 → 고3 전체
         grades.forEach(grade => {
-          mkGetMonths(grade, year).forEach(m => {
-            if (year === 2026 && m > 4) return;
-            items.push({ grade, year, month: m, key: `${grade}-${year}-${m}` });
+          years.forEach(year => {
+            mkGetMonths(grade, year).forEach(m => {
+              if (year === 2026 && m > 4) return;
+              items.push({ grade, year, month: m, key: `${grade}-${year}-${m}` });
+            });
           });
         });
-      });
+      } else {
+        // 특정 학년 선택 시 기존 방식 (연도 내림차순)
+        years.forEach(year => {
+          grades.forEach(grade => {
+            mkGetMonths(grade, year).forEach(m => {
+              if (year === 2026 && m > 4) return;
+              items.push({ grade, year, month: m, key: `${grade}-${year}-${m}` });
+            });
+          });
+        });
+      }
 
       // Filter
       let filtered = items.filter(it => {
