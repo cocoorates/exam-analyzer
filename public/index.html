@@ -1162,12 +1162,14 @@
       height: 100%;
       z-index: 20;
       opacity: 0;
-      transition: opacity 0.25s;
+      transition: opacity 0.2s;
       pointer-events: none;
+    }
+    .mk-custom-scrollbar.visible .mk-custom-scrollbar-thumb {
+      pointer-events: auto;
     }
     .mk-custom-scrollbar.visible {
       opacity: 1;
-      pointer-events: auto;
     }
     .mk-custom-scrollbar-thumb {
       position: absolute;
@@ -4210,26 +4212,33 @@
       // Show on scroll
       panel.addEventListener('scroll', () => { showBar(); if (!nearEdge) hideBar(); });
 
-      // Show when mouse near right edge (within 20px)
+      // Show when mouse near right edge
       const wrap = document.getElementById('mkPassagesWrap');
       wrap.addEventListener('mousemove', (e) => {
         const rect = wrap.getBoundingClientRect();
         const dist = rect.right - e.clientX;
         if (dist <= 26 && dist >= 0) {
           nearEdge = true;
+          clearTimeout(hideTimer);
           showBar();
-        } else {
+          // Hover highlight when very close to scrollbar
+          if (dist <= 14) {
+            track.classList.add('hovered');
+          } else {
+            track.classList.remove('hovered');
+          }
+        } else if (nearEdge) {
           nearEdge = false;
           track.classList.remove('hovered');
-          if (!dragging) hideBar();
+          hideBar();
         }
       });
 
-      // Hover effect on track area
-      track.addEventListener('mouseenter', () => { nearEdge = true; track.classList.add('hovered'); clearTimeout(hideTimer); showBar(); });
-      track.addEventListener('mouseleave', () => { nearEdge = false; track.classList.remove('hovered'); hideBar(); });
-
-      wrap.addEventListener('mouseleave', () => { nearEdge = false; if (!dragging) hideBar(); });
+      wrap.addEventListener('mouseleave', () => {
+        nearEdge = false;
+        track.classList.remove('hovered');
+        if (!dragging) hideBar();
+      });
 
       // Drag scrolling
       thumb.addEventListener('mousedown', (e) => {
