@@ -4020,10 +4020,15 @@
 
     function mkSidebarFilter(el, type, val) {
       if (type === 'grade') {
-        // 학년: 단일 선택 (하나만 활성)
+        // 학년: 단일 선택 (토글 — 같은 걸 다시 누르면 해제)
+        const wasActive = el.classList.contains('active');
         document.querySelectorAll('#pageMock .tb-sidebar .tb-nav-item[data-filter="grade"]').forEach(n => n.classList.remove('active'));
-        el.classList.add('active');
-        mkGradeFilter = val;
+        if (!wasActive) {
+          el.classList.add('active');
+          mkGradeFilter = val;
+        } else {
+          mkGradeFilter = 'all';
+        }
       } else {
         // 연도: 단일 선택 (토글 — 같은 걸 다시 누르면 해제)
         const wasActive = el.classList.contains('active');
