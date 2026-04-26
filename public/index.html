@@ -4743,21 +4743,64 @@
     function isSubtitle(text) {
       if (!text) return false;
       const t = text.trim();
-      if (t.length > 60 || t.length < 5) return false;
+      if (t.length > 100 || t.length < 5) return false;
       if (t.includes('\n')) return false;
       if (t.endsWith('.') && t.split('.').length > 2) return false;
       // Check if mostly English (low Korean ratio)
       const ko = [...t].filter(c => c >= '가' && c <= '힣').length;
       if (ko / t.length > 0.3) return false;
-      // Check: no lowercase start (subtitles are title-cased or all-caps)
-      // But allow "Q&A:" style
       return true;
+    }
+
+    // Helper: detect if first line of a passage is an embedded title
+    function extractEmbeddedTitle(text) {
+      if (!text) return null;
+      const lines = text.split('\n');
+      if (lines.length < 2) return null;
+      const first = lines[0].trim();
+      // Must be short, no period at end, mostly English
+      if (first.length < 5 || first.length > 100) return null;
+      if (first.endsWith('.') || first.endsWith(',')) return null;
+      const ko = [...first].filter(c => c >= '가' && c <= '힣').length;
+      if (ko / first.length > 0.3) return null;
+      // Must not look like a regular sentence (starts lowercase after first word)
+      // Allow quoted titles like "The Boy Who..."
+      const unquoted = first.replace(/^[""]|[""]$/g, '');
+      // Check: title-like (capitalized words, short phrase)
+      const words = unquoted.split(/\s+/);
+      if (words.length > 15) return null;
+      // Exclude dialogue lines (Name: text patterns where text is long)
+      if (/^[A-Z][a-z]+:\s+\S/.test(first) && first.indexOf(':') < 20) return null;
+      return { title: first, body: lines.slice(1).join('\n').trim() };
+    }
+
+    // Helper: format dialogue speaker names with semi-bold
+    function formatDialogueSpeakers(html) {
+      // Match patterns like "Name:" or "Dr. Name:" at start of line in pre-wrap text
+      return html.replace(/(^|\n)([A-Z][a-zA-Z\.\s]{0,22}?):\s/gm, function(match, prefix, name) {
+        const trimmed = name.trim();
+        if (trimmed.length > 22 || trimmed.length < 2) return match;
+        const lower = trimmed.toLowerCase();
+        // Exclude common words that aren't speaker names
+        const excludes = ['however','but','because','that','which','another','this','these','those',
+          'where','when','note','example','step','tip','fact','result','reason','question',
+          'answer','warning','conclusion','summary','source','reference','resilience','digital footprints'];
+        if (excludes.includes(lower)) return match;
+        // Exclude if it looks like a label (single common word)
+        if (trimmed.split(/\s+/).length === 1 && /^[a-z]/.test(trimmed.charAt(1))) return match;
+        return prefix + '<span style="font-weight:600;color:var(--ink-800);">' + trimmed + ':</span> ';
+      });
     }
 
     // Helper: remove "by Author" lines from passage text
     function cleanPassageText(text) {
       if (!text) return text;
-      return text.replace(/^by\s+[A-Z][A-Za-z\s.'-]+$/gm, '').trim();
+      return text
+        .replace(/^by\s+[A-Z][A-Za-z\s.'-]+$/gm, '')  // Remove author attributions
+        .replace(/<그림>/g, '')                          // Remove <그림>
+        .replace(/\[그림[^\]]*\]/g, '')                  // Remove [그림], [그림 설명] etc
+        .replace(/^\s*[\n]+/gm, '\n')                    // Clean up empty lines
+        .trim();
     }
 
     async function tbLoadPassages(publisher, author, lesson) {
@@ -4816,14 +4859,26 @@
           const isSub = isSubtitle(enText);
 
           if (isSub) {
-            // Render as subtitle: bold, centered, no passage number
-            html += `<div style="padding:12px 16px 4px;text-align:center;font-weight:700;font-size:13.5px;color:var(--ink-800);border-bottom:1px solid var(--ink-50);">${enText}</div>`;
+            // Render as subtitle: bold, left-aligned, no passage number
+            html += `<div style="padding:12px 16px 4px;text-align:left;font-weight:700;font-size:13.5px;color:var(--ink-800);border-bottom:1px solid var(--ink-50);">${enText}</div>`;
             // Also show Korean subtitle if exists
             if (p.passage_ko) {
-              html += `<div class="passage-ko-subtitle" style="max-height:0;overflow:hidden;transition:max-height 0.35s ease,padding 0.35s ease,opacity 0.25s ease;opacity:0;padding:0 16px;text-align:center;font-weight:600;font-size:12.5px;color:var(--ink-600);border-bottom:1px solid var(--ink-100);">${p.passage_ko}</div>`;
+              html += `<div class="passage-ko-subtitle" style="max-height:0;overflow:hidden;transition:max-height 0.35s ease,padding 0.35s ease,opacity 0.25s ease;opacity:0;padding:0 16px;text-align:left;font-weight:600;font-size:12.5px;color:var(--ink-600);border-bottom:1px solid var(--ink-100);">${p.passage_ko}</div>`;
             }
           } else {
             passageNum++;
+            // Check for embedded title in first line
+            const embedded = extractEmbeddedTitle(enText);
+            let displayText = enText;
+            let embeddedTitleHtml = '';
+            if (embedded) {
+              const safeTitle = embedded.title.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+              embeddedTitleHtml = `<div style="font-weight:700;font-size:13px;color:var(--ink-800);margin-bottom:6px;">${safeTitle}</div>`;
+              displayText = embedded.body;
+            }
+            // Format dialogue speakers with semi-bold
+            let formattedText = displayText.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            formattedText = formatDialogueSpeakers(formattedText);
             const transInner = p.passage_ko
               ? `<div style="font-weight:700;font-size:12px;color:var(--honey-ink);margin-bottom:6px;">해석</div><div>${p.passage_ko}</div>`
               : `<div style="color:var(--ink-300);font-size:12px;font-style:italic;">해석이 준비되지 않았습니다.</div>`;
@@ -4831,7 +4886,8 @@
               <div class="passage-card-row">
                 <div class="passage-en">
                   <div style="font-weight:700;font-size:13px;color:var(--sage-ink);margin-bottom:6px;">본문 ${passageNum}</div>
-                  <div style="font-size:12.5px;line-height:1.7;color:var(--ink-700);white-space:pre-wrap;">${enText}</div>
+                  ${embeddedTitleHtml}
+                  <div style="font-size:12.5px;line-height:1.7;color:var(--ink-700);white-space:pre-wrap;">${formattedText}</div>
                 </div>
                 <div class="passage-ko">${transInner}</div>
               </div>
