@@ -4786,8 +4786,6 @@
           'where','when','note','example','step','tip','fact','result','reason','question',
           'answer','warning','conclusion','summary','source','reference','resilience','digital footprints'];
         if (excludes.includes(lower)) return match;
-        // Exclude if it looks like a label (single common word)
-        if (trimmed.split(/\s+/).length === 1 && /^[a-z]/.test(trimmed.charAt(1))) return match;
         return prefix + '<span style="font-weight:600;color:var(--ink-800);">' + trimmed + ':</span> ';
       });
     }
