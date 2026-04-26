@@ -2919,27 +2919,14 @@
           <h3>과목</h3>
           <div class="tb-nav-item active" onclick="tbSidebarFilter(this,'subject','공통영어1')">
             <span class="tb-nav-bar" style="background:var(--blush-ink)"></span> 공통영어1
-            <span class="nav-count">10</span>
-          </div>
-          <div class="tb-nav-item" onclick="tbSidebarFilter(this,'subject','공통영어2')">
-            <span class="tb-nav-bar" style="background:var(--sage-ink)"></span> 공통영어2
-            <span class="nav-count">5</span>
-          </div>
-          <div class="tb-nav-item" onclick="tbSidebarFilter(this,'subject','영어')">
-            <span class="tb-nav-bar" style="background:var(--sky-ink)"></span> 영어
-            <span class="nav-count">3</span>
-          </div>
-          <div class="tb-nav-item" onclick="tbSidebarFilter(this,'subject','중2')">
-            <span class="tb-nav-bar" style="background:var(--honey-ink)"></span> 중2
-            <span class="nav-count">4</span>
-          </div>
-          <div class="tb-nav-item" onclick="tbSidebarFilter(this,'subject','중3')">
-            <span class="tb-nav-bar" style="background:var(--lilac-ink)"></span> 중3
-            <span class="nav-count">3</span>
+            <span class="nav-count">9</span>
           </div>
           <h3>출판사</h3>
-          <div class="tb-nav-item" onclick="tbSidebarFilter(this,'publisher','능률')">
-            <span class="tb-nav-bar" style="background:var(--mint-ink)"></span> 능률
+          <div class="tb-nav-item" onclick="tbSidebarFilter(this,'publisher','NE능률')">
+            <span class="tb-nav-bar" style="background:var(--mint-ink)"></span> NE능률
+          </div>
+          <div class="tb-nav-item" onclick="tbSidebarFilter(this,'publisher','YBM')">
+            <span class="tb-nav-bar" style="background:var(--blush-ink)"></span> YBM
           </div>
           <div class="tb-nav-item" onclick="tbSidebarFilter(this,'publisher','동아')">
             <span class="tb-nav-bar" style="background:var(--rose-ink)"></span> 동아
@@ -2956,9 +2943,6 @@
           <div class="tb-nav-item" onclick="tbSidebarFilter(this,'publisher','천재')">
             <span class="tb-nav-bar" style="background:var(--lilac-ink)"></span> 천재
           </div>
-          <div class="tb-nav-item" onclick="tbSidebarFilter(this,'publisher','YBM')">
-            <span class="tb-nav-bar" style="background:var(--blush-ink)"></span> YBM
-          </div>
         </div>
         <div class="tb-table-area">
           <div class="tb-table-header">
@@ -2974,8 +2958,13 @@
         </div>
       </div>
 
-      <!-- Right: generation options -->
-      <div class="tb-options">
+      <!-- Right: 원문/해석 패널 -->
+      <div class="tb-options" id="tbPassagePanel">
+        <div style="display:flex;align-items:center;justify-content:center;height:100%;min-height:200px;color:var(--ink-400);font-size:13px;">왼쪽 테이블에서 교과서를 선택하세요.</div>
+      </div>
+
+      <!-- Right: generation options (hidden for now) -->
+      <div class="tb-options" style="display:none">
         <div class="tb-options-head">
           <h3>문제 출제</h3>
         </div>
@@ -4484,36 +4473,26 @@
 
     // ── Textbook page logic ──
     const tbData = [
-      { subject: '공통영어1', publisher: '능률', author: '민병천', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4','Lesson 5','Lesson 6','Special Lesson 1','Special Lesson 2'], passagesPerLesson: 4 },
-      { subject: '공통영어1', publisher: '능률', author: '오선영', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4','Lesson 5','Lesson 6'], passagesPerLesson: 4 },
-      { subject: '공통영어1', publisher: '동아', author: '이병민', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4','Lesson 5','Lesson 6'], passagesPerLesson: 4 },
-      { subject: '공통영어1', publisher: '미래엔', author: '김성연', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4','Lesson 5','Lesson 6'], passagesPerLesson: 4 },
-      { subject: '공통영어1', publisher: '비상', author: '홍민표', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4','Lesson 5','Lesson 6'], passagesPerLesson: 4 },
-      { subject: '공통영어1', publisher: '지학사', author: '신상근', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4','Lesson 5','Lesson 6'], passagesPerLesson: 4 },
-      { subject: '공통영어1', publisher: '천재', author: '강상구', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4','Lesson 5','Lesson 6'], passagesPerLesson: 4 },
-      { subject: '공통영어1', publisher: '천재', author: '조수경', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4','Lesson 5','Lesson 6'], passagesPerLesson: 4 },
-      { subject: '공통영어1', publisher: 'YBM', author: '김은형', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4','Lesson 5','Lesson 6'], passagesPerLesson: 4 },
-      { subject: '공통영어1', publisher: 'YBM', author: '박준언', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4','Lesson 5','Lesson 6'], passagesPerLesson: 4 },
-      { subject: '공통영어2', publisher: '능률', author: '민병천', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4','Lesson 5','Lesson 6'], passagesPerLesson: 4 },
-      { subject: '공통영어2', publisher: '능률', author: '오선영', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4','Lesson 5','Lesson 6'], passagesPerLesson: 4 },
-      { subject: '공통영어2', publisher: '동아', author: '이병민', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4','Lesson 5','Lesson 6'], passagesPerLesson: 4 },
-      { subject: '공통영어2', publisher: '미래엔', author: '김성연', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4','Lesson 5','Lesson 6'], passagesPerLesson: 4 },
-      { subject: '공통영어2', publisher: '비상', author: '홍민표', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4','Lesson 5','Lesson 6'], passagesPerLesson: 4 },
+      { subject: '공통영어1', publisher: 'NE능률', author: '민병천', lessons: ['Lesson 2','Lesson 3'] },
+      { subject: '공통영어1', publisher: 'YBM', author: '김은형', lessons: ['Lesson 1','Lesson 4'] },
+      { subject: '공통영어1', publisher: 'YBM', author: '박준언', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4'] },
+      { subject: '공통영어1', publisher: '동아', author: '이병민', lessons: ['Lesson 2','Lesson 3','Lesson 4'] },
+      { subject: '공통영어1', publisher: '미래엔', author: '김성연', lessons: ['Lesson 2','Lesson 3'] },
+      { subject: '공통영어1', publisher: '비상', author: '홍민표', lessons: ['Lesson 1','Lesson 3','Lesson 4'] },
+      { subject: '공통영어1', publisher: '지학사', author: '신상근', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4'] },
+      { subject: '공통영어1', publisher: '천재', author: '강상구', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4'] },
+      { subject: '공통영어1', publisher: '천재', author: '조수경', lessons: ['Lesson 1','Lesson 2','Lesson 3','Lesson 4'] },
     ];
 
     const tbStripColors = {
       '공통영어1': 'var(--blush-ink)',
       '공통영어2': 'var(--sage-ink)',
       '영어': 'var(--sky-ink)',
-      '중2': 'var(--honey-ink)',
-      '중3': 'var(--lilac-ink)',
     };
     const tbBadgeStyles = {
       '공통영어1': { bg: 'var(--blush)', c: 'var(--blush-ink)' },
       '공통영어2': { bg: 'var(--sage)', c: 'var(--sage-ink)' },
       '영어': { bg: 'var(--sky)', c: 'var(--sky-ink)' },
-      '중2': { bg: 'var(--honey)', c: 'var(--honey-ink)' },
-      '중3': { bg: 'var(--lilac)', c: 'var(--lilac-ink)' },
     };
     const tbLessonCardColors = ['var(--blush)','var(--sky)','var(--sage)','var(--honey)','var(--lilac)','var(--mint)','var(--rose)','var(--blush)'];
     const tbLessonCardInks = ['var(--blush-ink)','var(--sky-ink)','var(--sage-ink)','var(--honey-ink)','var(--lilac-ink)','var(--mint-ink)','var(--rose-ink)','var(--blush-ink)'];
@@ -4583,12 +4562,12 @@
 
       let html = `<table><thead><tr>
         <th style="width:30px"><input type="checkbox" onchange="tbCheckAll(this)"></th>
-        <th>교과서</th><th>과목</th><th>출판사</th><th>단원</th><th>지문</th>
+        <th>교과서</th><th>과목</th><th>출판사</th><th>단원</th>
       </tr></thead><tbody>`;
 
       filtered.forEach((book, bi) => {
         const realIdx = tbData.indexOf(book);
-        const totalP = book.lessons.length * book.passagesPerLesson;
+        const totalP = book.lessons.length;
         const badge = tbBadgeStyles[book.subject] || { bg: 'var(--sky)', c: 'var(--sky-ink)' };
         const isExpanded = tbExpandedRow === realIdx;
 
@@ -4600,20 +4579,21 @@
           <td><span class="tb-subject-badge" style="background:${badge.bg};color:${badge.c}">${book.subject}</span></td>
           <td>${book.publisher}</td>
           <td><span class="tb-lessons-badge">${book.lessons.length}개</span></td>
-          <td><span class="tb-passages-num">${totalP}</span></td>
         </tr>`;
 
         // Expandable lesson row
         html += `<tr class="tb-expand-row${isExpanded ? ' open' : ''}" id="tb-expand-${realIdx}">
-          <td colspan="6" class="tb-expand-cell">
+          <td colspan="5" class="tb-expand-cell">
             <div class="tb-expand-lessons">`;
         book.lessons.forEach((lesson, li) => {
           const cardColor = tbLessonCardColors[li % tbLessonCardColors.length];
           const cardInk = tbLessonCardInks[li % tbLessonCardInks.length];
-          html += `<div class="tb-expand-lesson-card" style="border-left:3px solid ${cardInk}" onclick="event.stopPropagation()">
-            <input type="checkbox" onchange="tbCountSelected()" data-passage="1" data-book="${realIdx}" data-lesson="${li}">
+          const pubEsc = book.publisher.replace(/'/g, "\\'");
+          const authEsc = book.author.replace(/'/g, "\\'");
+          const lessonEsc = lesson.replace(/'/g, "\\'");
+          html += `<div class="tb-expand-lesson-card" style="border-left:3px solid ${cardInk};cursor:pointer" onclick="event.stopPropagation();tbLoadPassages('${pubEsc}','${authEsc}','${lessonEsc}')">
             <h4>${lesson}</h4>
-            <span>${book.passagesPerLesson} 지문</span>
+            <span style="font-size:11px;color:var(--ink-400)">원문 · 해석 보기</span>
           </div>`;
         });
         html += `</div></td></tr>`;
@@ -4670,6 +4650,84 @@
     function tbLayoutTab(btn) {
       btn.parentElement.querySelectorAll('.tb-layout-tab').forEach(t => t.classList.remove('active'));
       btn.classList.add('active');
+    }
+
+    // ── Textbook passage viewer ──
+    let tbTranslationOpen = true;
+    let tbSelectedBook = null;
+
+    async function tbLoadPassages(publisher, author, lesson) {
+      const panel = document.getElementById('tbPassagePanel');
+      if (!panel) return;
+
+      panel.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;min-height:200px;color:var(--ink-400);font-size:13px;">불러오는 중...</div>';
+
+      tbSelectedBook = { publisher, author, lesson };
+
+      try {
+        const supabaseUrl = 'https://qnohnjysnrjznqawwvep.supabase.co';
+        const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFub2huanlzbnJqem5xYXd3dmVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjA3MDMsImV4cCI6MjA5MjY5NjcwM30.O1KXAzfKtF6Ui1iMTg82iwHCIWLVwHHjy-E9N-s82rU';
+        const headers = { 'apikey': anonKey, 'Authorization': `Bearer ${anonKey}`, 'Content-Type': 'application/json' };
+
+        const lessonNum = parseInt(lesson.replace(/\D/g, ''));
+        const url = `${supabaseUrl}/rest/v1/textbook_passages?publisher=eq.${encodeURIComponent(publisher)}&author=eq.${encodeURIComponent(author)}&lesson=eq.${lessonNum}&select=passage_order,passage_en,passage_ko&order=passage_order`;
+
+        const res = await fetch(url, { headers });
+        if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+        const passages = await res.json();
+
+        if (!passages || passages.length === 0) {
+          panel.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;min-height:200px;color:var(--ink-400);font-size:13px;">해당 단원의 지문이 없습니다.</div>';
+          return;
+        }
+
+        const hasTranslations = passages.some(p => p.passage_ko);
+
+        let html = `<div class="mk-passages-header">`;
+        html += `<div style="padding:12px 16px 8px;font-weight:600;font-size:14px;color:var(--ink-800);border-bottom:1px solid var(--ink-100);">${publisher}(${author}) ${lesson}</div>`;
+
+        if (hasTranslations) {
+          html += `<div class="mk-trans-toggle ${tbTranslationOpen ? 'active' : ''}" id="tbTransToggle" onclick="tbToggleTranslation()">
+            <div class="toggle-switch"></div>
+            <span>해석 보기</span>
+          </div>`;
+        }
+        html += `</div>`;
+
+        passages.forEach((p, i) => {
+          const transHtml = p.passage_ko
+            ? `<div class="passage-ko"><div style="font-weight:700;font-size:12px;color:var(--honey-ink);margin-bottom:6px;">해석</div><div style="font-size:12.5px;line-height:1.7;color:var(--ink-700);white-space:pre-wrap;">${p.passage_ko}</div></div>`
+            : `<div class="passage-ko"><div style="color:var(--ink-300);font-size:12px;font-style:italic;">해석이 준비되지 않았습니다.</div></div>`;
+          html += `<div class="passage-card" style="border-bottom:1px solid var(--ink-100);">
+            <div class="passage-card-row">
+              <div class="passage-en">
+                <div style="font-weight:700;font-size:13px;color:var(--sage-ink);margin-bottom:6px;">본문 ${p.passage_order}</div>
+                <div style="font-size:12.5px;line-height:1.7;color:var(--ink-700);white-space:pre-wrap;">${p.passage_en}</div>
+              </div>
+              ${transHtml}
+            </div>
+          </div>`;
+        });
+
+        panel.innerHTML = html;
+
+        // Apply translation visibility
+        if (!tbTranslationOpen) {
+          panel.querySelectorAll('.passage-ko').forEach(el => el.style.display = 'none');
+        }
+      } catch (err) {
+        console.error('Failed to fetch textbook passages:', err);
+        panel.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;min-height:200px;color:var(--ink-400);font-size:13px;">지문을 불러올 수 없습니다.</div>';
+      }
+    }
+
+    function tbToggleTranslation() {
+      tbTranslationOpen = !tbTranslationOpen;
+      const toggle = document.getElementById('tbTransToggle');
+      if (toggle) toggle.classList.toggle('active', tbTranslationOpen);
+      document.querySelectorAll('#tbPassagePanel .passage-ko').forEach(el => {
+        el.style.display = tbTranslationOpen ? '' : 'none';
+      });
     }
 
     // Initial render
