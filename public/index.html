@@ -4208,7 +4208,7 @@
       function hideBar() {
         if (dragging) return;
         clearTimeout(hideTimer);
-        hideTimer = setTimeout(() => { track.classList.remove('visible'); track.classList.remove('hovered'); }, 300);
+        hideTimer = setTimeout(() => { track.classList.remove('visible'); track.classList.remove('hovered'); }, 1000);
       }
       panel.addEventListener('scroll', () => {
         updateThumb();
@@ -4217,11 +4217,10 @@
           clearTimeout(hideTimer);
           track.classList.add('visible');
         } else {
-          // 그 외 — 스크롤 시 잠깐 보여주고 숨김
+          // 스크롤 중 계속 보이고, 멈추면 1초 후 사라짐
+          clearTimeout(hideTimer);
           track.classList.add('visible');
-          if (!hideTimer) {
-            hideBar();
-          }
+          hideBar();
         }
       });
 
@@ -4242,11 +4241,12 @@
             track.classList.remove('hovered');
           }
         } else {
-          // 왼쪽으로 벗어남 (dist > 26) — 즉시 사라지게
+          // 왼쪽으로 벗어남 (dist > 26) — 1초 후 사라지게
           mouseInZone = false;
           track.classList.remove('hovered');
-          track.classList.remove('visible');
-          clearTimeout(hideTimer);
+          if (!hideTimer) {
+            hideBar();
+          }
         }
       });
 
@@ -4261,12 +4261,11 @@
           rightPadding = true;
           return;
         }
-        // 왼쪽/위/아래로 벗어남 — 즉시 숨김
+        // 왼쪽/위/아래로 벗어남 — 1초 후 숨김
         rightPadding = false;
         lastMouseX = 0;
         lastMouseY = 0;
-        clearTimeout(hideTimer);
-        if (!dragging) { track.classList.remove('visible'); track.classList.remove('hovered'); }
+        if (!dragging) hideBar();
       });
 
       // 패널 오른쪽 테두리선 밖으로 나가야 사라짐
