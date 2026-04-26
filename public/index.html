@@ -4244,11 +4244,11 @@
           // 왼쪽으로 벗어남 (dist > 26)
           mouseInZone = false;
           track.classList.remove('hovered');
-          if (dist >= 32) {
-            // 텍스트 영역 도달 — 1초 후 사라지게
+          if (dist >= 51) {
+            // 오른쪽 패딩(25px)과 대칭 거리 — 1초 후 사라지게
             if (!hideTimer) hideBar();
           }
-          // dist 26~32: 스크롤바~텍스트 사이 여백 — 옅은 상태 유지
+          // dist 26~51: 옅은 상태 유지 (오른쪽과 대칭)
         }
       });
 
