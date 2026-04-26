@@ -4198,29 +4198,43 @@
       let lastMouseX = 0;
       let lastMouseY = 0;
       let mouseInZone = false;
-      let rightPadding = false; // 오른쪽 padding 영역에 있음
+      let rightPadding = false;
+      let exitedLeft = false;
+
+      // 스크롤바 thumb 중심에서 tb-options 테두리까지 거리 계산
+      // 오른쪽: thumb(right=2, width=5) → wrap 우측에서 ~4.5px, gap ~25px → 총 ~30px
+      // 왼쪽도 동일 거리 적용: thumb 중심(wrap.right - 4.5)에서 왼쪽으로 ~30px → dist ~34.5
+      const LEFT_HIDE_DIST = 35;
 
       function showBar() {
         clearTimeout(hideTimer);
+        hideTimer = null;
         updateThumb();
         track.classList.add('visible');
       }
       function hideBar() {
         if (dragging) return;
         clearTimeout(hideTimer);
-        hideTimer = setTimeout(() => { track.classList.remove('visible'); track.classList.remove('hovered'); }, 1000);
+        hideTimer = setTimeout(() => {
+          track.classList.remove('visible');
+          track.classList.remove('hovered');
+          hideTimer = null;
+        }, 1000);
       }
       panel.addEventListener('scroll', () => {
         updateThumb();
+        if (exitedLeft) {
+          // 왼쪽으로 벗어난 상태 — 스크롤해도 스크롤바 안 보임, thumb만 업데이트
+          return;
+        }
         if (mouseInZone || rightPadding) {
-          // 스크롤바 영역이나 오른쪽 패딩에 있으면 계속 보임
           clearTimeout(hideTimer);
+          hideTimer = null;
           track.classList.add('visible');
         } else {
-          // 스크롤 중 계속 보이고, 멈추면 1초 후 사라짐
-          clearTimeout(hideTimer);
+          // 스크롤 중 보이되, 기존 hide 타이머가 있으면 건드리지 않음
           track.classList.add('visible');
-          hideBar();
+          if (!hideTimer) hideBar();
         }
       });
 
@@ -4233,23 +4247,30 @@
         const rect = wrap.getBoundingClientRect();
         const dist = rect.right - e.clientX;
         if (dist <= 26 && dist >= 0) {
+          // 스크롤바 존 진입
           mouseInZone = true;
+          exitedLeft = false;
           showBar();
           if (dist <= 14) {
             track.classList.add('hovered');
           } else {
             track.classList.remove('hovered');
           }
-        } else {
-          // 왼쪽으로 벗어남 (dist > 26)
+        } else if (dist > 26) {
+          // 왼쪽 영역
           mouseInZone = false;
           track.classList.remove('hovered');
-          if (dist >= 51) {
-            // 오른쪽 패딩(25px)과 대칭 거리 — 1초 후 사라지게
-            hideBar();
+          if (dist >= LEFT_HIDE_DIST) {
+            // 왼쪽 hide 거리 초과 — exitedLeft 설정, 1초 후 사라짐
+            if (!exitedLeft) {
+              exitedLeft = true;
+              hideBar();
+            }
+            // exitedLeft 이미 true면 아무것도 안 함 (타이머 리셋 방지)
           } else {
-            // dist 26~51: 옅은 상태 유지 (오른쪽과 대칭)
-            clearTimeout(hideTimer);
+            // 스크롤바 존과 hide 거리 사이 — 옅은 상태 유지
+            exitedLeft = false;
+            if (!hideTimer) hideBar();
           }
         }
       });
@@ -4257,28 +4278,29 @@
       wrap.addEventListener('mouseleave', (e) => {
         mouseInZone = false;
         track.classList.remove('hovered');
-        // 오른쪽으로 나갔는지 체크: wrap 오른쪽 끝 너머 + 패널 테두리 안
         const wrapRect = wrap.getBoundingClientRect();
         const tbRect = tbOptionsPanel ? tbOptionsPanel.getBoundingClientRect() : wrapRect;
         if (e.clientX >= wrapRect.right - 2 && e.clientX <= tbRect.right) {
           // 오른쪽 padding 영역 — 옅은 상태 유지
           rightPadding = true;
+          exitedLeft = false;
           return;
         }
-        // 왼쪽/위/아래로 벗어남 — 1초 후 숨김
+        // 왼쪽/위/아래로 벗어남
         rightPadding = false;
+        exitedLeft = true;
         lastMouseX = 0;
         lastMouseY = 0;
         if (!dragging) hideBar();
       });
 
-      // 패널 오른쪽 테두리선 밖으로 나가야 사라짐
       if (tbOptionsPanel) {
         tbOptionsPanel.addEventListener('mouseleave', () => {
           lastMouseX = 0;
           lastMouseY = 0;
           mouseInZone = false;
           rightPadding = false;
+          exitedLeft = true;
           track.classList.remove('hovered');
           if (!dragging) hideBar();
         });
