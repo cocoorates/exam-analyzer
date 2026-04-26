@@ -4198,33 +4198,26 @@
       let lastMouseX = 0;
       let lastMouseY = 0;
       let mouseInZone = false;
-      let leftExited = false; // 왼쪽으로 벗어남 플래그
+      let rightPadding = false; // 오른쪽 padding 영역에 있음
 
       function showBar() {
         clearTimeout(hideTimer);
         updateThumb();
         track.classList.add('visible');
       }
-      function hideBarNow() {
-        // 즉시 사라지게 (fade out transition은 CSS가 처리)
-        if (dragging) return;
-        clearTimeout(hideTimer);
-        track.classList.remove('visible');
-        track.classList.remove('hovered');
-      }
       function hideBar() {
         if (dragging) return;
         clearTimeout(hideTimer);
-        hideTimer = setTimeout(() => { track.classList.remove('visible'); track.classList.remove('hovered'); }, 800);
+        hideTimer = setTimeout(() => { track.classList.remove('visible'); track.classList.remove('hovered'); }, 300);
       }
       panel.addEventListener('scroll', () => {
         updateThumb();
-        if (mouseInZone) {
+        if (mouseInZone || rightPadding) {
+          // 스크롤바 영역이나 오른쪽 패딩에 있으면 계속 보임
           clearTimeout(hideTimer);
           track.classList.add('visible');
-        } else if (leftExited) {
-          // 왼쪽으로 벗어난 상태 — 스크롤해도 보여주지 않음
         } else {
+          // 그 외 — 스크롤 시 잠깐 보여주고 숨김
           track.classList.add('visible');
           if (!hideTimer) {
             hideBar();
@@ -4237,11 +4230,11 @@
       wrap.addEventListener('mousemove', (e) => {
         lastMouseX = e.clientX;
         lastMouseY = e.clientY;
+        rightPadding = false;
         const rect = wrap.getBoundingClientRect();
         const dist = rect.right - e.clientX;
         if (dist <= 26 && dist >= 0) {
           mouseInZone = true;
-          leftExited = false;
           showBar();
           if (dist <= 14) {
             track.classList.add('hovered');
@@ -4250,31 +4243,30 @@
           }
         } else {
           // 왼쪽으로 벗어남 (dist > 26) — 즉시 사라지게
-          if (mouseInZone && !leftExited) {
-            // 처음 벗어나는 순간 — 즉시 숨김
-            hideBarNow();
-          }
           mouseInZone = false;
-          leftExited = true;
           track.classList.remove('hovered');
+          track.classList.remove('visible');
+          clearTimeout(hideTimer);
         }
       });
 
       wrap.addEventListener('mouseleave', (e) => {
         mouseInZone = false;
         track.classList.remove('hovered');
+        // 오른쪽으로 나갔는지 체크: wrap 오른쪽 끝 너머 + 패널 테두리 안
         const wrapRect = wrap.getBoundingClientRect();
         const tbRect = tbOptionsPanel ? tbOptionsPanel.getBoundingClientRect() : wrapRect;
-        if (e.clientX >= wrapRect.right && e.clientX <= tbRect.right) {
-          // 오른쪽 padding 영역 — 옅은 상태 유지, 절대 사라지지 않음
-          leftExited = false;
+        if (e.clientX >= wrapRect.right - 2 && e.clientX <= tbRect.right) {
+          // 오른쪽 padding 영역 — 옅은 상태 유지
+          rightPadding = true;
           return;
         }
-        // 왼쪽이나 위아래로 벗어남
+        // 왼쪽/위/아래로 벗어남 — 즉시 숨김
+        rightPadding = false;
         lastMouseX = 0;
         lastMouseY = 0;
-        leftExited = true;
-        if (!dragging) hideBarNow();
+        clearTimeout(hideTimer);
+        if (!dragging) { track.classList.remove('visible'); track.classList.remove('hovered'); }
       });
 
       // 패널 오른쪽 테두리선 밖으로 나가야 사라짐
@@ -4283,7 +4275,7 @@
           lastMouseX = 0;
           lastMouseY = 0;
           mouseInZone = false;
-          leftExited = true;
+          rightPadding = false;
           track.classList.remove('hovered');
           if (!dragging) hideBar();
         });
