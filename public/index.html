@@ -1205,36 +1205,28 @@
       font-family: var(--font-serif);
     }
 
-    /* ── Translation side panel ── */
-    .tb-layout.mk-translation-open {
-      grid-template-columns: 1fr 720px;
-      transition: grid-template-columns 0.3s ease;
-    }
-    .passage-card-row {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 0;
-    }
-    .mk-translation-open .passage-card-row {
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
-    }
+    /* ── Translation toggle & passage layout ── */
     .passage-card-row .passage-en {
       padding: 14px 16px;
     }
     .passage-card-row .passage-ko {
-      padding: 14px 16px;
-      background: oklch(0.97 0.01 80 / 0.5);
-      border-left: 2px solid oklch(0.88 0.04 80);
-      display: none;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.35s ease, opacity 0.25s ease;
+      opacity: 0;
+      padding: 0 16px;
+      background: linear-gradient(135deg, oklch(0.97 0.01 80 / 0.5), oklch(0.97 0.015 150 / 0.3));
+      border-top: 2px solid oklch(0.88 0.04 80);
       font-size: 12.5px;
-      line-height: 1.75;
+      line-height: 1.85;
       color: var(--ink-700);
       font-family: var(--font-serif-ko);
       white-space: pre-wrap;
     }
     .mk-translation-open .passage-card-row .passage-ko {
-      display: block;
+      max-height: 2000px;
+      opacity: 1;
+      padding: 14px 16px;
     }
     .mk-trans-toggle {
       display: flex;
@@ -1277,11 +1269,6 @@
     }
     .mk-trans-toggle.active .toggle-switch::after {
       transform: translateX(16px);
-    }
-    @media (max-width: 900px) {
-      .tb-layout.mk-translation-open { grid-template-columns: 1fr; }
-      .mk-translation-open .passage-card-row { grid-template-columns: 1fr; }
-      .passage-card-row .passage-ko { border-left: none; border-top: 2px solid oklch(0.88 0.04 80); }
     }
 
     /* ═══════════════════════════════════════════════════
@@ -4163,8 +4150,8 @@
         passagesWrap.style.display = 'none';
         // Close translation panel when switching to options
         mkTranslationOpen = false;
-        const layout = document.querySelector('.page-mock .tb-layout');
-        if (layout) layout.classList.remove('mk-translation-open');
+        const mkPanel = document.getElementById('mkPassagesPanel');
+        if (mkPanel) mkPanel.classList.remove('mk-translation-open');
       } else {
         optionsPanel.style.display = 'none';
         passagesWrap.style.display = 'block';
@@ -4373,15 +4360,10 @@
 
     function mkToggleTranslation() {
       mkTranslationOpen = !mkTranslationOpen;
-      const layout = document.querySelector('.page-mock .tb-layout');
+      const panel = document.getElementById('mkPassagesPanel');
       const toggle = document.getElementById('mkTransToggle');
-      if (mkTranslationOpen) {
-        layout.classList.add('mk-translation-open');
-        toggle.classList.add('active');
-      } else {
-        layout.classList.remove('mk-translation-open');
-        toggle.classList.remove('active');
-      }
+      if (panel) panel.classList.toggle('mk-translation-open', mkTranslationOpen);
+      if (toggle) toggle.classList.toggle('active', mkTranslationOpen);
     }
 
     async function mkFetchPassages() {
@@ -4450,19 +4432,19 @@
         }
         html += `</div>`;
 
-        // Render passages with translations side by side
+        // Render passages with translations (vertical expand)
         passages.forEach(p => {
           const label = p.label;
-          const transHtml = p.translation
-            ? `<div class="passage-ko"><div style="font-weight:700;font-size:12px;color:var(--honey-ink);margin-bottom:6px;">해석</div>${p.translation}</div>`
-            : `<div class="passage-ko"><div style="color:var(--ink-300);font-size:12px;font-style:italic;">해석이 준비되지 않았습니다.</div></div>`;
+          const transInner = p.translation
+            ? `<div style="font-weight:700;font-size:12px;color:var(--honey-ink);margin-bottom:6px;">해석</div><div>${p.translation}</div>`
+            : `<div style="color:var(--ink-300);font-size:12px;font-style:italic;">해석이 준비되지 않았습니다.</div>`;
           html += `<div class="passage-card" style="border-bottom:1px solid var(--ink-100);">
             <div class="passage-card-row">
               <div class="passage-en">
                 <div style="font-weight:700;font-size:13px;color:var(--sage-ink);margin-bottom:6px;">${label}.</div>
                 <div style="font-size:12.5px;line-height:1.7;color:var(--ink-700);white-space:pre-wrap;">${p.passage}</div>
               </div>
-              ${transHtml}
+              <div class="passage-ko">${transInner}</div>
             </div>
           </div>`;
         });
@@ -4685,7 +4667,7 @@
     }
 
     // ── Textbook passage viewer ──
-    let tbTranslationOpen = true;
+    let tbTranslationOpen = false;
     let tbSelectedBook = null;
 
     function tbLessonToNum(lesson) {
@@ -4745,16 +4727,16 @@
         html += `</div>`;
 
         passages.forEach((p, i) => {
-          const transHtml = p.passage_ko
-            ? `<div class="passage-ko"><div style="font-weight:700;font-size:12px;color:var(--honey-ink);margin-bottom:6px;">해석</div><div style="font-size:12.5px;line-height:1.7;color:var(--ink-700);white-space:pre-wrap;">${p.passage_ko}</div></div>`
-            : `<div class="passage-ko"><div style="color:var(--ink-300);font-size:12px;font-style:italic;">해석이 준비되지 않았습니다.</div></div>`;
+          const transInner = p.passage_ko
+            ? `<div style="font-weight:700;font-size:12px;color:var(--honey-ink);margin-bottom:6px;">해석</div><div>${p.passage_ko}</div>`
+            : `<div style="color:var(--ink-300);font-size:12px;font-style:italic;">해석이 준비되지 않았습니다.</div>`;
           html += `<div class="passage-card" style="border-bottom:1px solid var(--ink-100);">
             <div class="passage-card-row">
               <div class="passage-en">
                 <div style="font-weight:700;font-size:13px;color:var(--sage-ink);margin-bottom:6px;">본문 ${p.passage_order}</div>
                 <div style="font-size:12.5px;line-height:1.7;color:var(--ink-700);white-space:pre-wrap;">${p.passage_en}</div>
               </div>
-              ${transHtml}
+              <div class="passage-ko">${transInner}</div>
             </div>
           </div>`;
         });
