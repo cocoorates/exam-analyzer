@@ -4197,9 +4197,10 @@
 
       let lastMouseX = 0;
       let lastMouseY = 0;
-      // mouseInZone: set true/false ONLY by mousemove/mouseleave
-      // This is the authoritative source of whether mouse is in the 26px zone
+      // mouseInZone: mouse is in the 26px scrollbar zone
+      // mouseInWrap: mouse is anywhere inside the wrap panel
       let mouseInZone = false;
+      let mouseInWrap = false;
 
       function showBar() {
         clearTimeout(hideTimer);
@@ -4214,13 +4215,16 @@
       panel.addEventListener('scroll', () => {
         updateThumb();
         if (mouseInZone) {
-          // Mouse is in the 26px zone (confirmed by mousemove) — keep visible
+          // Mouse is in the 26px zone — full visibility, cancel hide
+          clearTimeout(hideTimer);
+          track.classList.add('visible');
+        } else if (mouseInWrap) {
+          // Mouse is in wrap but outside 26px — show faded, don't hide
           clearTimeout(hideTimer);
           track.classList.add('visible');
         } else {
-          // Mouse is outside — show thumb briefly then hide
+          // Mouse is outside wrap — show briefly then hide
           track.classList.add('visible');
-          // Don't clear existing hideTimer — let it run
           if (!hideTimer) {
             hideBar();
           }
@@ -4231,6 +4235,7 @@
       wrap.addEventListener('mousemove', (e) => {
         lastMouseX = e.clientX;
         lastMouseY = e.clientY;
+        mouseInWrap = true;
         const rect = wrap.getBoundingClientRect();
         const dist = rect.right - e.clientX;
         if (dist <= 26 && dist >= 0) {
@@ -4242,9 +4247,9 @@
             track.classList.remove('hovered');
           }
         } else {
+          // 26px 밖이지만 wrap 안 — 옅은 상태 유지, 사라지지 않음
           mouseInZone = false;
           track.classList.remove('hovered');
-          hideBar();
         }
       });
 
@@ -4252,6 +4257,7 @@
         lastMouseX = 0;
         lastMouseY = 0;
         mouseInZone = false;
+        mouseInWrap = false;
         track.classList.remove('hovered');
         if (!dragging) hideBar();
       });
