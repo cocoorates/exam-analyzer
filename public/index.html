@@ -4740,19 +4740,30 @@
     }
 
     // Helper: detect subtitle (short, no period, single line, English)
+    // Known standalone title passages (second titles within a lesson)
+    // These are confirmed from HWP textbox analysis
+    const knownSubtitles = new Set([
+      'Resilience: Recovering from Difficult Times',
+      'The Cambridge Declaration of Consciousness',
+      'Who Is the Author of AI-generated Art?',
+      'Tā Moko: A Record of an Individual\'s Path',
+      'The Journey of Sound Waves Through Our Ears',
+      'Become a Mushroom Farmer at Home!',
+      'Should social media have a "Dislike" button?',
+      'Popular Extracurricular Activities Around the World',
+      'Unique Idioms Around the World',
+      'You Can Make Yourself Happy: Synthetic Happiness vs. Natural Happiness',
+      'A Local Project for Mapping Urban Forests',
+      'Q&A: Are Dutch clogs comfortable?',
+      "Banksy's New Work in Port Talbot",
+      'UNESCO King Sejong Literacy Prize',
+      "Let's Celebrate Marine Gardening Day!",
+      'Digital Footprints: Mind Your Privacy',
+    ]);
     function isSubtitle(text) {
       if (!text) return false;
       const t = text.trim();
-      if (t.length > 100 || t.length < 5) return false;
-      if (t.includes('\n')) return false;
-      // Reject if it ends with a period (it's a sentence, not a title)
-      if (t.endsWith('.')) return false;
-      // Reject dialogue lines (Name: text)
-      if (/^[A-Z][a-zA-Z\.\s]{0,22}:\s/.test(t)) return false;
-      // Check if mostly English (low Korean ratio)
-      const ko = [...t].filter(c => c >= '가' && c <= '힣').length;
-      if (ko / t.length > 0.3) return false;
-      return true;
+      return knownSubtitles.has(t);
     }
 
     // Helper: detect if first line of a passage is an embedded title
@@ -4870,7 +4881,10 @@
             passageNum = 0;
             // Section label mapping (extracted from HWP textboxes)
             const sectionLabels = {
-              'YBM|김은형': 'READING about Psychology',
+              'YBM|김은형|Lesson 1': 'READING about Psychology',
+              'YBM|김은형|Lesson 2': 'READING about Health Science',
+              'YBM|김은형|Lesson 3': 'READING about Economics',
+              'YBM|김은형|Lesson 4': 'READING about Computers',
               'YBM|박준언': 'Further Reading',
               '비상|홍민표': 'Read More',
               '지학사|신상근|Lesson 1': 'Inside Culture',
