@@ -4241,12 +4241,14 @@
             track.classList.remove('hovered');
           }
         } else {
-          // 왼쪽으로 벗어남 (dist > 26) — 1초 후 사라지게
+          // 왼쪽으로 벗어남 (dist > 26)
           mouseInZone = false;
           track.classList.remove('hovered');
-          if (!hideTimer) {
-            hideBar();
+          if (dist >= 32) {
+            // 텍스트 영역 도달 — 1초 후 사라지게
+            if (!hideTimer) hideBar();
           }
+          // dist 26~32: 스크롤바와 텍스트 사이 빈 공간 — 옅은 상태 유지
         }
       });
 
