@@ -4246,9 +4246,11 @@
           track.classList.remove('hovered');
           if (dist >= 51) {
             // 오른쪽 패딩(25px)과 대칭 거리 — 1초 후 사라지게
-            if (!hideTimer) hideBar();
+            hideBar();
+          } else {
+            // dist 26~51: 옅은 상태 유지 (오른쪽과 대칭)
+            clearTimeout(hideTimer);
           }
-          // dist 26~51: 옅은 상태 유지 (오른쪽과 대칭)
         }
       });
 
