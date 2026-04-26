@@ -1149,12 +1149,16 @@
     .mk-passages-panel {
       padding: 0;
       scrollbar-width: thin;
+      scrollbar-color: transparent transparent;
+    }
+    .mk-passages-panel:hover {
       scrollbar-color: var(--ink-200) transparent;
     }
     .mk-passages-panel::-webkit-scrollbar { width: 4px; }
     .mk-passages-panel::-webkit-scrollbar-track { background: transparent; }
-    .mk-passages-panel::-webkit-scrollbar-thumb { background: var(--ink-200); border-radius: 4px; }
-    .mk-passages-panel::-webkit-scrollbar-thumb:hover { background: var(--ink-300); }
+    .mk-passages-panel::-webkit-scrollbar-thumb { background: transparent; border-radius: 4px; transition: background 0.2s; }
+    .mk-passages-panel:hover::-webkit-scrollbar-thumb { background: var(--ink-200); }
+    .mk-passages-panel:hover::-webkit-scrollbar-thumb:hover { background: var(--ink-400); }
     .mk-passages-header {
       position: sticky;
       top: 0;
