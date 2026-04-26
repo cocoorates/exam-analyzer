@@ -1166,6 +1166,85 @@
       font-family: var(--font-serif);
     }
 
+    /* ── Translation side panel ── */
+    .tb-layout.mk-translation-open {
+      grid-template-columns: 1fr 720px;
+      transition: grid-template-columns 0.3s ease;
+    }
+    .passage-card-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    .mk-translation-open .passage-card-row {
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+    .passage-card-row .passage-en {
+      padding: 14px 16px;
+    }
+    .passage-card-row .passage-ko {
+      padding: 14px 16px;
+      background: oklch(0.97 0.01 80 / 0.5);
+      border-left: 2px solid oklch(0.88 0.04 80);
+      display: none;
+      font-size: 12.5px;
+      line-height: 1.75;
+      color: var(--ink-700);
+      font-family: var(--font-serif-ko);
+      white-space: pre-wrap;
+    }
+    .mk-translation-open .passage-card-row .passage-ko {
+      display: block;
+    }
+    .mk-trans-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: oklch(0.97 0.01 80 / 0.5);
+      border-bottom: 1px solid var(--ink-100);
+      font-size: 13px;
+      color: var(--ink-500);
+      cursor: pointer;
+      user-select: none;
+    }
+    .mk-trans-toggle:hover {
+      background: oklch(0.95 0.02 80 / 0.5);
+    }
+    .mk-trans-toggle .toggle-switch {
+      position: relative;
+      width: 36px;
+      height: 20px;
+      background: var(--ink-200);
+      border-radius: 10px;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .mk-trans-toggle .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+    .mk-trans-toggle.active .toggle-switch {
+      background: var(--honey-ink);
+    }
+    .mk-trans-toggle.active .toggle-switch::after {
+      transform: translateX(16px);
+    }
+    @media (max-width: 900px) {
+      .tb-layout.mk-translation-open { grid-template-columns: 1fr; }
+      .mk-translation-open .passage-card-row { grid-template-columns: 1fr; }
+      .passage-card-row .passage-ko { border-left: none; border-top: 2px solid oklch(0.88 0.04 80); }
+    }
+
     /* ═══════════════════════════════════════════════════
        ANALYZE PAGE
        ═══════════════════════════════════════════════════ */
@@ -4023,6 +4102,10 @@
       if (tab === 'options') {
         optionsPanel.style.display = 'block';
         passagesPanel.style.display = 'none';
+        // Close translation panel when switching to options
+        mkTranslationOpen = false;
+        const layout = document.querySelector('.page-mock .tb-layout');
+        if (layout) layout.classList.remove('mk-translation-open');
       } else {
         optionsPanel.style.display = 'none';
         passagesPanel.style.display = 'block';
@@ -4037,6 +4120,21 @@
     function mkLayoutTab(btn) {
       btn.parentElement.querySelectorAll('.tb-layout-tab').forEach(t => t.classList.remove('active'));
       btn.classList.add('active');
+    }
+
+    let mkTranslationOpen = false;
+
+    function mkToggleTranslation() {
+      mkTranslationOpen = !mkTranslationOpen;
+      const layout = document.querySelector('.page-mock .tb-layout');
+      const toggle = document.getElementById('mkTransToggle');
+      if (mkTranslationOpen) {
+        layout.classList.add('mk-translation-open');
+        toggle.classList.add('active');
+      } else {
+        layout.classList.remove('mk-translation-open');
+        toggle.classList.remove('active');
+      }
     }
 
     async function mkFetchPassages() {
@@ -4069,8 +4167,8 @@
         }
         const examUuid = exams[0].id;
 
-        // Step 2: Fetch questions by exam UUID
-        const qRes = await fetch(`${supabaseUrl}/rest/v1/mock_questions?exam_id=eq.${examUuid}&select=question_number,passage,passage_group&order=question_number`, { headers });
+        // Step 2: Fetch questions by exam UUID (including translation_ko)
+        const qRes = await fetch(`${supabaseUrl}/rest/v1/mock_questions?exam_id=eq.${examUuid}&select=question_number,passage,passage_group,translation_ko&order=question_number`, { headers });
         if (!qRes.ok) throw new Error(`Questions fetch failed: ${qRes.status}`);
         const questions = await qRes.json();
 
@@ -4087,16 +4185,36 @@
           const groupKey = q.passage_group && q.passage_group.trim() ? q.passage_group.trim() : String(q.question_number);
           if (seen.has(groupKey)) return;
           seen.add(groupKey);
-          passages.push({ label: groupKey, passage: q.passage });
+          passages.push({ label: groupKey, passage: q.passage, translation: q.translation_ko || '' });
         });
 
-        // Render: "번호.\n원문" format
-        let html = `<div style="padding:12px 16px 8px;font-weight:600;font-size:14px;color:var(--ink-800);border-bottom:1px solid var(--ink-100);margin-bottom:4px;">${grade} ${year}년 ${month}월 모의고사</div>`;
+        // Check if any translations exist
+        const hasTranslations = passages.some(p => p.translation);
+
+        // Render header with translation toggle
+        let html = `<div style="padding:12px 16px 8px;font-weight:600;font-size:14px;color:var(--ink-800);border-bottom:1px solid var(--ink-100);">${grade} ${year}년 ${month}월 모의고사</div>`;
+
+        if (hasTranslations) {
+          html += `<div class="mk-trans-toggle ${mkTranslationOpen ? 'active' : ''}" id="mkTransToggle" onclick="mkToggleTranslation()">
+            <div class="toggle-switch"></div>
+            <span>해석 보기</span>
+          </div>`;
+        }
+
+        // Render passages with translations side by side
         passages.forEach(p => {
           const label = p.label;
-          html += `<div class="passage-card" style="padding:14px 16px;border-bottom:1px solid var(--ink-50);">
-            <div style="font-weight:700;font-size:13px;color:var(--sage-ink);margin-bottom:6px;">${label}.</div>
-            <div style="font-size:12.5px;line-height:1.7;color:var(--ink-700);white-space:pre-wrap;">${p.passage}</div>
+          const transHtml = p.translation
+            ? `<div class="passage-ko"><div style="font-weight:700;font-size:12px;color:var(--honey-ink);margin-bottom:6px;">해석</div>${p.translation}</div>`
+            : `<div class="passage-ko"><div style="color:var(--ink-300);font-size:12px;font-style:italic;">해석이 준비되지 않았습니다.</div></div>`;
+          html += `<div class="passage-card" style="border-bottom:1px solid var(--ink-100);">
+            <div class="passage-card-row">
+              <div class="passage-en">
+                <div style="font-weight:700;font-size:13px;color:var(--sage-ink);margin-bottom:6px;">${label}.</div>
+                <div style="font-size:12.5px;line-height:1.7;color:var(--ink-700);white-space:pre-wrap;">${p.passage}</div>
+              </div>
+              ${transHtml}
+            </div>
           </div>`;
         });
 
