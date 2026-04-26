@@ -4762,9 +4762,12 @@
       "Let's Celebrate Marine Gardening Day!",
       'Digital Footprints: Mind Your Privacy',
     ]);
+    function normalizeQuotes(s) {
+      return s.replace(/[“”‘’]/g, m => ({'“':'"','”':'"','‘':"'",'’':"'"}[m]));
+    }
     function isSubtitle(text) {
       if (!text) return false;
-      const t = text.trim();
+      const t = normalizeQuotes(text.trim());
       return knownSubtitles.has(t);
     }
 
