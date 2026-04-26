@@ -1210,9 +1210,8 @@
       padding: 14px 16px;
     }
     .passage-card-row .passage-ko {
-      max-height: 0;
       overflow: hidden;
-      transition: max-height 0.35s cubic-bezier(0, 1, 0, 1), padding 0.3s ease, opacity 0.25s ease;
+      height: 0;
       opacity: 0;
       padding: 0 16px;
       background: linear-gradient(135deg, oklch(0.97 0.01 80 / 0.5), oklch(0.97 0.015 150 / 0.3));
@@ -1222,12 +1221,7 @@
       color: var(--ink-700);
       font-family: var(--font-serif-ko);
       white-space: pre-wrap;
-    }
-    .mk-translation-open .passage-card-row .passage-ko {
-      max-height: 5000px;
-      opacity: 1;
-      padding: 14px 16px;
-      transition: max-height 0.5s cubic-bezier(1, 0, 1, 0), padding 0.3s ease, opacity 0.3s ease 0.05s;
+      transition: height 0.35s ease, padding 0.3s ease, opacity 0.25s ease;
     }
     .mk-trans-toggle {
       display: flex;
@@ -4157,7 +4151,7 @@
         // Close translation panel when switching to options
         mkTranslationOpen = false;
         const mkPanel = document.getElementById('mkPassagesPanel');
-        if (mkPanel) mkPanel.classList.remove('mk-translation-open');
+        if (mkPanel) animateTranslation(mkPanel, false);
       } else {
         optionsPanel.style.display = 'none';
         passagesWrap.style.display = 'block';
@@ -4364,12 +4358,38 @@
       new ResizeObserver(() => updateThumb()).observe(panel);
     })();
 
+    function animateTranslation(panel, open) {
+      panel.querySelectorAll('.passage-card-row .passage-ko').forEach(el => {
+        if (open) {
+          el.style.height = 'auto';
+          el.style.padding = '14px 16px';
+          const h = el.scrollHeight;
+          el.style.height = '0px';
+          el.style.padding = '0 16px';
+          el.offsetHeight; // force reflow
+          el.style.height = h + 'px';
+          el.style.padding = '14px 16px';
+          el.style.opacity = '1';
+          // After transition, set auto so it can resize
+          const onEnd = () => { el.style.height = 'auto'; el.removeEventListener('transitionend', onEnd); };
+          el.addEventListener('transitionend', onEnd);
+        } else {
+          const h = el.scrollHeight;
+          el.style.height = h + 'px';
+          el.offsetHeight; // force reflow
+          el.style.height = '0px';
+          el.style.padding = '0 16px';
+          el.style.opacity = '0';
+        }
+      });
+    }
+
     function mkToggleTranslation() {
       mkTranslationOpen = !mkTranslationOpen;
       const panel = document.getElementById('mkPassagesPanel');
       const toggle = document.getElementById('mkTransToggle');
-      if (panel) panel.classList.toggle('mk-translation-open', mkTranslationOpen);
       if (toggle) toggle.classList.toggle('active', mkTranslationOpen);
+      if (panel) animateTranslation(panel, mkTranslationOpen);
     }
 
     async function mkFetchPassages() {
@@ -4458,6 +4478,14 @@
 
         panel.innerHTML = html;
         panel.style.minHeight = '';
+        // Apply translation visibility for mock exam
+        if (mkTranslationOpen) {
+          panel.querySelectorAll('.passage-card-row .passage-ko').forEach(el => {
+            el.style.height = 'auto';
+            el.style.padding = '14px 16px';
+            el.style.opacity = '1';
+          });
+        }
         window.scrollTo(0, scrollY);
       } catch (err) {
         console.error('Failed to fetch passages:', err);
@@ -4780,6 +4808,8 @@
       // Must be short, no period at end, mostly English
       if (first.length < 5 || first.length > 100) return null;
       if (first.endsWith('.') || first.endsWith(',')) return null;
+      // Exclude lines starting with symbols (list items, not titles)
+      if (/^[□■●○◆◇▶▷★☆✓✗•→←↑↓※\-\*#\d+\.]/.test(first)) return null;
       const ko = [...first].filter(c => c >= '가' && c <= '힣').length;
       if (ko / first.length > 0.3) return null;
       // Allow quoted titles like "The Boy Who..."
@@ -4973,11 +5003,14 @@
         panel.innerHTML = html;
         panel.scrollTop = 0;
 
-        // Apply translation visibility via class
+        // Apply translation visibility
         if (tbTranslationOpen) {
-          panel.classList.add('mk-translation-open');
-        } else {
-          panel.classList.remove('mk-translation-open');
+          // Set initial open state without animation for fresh render
+          panel.querySelectorAll('.passage-card-row .passage-ko').forEach(el => {
+            el.style.height = 'auto';
+            el.style.padding = '14px 16px';
+            el.style.opacity = '1';
+          });
         }
 
         // Initialize scrollbar for textbook passages
@@ -4994,7 +5027,7 @@
       if (toggle) toggle.classList.toggle('active', tbTranslationOpen);
       const panel = document.getElementById('tbPassagePanel');
       if (panel) {
-        panel.classList.toggle('mk-translation-open', tbTranslationOpen);
+        animateTranslation(panel, tbTranslationOpen);
         // Also toggle subtitle translations
         panel.querySelectorAll('.passage-ko-subtitle').forEach(el => {
           if (tbTranslationOpen) {
