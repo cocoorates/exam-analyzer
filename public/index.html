@@ -4853,7 +4853,7 @@
 
         // Add lesson title in passage area as < Title >
         if (lessonTitle) {
-          html += `<div style="padding:14px 16px 10px;font-weight:700;font-size:14px;color:var(--ink-900);border-bottom:1px solid var(--ink-100);font-family:var(--font-serif);letter-spacing:0.3px;">&lt; ${lessonTitle} &gt;</div>`;
+          html += `<div style="padding:14px 16px 10px;font-weight:700;font-size:14px;color:var(--ink-900);">&lt; ${lessonTitle} &gt;</div>`;
         }
 
         let passageNum = 0;
@@ -4866,13 +4866,13 @@
             subtitleCount++;
             // Reset passage numbering for new section
             passageNum = 0;
-            // Add (Read More) divider before the second+ title
+            // Add section divider before additional titles
             if (subtitleCount >= 1) {
-              html += `<div style="padding:16px 16px 4px;text-align:left;font-size:12px;font-weight:600;color:var(--sage-ink);letter-spacing:0.5px;border-top:2px solid var(--ink-100);">(Read More)</div>`;
+              html += `<div style="border-top:2px solid var(--ink-200);margin:12px 16px 0;"></div>`;
             }
             // Render as title: < Subtitle > format, bold
             const safeSubTitle = enText.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-            html += `<div style="padding:6px 16px 10px;font-weight:700;font-size:14px;color:var(--ink-900);border-bottom:1px solid var(--ink-100);font-family:var(--font-serif);letter-spacing:0.3px;">&lt; ${safeSubTitle} &gt;</div>`;
+            html += `<div style="padding:6px 16px 10px;font-weight:700;font-size:14px;color:var(--ink-900);">&lt; ${safeSubTitle} &gt;</div>`;
             // Also show Korean subtitle if exists
             if (p.passage_ko) {
               html += `<div class="passage-ko-subtitle" style="max-height:0;overflow:hidden;transition:max-height 0.35s ease,padding 0.35s ease,opacity 0.25s ease;opacity:0;padding:0 16px;text-align:left;font-weight:600;font-size:12.5px;color:var(--ink-600);border-bottom:1px solid var(--ink-100);">${p.passage_ko}</div>`;
