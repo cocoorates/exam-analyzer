@@ -4505,7 +4505,7 @@
           const label = p.label;
           const safeTrans = (p.translation || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
           const transInner = p.translation
-            ? `<div style="font-weight:700;font-size:12px;color:var(--honey-ink);margin-bottom:6px;">해석</div><div style="white-space:pre-wrap;font-weight:500;">${safeTrans}</div>`
+            ? `<div style="font-weight:700;font-size:12px;color:var(--honey-ink);margin-bottom:6px;">해석</div><div style="white-space:pre-wrap;">${safeTrans}</div>`
             : `<div style="color:var(--ink-300);font-size:12px;font-style:italic;">해석이 준비되지 않았습니다.</div>`;
           html += `<div class="passage-card" style="border-bottom:1px solid var(--ink-100);">
             <div class="passage-card-row">
@@ -5070,7 +5070,7 @@
             subtitleHeader += `<div style="padding:6px 16px 10px;font-weight:700;font-size:14px;color:var(--ink-900);">&lt; ${safeSub} &gt;</div>`;
             if (pendingSubtitleKo) {
               const safeSubKo = pendingSubtitleKo.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-              subtitleHeader += `<div class="passage-ko" style="border-bottom:1px solid var(--ink-100);"><div style="font-weight:700;font-size:12px;color:var(--honey-ink);margin-bottom:6px;">해석</div><div style="white-space:pre-wrap;font-weight:700;">${safeSubKo}</div></div>`;
+              subtitleHeader += `<div class="passage-ko" style="border-bottom:1px solid var(--ink-100);"><div style="font-weight:700;font-size:12px;color:var(--honey-ink);margin-bottom:6px;">해석</div><div style="white-space:pre-wrap;font-weight:500;">${safeSubKo}</div></div>`;
             }
             pendingSubtitle = null;
             pendingSubtitleKo = null;
@@ -5097,11 +5097,11 @@
             if (koEmbedded && koEmbedded.body) {
               const safeKoTitle = koEmbedded.title.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
               const safeKoBody = koEmbedded.body.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-              safeKo = `<span style="font-weight:700;">${safeKoTitle}</span>\n${safeKoBody}`;
+              safeKo = `<span style="font-weight:500;">${safeKoTitle}</span>\n${safeKoBody}`;
             }
           }
           const transInner = p.passage_ko
-            ? `<div style="font-weight:700;font-size:12px;color:var(--honey-ink);margin-bottom:6px;">해석</div><div style="white-space:pre-wrap;font-weight:500;">${safeKo}</div>`
+            ? `<div style="font-weight:700;font-size:12px;color:var(--honey-ink);margin-bottom:6px;">해석</div><div style="white-space:pre-wrap;">${safeKo}</div>`
             : `<div style="color:var(--ink-300);font-size:12px;font-style:italic;">해석이 준비되지 않았습니다.</div>`;
 
           html += subtitleHeader;
