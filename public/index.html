@@ -940,6 +940,15 @@
       box-shadow: var(--shadow-card);
       border-color: var(--ink-300);
     }
+    .tb-expand-lesson-card.active {
+      background: var(--honey);
+      border-color: var(--honey-ink);
+      border-left-color: var(--honey-ink) !important;
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--honey-ink) 20%, transparent);
+      transform: translateY(-1px);
+    }
+    .tb-expand-lesson-card.active h4 { color: var(--honey-ink); }
+    .tb-expand-lesson-card.active span { color: var(--honey-ink); opacity:.7; }
     .tb-expand-lesson-card h4 {
       font-size: 13px; font-weight: 550; margin: 0 0 4px;
       color: var(--ink-900);
@@ -4886,6 +4895,18 @@
 
       // Reset translation toggle to OFF when switching lessons
       tbTranslationOpen = false;
+
+      // Highlight active lesson card
+      document.querySelectorAll('.tb-expand-lesson-card').forEach(c => c.classList.remove('active'));
+      // Find and activate the clicked card
+      document.querySelectorAll('.tb-expand-lesson-card').forEach(c => {
+        const onclick = c.getAttribute('onclick') || '';
+        if (onclick.includes("'" + publisher.replace(/'/g, "\\'") + "'") &&
+            onclick.includes("'" + author.replace(/'/g, "\\'") + "'") &&
+            onclick.includes("'" + lesson.replace(/'/g, "\\'") + "'")) {
+          c.classList.add('active');
+        }
+      });
 
       // Keep current tab (default is 문제출제)
 
