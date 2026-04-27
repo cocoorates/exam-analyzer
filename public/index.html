@@ -1846,12 +1846,12 @@
         <span class="bridge">BRIDGE</span>
       </div>
       <div class="nav-links">
-        <span class="nav-link" data-page="textbook" onclick="showPage('textbook')">교과서</span>
-        <span class="nav-link" data-page="supplement" onclick="showPage('supplement')">부교재</span>
-        <span class="nav-link" data-page="mock" onclick="showPage('mock')">모의고사</span>
-        <span class="nav-link" data-page="suneung" onclick="showPage('suneung')">수능</span>
-        <span class="nav-link" data-page="analyze" onclick="showPage('analyze')">분석서</span>
-        <span class="nav-link" data-page="analyze2" onclick="showPage('analyze2')">분석서2</span>
+        <span class="nav-link" data-page="textbook" onclick="navReload('textbook')">교과서</span>
+        <span class="nav-link" data-page="supplement" onclick="navReload('supplement')">부교재</span>
+        <span class="nav-link" data-page="mock" onclick="navReload('mock')">모의고사</span>
+        <span class="nav-link" data-page="suneung" onclick="navReload('suneung')">수능</span>
+        <span class="nav-link" data-page="analyze" onclick="navReload('analyze')">분석서</span>
+        <span class="nav-link" data-page="analyze2" onclick="navReload('analyze2')">분석서2</span>
       </div>
       <button class="nav-hamburger" onclick="openMobileMenu()">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -1866,12 +1866,12 @@
   <!-- Side nav (appears on scroll) -->
   <div class="side-nav" id="sideNav">
     <div class="side-nav-inner">
-      <span class="side-nav-link" data-page="textbook" onclick="showPage('textbook')">교과서</span>
-      <span class="side-nav-link" data-page="supplement" onclick="showPage('supplement')">부교재</span>
-      <span class="side-nav-link" data-page="mock" onclick="showPage('mock')">모의고사</span>
-      <span class="side-nav-link" data-page="suneung" onclick="showPage('suneung')">수능</span>
-      <span class="side-nav-link" data-page="analyze" onclick="showPage('analyze')">분석서</span>
-      <span class="side-nav-link" data-page="analyze2" onclick="showPage('analyze2')">분석서2</span>
+      <span class="side-nav-link" data-page="textbook" onclick="navReload('textbook')">교과서</span>
+      <span class="side-nav-link" data-page="supplement" onclick="navReload('supplement')">부교재</span>
+      <span class="side-nav-link" data-page="mock" onclick="navReload('mock')">모의고사</span>
+      <span class="side-nav-link" data-page="suneung" onclick="navReload('suneung')">수능</span>
+      <span class="side-nav-link" data-page="analyze" onclick="navReload('analyze')">분석서</span>
+      <span class="side-nav-link" data-page="analyze2" onclick="navReload('analyze2')">분석서2</span>
     </div>
   </div>
 
@@ -1882,12 +1882,12 @@
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
       <div class="mobile-menu-links">
-        <a href="#" onclick="showPage('textbook');closeMobileMenu()">교과서</a>
-        <a href="#" onclick="showPage('supplement');closeMobileMenu()">부교재</a>
-        <a href="#" onclick="showPage('mock');closeMobileMenu()">모의고사</a>
-        <a href="#" onclick="showPage('suneung');closeMobileMenu()">수능</a>
-        <a href="#" onclick="showPage('analyze');closeMobileMenu()">분석서</a>
-        <a href="#" onclick="showPage('analyze2');closeMobileMenu()">분석서2</a>
+        <a href="#" onclick="navReload('textbook')">교과서</a>
+        <a href="#" onclick="navReload('supplement')">부교재</a>
+        <a href="#" onclick="navReload('mock')">모의고사</a>
+        <a href="#" onclick="navReload('suneung')">수능</a>
+        <a href="#" onclick="navReload('analyze')">분석서</a>
+        <a href="#" onclick="navReload('analyze2')">분석서2</a>
         <div class="mobile-divider"></div>
         <a href="#" class="mobile-auth-link" onclick="openAuthModal('login');closeMobileMenu()" style="font-weight:600;color:var(--ink-700)">로그인 / 회원가입</a>
       </div>
@@ -3315,6 +3315,12 @@
     let selectedModel = 'claude-sonnet-4-6';
 
     const homeElements = ['pageHome', 'featuresSection', 'demoSection', 'statsSection', 'quoteSection', 'ctaSection', 'footerSection'];
+
+    function navReload(page) {
+      // Force full page reload to reset all state, then show the target page
+      window.location.href = window.location.pathname + '#' + page;
+      window.location.reload();
+    }
 
     function showPage(page, pushState = true) {
       // Hide everything
