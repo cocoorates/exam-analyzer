@@ -4614,6 +4614,15 @@
     };
     const tbLessonCardColors = ['var(--blush)','var(--sky)','var(--sage)','var(--honey)','var(--lilac)','var(--mint)','var(--rose)','var(--blush)'];
     const tbLessonCardInks = ['var(--blush-ink)','var(--sky-ink)','var(--sage-ink)','var(--honey-ink)','var(--lilac-ink)','var(--mint-ink)','var(--rose-ink)','var(--blush-ink)'];
+    const tbPublisherColors = {
+      'NE능률': 'var(--blush-ink)',
+      'YBM': 'var(--sky-ink)',
+      '동아': 'var(--sage-ink)',
+      '미래엔': 'var(--honey-ink)',
+      '비상': 'var(--lilac-ink)',
+      '지학사': 'var(--mint-ink)',
+      '천재': 'var(--rose-ink)',
+    };
 
     let tbSubjectFilter = '공통영어1';
     let tbPublisherFilter = 'all';
@@ -4689,7 +4698,8 @@
         const badge = tbBadgeStyles[book.subject] || { bg: 'var(--sky)', c: 'var(--sky-ink)' };
         const isExpanded = tbExpandedRow === realIdx;
 
-        html += `<tr onclick="tbToggleExpand(${realIdx})" class="${isExpanded ? 'expanded' : ''}">
+        const pubColor = tbPublisherColors[book.publisher] || 'var(--ink-300)';
+        html += `<tr onclick="tbToggleExpand(${realIdx})" class="${isExpanded ? 'expanded' : ''}" style="border-left:3px solid ${pubColor};">
           <td>
             <input type="checkbox" onclick="event.stopPropagation();tbCheckBook(${realIdx},this)" style="width:16px;height:16px;accent-color:var(--sage-ink);cursor:pointer">
           </td>
@@ -4704,15 +4714,13 @@
           <td colspan="5" class="tb-expand-cell">
             <div class="tb-expand-lessons">`;
         book.lessons.forEach((lesson, li) => {
-          const cardColor = tbLessonCardColors[li % tbLessonCardColors.length];
-          const cardInk = tbLessonCardInks[li % tbLessonCardInks.length];
           const pubEsc = book.publisher.replace(/'/g, "\\'");
           const authEsc = book.author.replace(/'/g, "\\'");
           const lessonEsc = lesson.replace(/'/g, "\\'");
           const titleKey = `${book.publisher}|${book.author}|${lesson}`;
           const lessonTitle = tbTitles[titleKey] || '';
           html += `<div class="tb-expand-lesson-card-wrap" onclick="event.stopPropagation();tbLoadPassages('${pubEsc}','${authEsc}','${lessonEsc}')">
-            <div class="tb-expand-lesson-card" style="border-left:3px solid ${cardInk};margin-left:12px;padding:6px 12px;" data-lesson="${lessonEsc}">
+            <div class="tb-expand-lesson-card" style="border-left:3px solid ${pubColor};margin-left:12px;padding:6px 12px;" data-lesson="${lessonEsc}">
               <h4 style="margin:0;font-size:13px;">${lesson}${lessonTitle ? ' <span style=\"font-weight:400;color:var(--ink-500);font-size:12px;\">— ' + lessonTitle + '</span>' : ''}</h4>
             </div>
           </div>`;
