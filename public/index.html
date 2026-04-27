@@ -4887,12 +4887,7 @@
       // Reset translation toggle to OFF when switching lessons
       tbTranslationOpen = false;
 
-      // Auto-switch to passages tab
-      const wrap = document.getElementById('tbPassagesWrap');
-      const tabBtns = wrap.closest('.tb-options').querySelectorAll('.tb-option-tab');
-      if (tabBtns.length >= 2) {
-        tbShowTab(tabBtns[1], 'passages');
-      }
+      // Keep current tab (default is 문제출제)
 
       panel.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;min-height:200px;color:var(--ink-400);font-size:13px;">불러오는 중...</div>';
 
