@@ -760,14 +760,14 @@
     }
     .tb-layout {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 520px;
+      grid-template-columns: 1fr 360px;
       gap: 24px;
       align-items: start;
     }
     /* ── New: Sidebar + Table layout (left panel) ── */
     .tb-left-panel {
       display: grid;
-      grid-template-columns: 160px 1fr;
+      grid-template-columns: 200px 1fr;
       gap: 0;
       background: var(--white);
       border: 1px solid var(--ink-200);
@@ -930,6 +930,7 @@
     .tb-expand-lesson-card-wrap {
       padding: 3px 0;
       cursor: pointer;
+      max-width: 420px;
     }
     .tb-expand-lesson-card {
       padding: 10px 14px;
