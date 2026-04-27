@@ -3317,9 +3317,27 @@
     const homeElements = ['pageHome', 'featuresSection', 'demoSection', 'statsSection', 'quoteSection', 'ctaSection', 'footerSection'];
 
     function navReload(page) {
-      // Force full page reload to reset all state, then show the target page
-      window.location.href = window.location.pathname + '#' + page;
-      window.location.reload();
+      // Reset page state and show the page cleanly
+      resetPageState(page);
+      showPage(page);
+    }
+
+    function resetPageState(page) {
+      // Reset textbook state
+      if (page === 'textbook') {
+        tbTranslationOpen = false;
+        const panel = document.getElementById('tbPassagePanel');
+        if (panel) panel.innerHTML = '';
+        // Deselect any active lesson
+        document.querySelectorAll('#tbTree .tb-lesson').forEach(el => el.classList.remove('active'));
+      }
+      // Reset mock exam state
+      if (page === 'mock') {
+        const passagePanel = document.getElementById('mockPassagePanel');
+        if (passagePanel) passagePanel.style.display = 'none';
+      }
+      // Close mobile menu if open
+      if (typeof closeMobileMenu === 'function') closeMobileMenu();
     }
 
     function showPage(page, pushState = true) {
