@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WonderBridge - 영어강사를 위한 올인원 워크스페이스</title>
+  <title>DEEPBRIDGE - 영어강사를 위한 올인원 워크스페이스</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -99,14 +99,11 @@
     .page-content-wrapper.ready { visibility: visible; }
 
     /* ───────── Logo ───────── */
-    .logo { display: inline-flex; flex-direction: column; align-items: center; line-height: 0.85; color: var(--ink-900); cursor: pointer; }
-    .logo .wonder { font-family: "Dancing Script", cursive; font-weight: 700; font-size: 33px; transform: rotate(-2deg); margin-bottom: 2px; }
-    .logo .bridge { font-family: "Inter", sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 0.32em; padding-left: 0.32em; }
-    .logo.lg .wonder { font-size: 66px; }
-    .logo.lg .bridge { font-size: 22px; letter-spacing: 0.36em; padding-left: 0.36em; }
-    .logo.sm .wonder { font-size: 24px; }
-    .logo.sm .bridge { font-size: 9px; letter-spacing: 0.28em; padding-left: 0.28em; }
-    .logo.dark .wonder, .logo.dark .bridge { color: var(--paper); }
+    .logo { display: inline-flex; align-items: center; color: var(--ink-900); cursor: pointer; }
+    .logo .deepbridge { font-family: "Inter", sans-serif; font-weight: 800; font-size: 22px; letter-spacing: 0.18em; text-transform: uppercase; }
+    .logo.lg .deepbridge { font-size: 42px; letter-spacing: 0.2em; }
+    .logo.sm .deepbridge { font-size: 16px; letter-spacing: 0.15em; }
+    .logo.dark .deepbridge { color: var(--paper); }
 
     /* ───────── Pill Nav ───────── */
     .nav-wrap {
@@ -1856,8 +1853,7 @@
   <div class="nav-wrap" id="navWrap">
     <nav class="nav">
       <div class="logo" onclick="location.href=location.pathname">
-        <span class="wonder">Wonder</span>
-        <span class="bridge">BRIDGE</span>
+        <span class="deepbridge">DEEPBRIDGE</span>
       </div>
       <div class="nav-links">
         <span class="nav-link" data-page="textbook" onclick="navReload('textbook')">교과서</span>
@@ -1913,7 +1909,7 @@
     <div class="auth-modal">
       <button class="auth-close" onclick="closeAuthModal()">&times;</button>
       <div class="auth-title" id="authTitle">로그인</div>
-      <div class="auth-subtitle" id="authSubtitle">WonderBridge에 오신 것을 환영합니다</div>
+      <div class="auth-subtitle" id="authSubtitle">DEEPBRIDGE에 오신 것을 환영합니다</div>
 
       <div class="auth-error" id="authError"></div>
 
@@ -1985,8 +1981,7 @@
         <div class="sidebar">
           <div style="padding: 4px 8px 14px">
             <div class="logo sm">
-              <span class="wonder">Wonder</span>
-              <span class="bridge">BRIDGE</span>
+              <span class="deepbridge">DEEPBRIDGE</span>
             </div>
           </div>
           <div class="sidebar-item active"><span class="ic">□</span> 전체 보기</div>
@@ -2199,8 +2194,7 @@
     <div class="container">
       <div>
         <div class="logo">
-          <span class="wonder">Wonder</span>
-          <span class="bridge">BRIDGE</span>
+          <span class="deepbridge">DEEPBRIDGE</span>
         </div>
         <p style="font-size:13.5px;color:var(--ink-500);line-height:1.55;margin:16px 0 0;max-width:280px">모든 영어 강사를 위한 워크스페이스</p>
       </div>
@@ -3209,7 +3203,7 @@
       const isLogin = authMode === 'login';
       document.getElementById('authTitle').textContent = isLogin ? '로그인' : '회원가입';
       document.getElementById('authSubtitle').textContent = isLogin
-        ? 'WonderBridge에 오신 것을 환영합니다'
+        ? 'DEEPBRIDGE에 오신 것을 환영합니다'
         : '새 계정을 만들어보세요';
       document.getElementById('authSubmit').textContent = isLogin ? '로그인' : '회원가입';
       document.getElementById('authNameField').style.display = isLogin ? 'none' : 'block';
