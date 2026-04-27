@@ -4890,6 +4890,31 @@
       'UNESCO King Sejong Literacy Prize',
       "Let's Celebrate Marine Gardening Day!",
       'Digital Footprints: Mind Your Privacy',
+      // 공통영어2 subtitles
+      'Purifying Polluted Soil',
+      'Instant Camouflage',
+      'The Virtual Music Factory',
+      'A Race against the Clock at Altaussee',
+      'Transcripts and Captions for Multimedia Content',
+      'Inventing with Discarded Electronic Parts',
+      'Further Reading',
+      '드라이',
+      'Speed Eating',
+      'Day 2',
+      'A Hidden Painting Revealed',
+      'July 30, Tuesday',
+      'Deep Learning',
+      'Maud Lewis',
+      'Revolutionizing Mobility: The Evolution of Artificial Limbs',
+      'Examine Your Resources',
+      'Edward Hopper',
+      'Breakdancing',
+      'How Ondol Works',
+      'How High Will Sea Levels Rise?',
+      'Artworks',
+      'PART 2 - THE PREDATOR',
+      'Read More',
+      'TYPE B. Food Lover',
     ]);
     function normalizeQuotes(s) {
       return s.replace(/[“”‘’]/g, m => ({'“':'"','”':'"','‘':"'",'’':"'"}[m]));
@@ -5042,7 +5067,7 @@
 
         passages.forEach((p, i) => {
           const enText = cleanPassageText(p.passage_en);
-          const isSub = isSubtitle(p.passage_en);
+          const isSub = isSubtitle(p.passage_en) || p.passage_order === 1;
 
           if (isSub) {
             // Store subtitle to merge with the NEXT passage card
