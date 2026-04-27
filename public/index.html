@@ -924,8 +924,12 @@
     .tb-expand-lessons {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      padding-top: 8px;
+      gap: 0;
+      padding-top: 4px;
+    }
+    .tb-expand-lesson-card-wrap {
+      padding: 3px 0;
+      cursor: pointer;
     }
     .tb-expand-lesson-card {
       padding: 10px 14px;
@@ -941,14 +945,14 @@
       border-color: var(--ink-300);
     }
     .tb-expand-lesson-card.active {
-      background: var(--honey);
-      border-color: var(--honey-ink);
-      border-left-color: var(--honey-ink) !important;
-      box-shadow: 0 0 0 2px color-mix(in srgb, var(--honey-ink) 20%, transparent);
+      background: var(--lilac);
+      border-color: var(--lilac-ink);
+      border-left-color: var(--lilac-ink) !important;
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--lilac-ink) 18%, transparent);
       transform: translateY(-1px);
     }
-    .tb-expand-lesson-card.active h4 { color: var(--honey-ink); }
-    .tb-expand-lesson-card.active span { color: var(--honey-ink); opacity:.7; }
+    .tb-expand-lesson-card.active h4 { color: var(--lilac-ink); }
+    .tb-expand-lesson-card.active span { color: var(--lilac-ink); opacity:.75; }
     .tb-expand-lesson-card h4 {
       font-size: 13px; font-weight: 550; margin: 0 0 4px;
       color: var(--ink-900);
@@ -4706,8 +4710,10 @@
           const lessonEsc = lesson.replace(/'/g, "\\'");
           const titleKey = `${book.publisher}|${book.author}|${lesson}`;
           const lessonTitle = tbTitles[titleKey] || '';
-          html += `<div class="tb-expand-lesson-card" style="border-left:3px solid ${cardInk};cursor:pointer;margin-left:12px;padding:6px 12px;" onclick="event.stopPropagation();tbLoadPassages('${pubEsc}','${authEsc}','${lessonEsc}')">
-            <h4 style="margin:0;font-size:13px;">${lesson}${lessonTitle ? ' <span style=\"font-weight:400;color:var(--ink-500);font-size:12px;\">— ' + lessonTitle + '</span>' : ''}</h4>
+          html += `<div class="tb-expand-lesson-card-wrap" onclick="event.stopPropagation();tbLoadPassages('${pubEsc}','${authEsc}','${lessonEsc}')">
+            <div class="tb-expand-lesson-card" style="border-left:3px solid ${cardInk};margin-left:12px;padding:6px 12px;" data-lesson="${lessonEsc}">
+              <h4 style="margin:0;font-size:13px;">${lesson}${lessonTitle ? ' <span style=\"font-weight:400;color:var(--ink-500);font-size:12px;\">— ' + lessonTitle + '</span>' : ''}</h4>
+            </div>
           </div>`;
         });
         html += `</div></td></tr>`;
@@ -4898,13 +4904,13 @@
 
       // Highlight active lesson card
       document.querySelectorAll('.tb-expand-lesson-card').forEach(c => c.classList.remove('active'));
-      // Find and activate the clicked card
-      document.querySelectorAll('.tb-expand-lesson-card').forEach(c => {
-        const onclick = c.getAttribute('onclick') || '';
-        if (onclick.includes("'" + publisher.replace(/'/g, "\\'") + "'") &&
-            onclick.includes("'" + author.replace(/'/g, "\\'") + "'") &&
-            onclick.includes("'" + lesson.replace(/'/g, "\\'") + "'")) {
-          c.classList.add('active');
+      // Find and activate the clicked card via parent wrap's onclick
+      document.querySelectorAll('.tb-expand-lesson-card-wrap').forEach(w => {
+        const onclick = w.getAttribute('onclick') || '';
+        if (onclick.includes("'" + lesson.replace(/'/g, "\\'") + "'") &&
+            onclick.includes("'" + publisher.replace(/'/g, "\\'") + "'")) {
+          const card = w.querySelector('.tb-expand-lesson-card');
+          if (card) card.classList.add('active');
         }
       });
 
