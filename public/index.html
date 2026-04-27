@@ -99,11 +99,11 @@
     .page-content-wrapper.ready { visibility: visible; }
 
     /* ───────── Logo ───────── */
-    .logo { display: inline-flex; align-items: center; color: var(--ink-900); cursor: pointer; }
-    .logo .deepbridge { font-family: "Orbitron", sans-serif; font-weight: 700; font-size: 20px; letter-spacing: 0.12em; }
-    .logo.lg .deepbridge { font-size: 38px; letter-spacing: 0.14em; }
-    .logo.sm .deepbridge { font-size: 15px; letter-spacing: 0.1em; }
-    .logo.dark .deepbridge { color: var(--paper); }
+    .logo { display: inline-flex; align-items: center; cursor: pointer; }
+    .logo img { height: 28px; }
+    .logo.lg img { height: 48px; }
+    .logo.sm img { height: 20px; }
+    .logo.dark img { filter: invert(1); }
 
     /* ───────── Pill Nav ───────── */
     .nav-wrap {
@@ -1853,7 +1853,7 @@
   <div class="nav-wrap" id="navWrap">
     <nav class="nav">
       <div class="logo" onclick="location.href=location.pathname">
-        <span class="deepbridge">DEEPBRIDGE</span>
+        <img src="deepbridge-logo.png" alt="DEEPBRIDGE">
       </div>
       <div class="nav-links">
         <span class="nav-link" data-page="textbook" onclick="navReload('textbook')">교과서</span>
@@ -1981,7 +1981,7 @@
         <div class="sidebar">
           <div style="padding: 4px 8px 14px">
             <div class="logo sm">
-              <span class="deepbridge">DEEPBRIDGE</span>
+              <img src="deepbridge-logo.png" alt="DEEPBRIDGE">
             </div>
           </div>
           <div class="sidebar-item active"><span class="ic">□</span> 전체 보기</div>
@@ -2194,7 +2194,7 @@
     <div class="container">
       <div>
         <div class="logo">
-          <span class="deepbridge">DEEPBRIDGE</span>
+          <img src="deepbridge-logo.png" alt="DEEPBRIDGE">
         </div>
         <p style="font-size:13.5px;color:var(--ink-500);line-height:1.55;margin:16px 0 0;max-width:280px">모든 영어 강사를 위한 워크스페이스</p>
       </div>
