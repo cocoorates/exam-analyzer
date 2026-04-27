@@ -4986,7 +4986,8 @@
         const headers = { 'apikey': anonKey, 'Authorization': `Bearer ${anonKey}`, 'Content-Type': 'application/json' };
 
         const lessonNum = tbLessonToNum(lesson);
-        const url = `${supabaseUrl}/rest/v1/textbook_passages?publisher=eq.${encodeURIComponent(publisher)}&author=eq.${encodeURIComponent(author)}&lesson=eq.${lessonNum}&select=passage_order,passage_en,passage_ko&order=passage_order`;
+        const currentSubject = tbExpandedRow !== null ? tbData[tbExpandedRow].subject : '';
+        const url = `${supabaseUrl}/rest/v1/textbook_passages?subject=eq.${encodeURIComponent(currentSubject)}&publisher=eq.${encodeURIComponent(publisher)}&author=eq.${encodeURIComponent(author)}&lesson=eq.${lessonNum}&select=passage_order,passage_en,passage_ko&order=passage_order`;
 
         const res = await fetch(url, { headers });
         if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
@@ -4998,7 +4999,6 @@
         }
 
         const hasTranslations = passages.some(p => p.passage_ko);
-        const currentSubject = tbExpandedRow !== null ? tbData[tbExpandedRow].subject : '';
         const titleKey = `${currentSubject}|${publisher}|${author}|${lesson}`;
         const lessonTitle = tbTitles[titleKey] || '';
 
