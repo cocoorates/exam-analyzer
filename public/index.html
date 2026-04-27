@@ -4858,6 +4858,9 @@
       const panel = document.getElementById('tbPassagePanel');
       if (!panel) return;
 
+      // Reset translation toggle to OFF when switching lessons
+      tbTranslationOpen = false;
+
       // Auto-switch to passages tab
       const wrap = document.getElementById('tbPassagesWrap');
       const tabBtns = wrap.closest('.tb-options').querySelectorAll('.tb-option-tab');
