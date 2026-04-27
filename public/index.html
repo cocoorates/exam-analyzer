@@ -5043,7 +5043,7 @@
       }
     }
 
-    // Textbook scrollbar (reusable init)
+    // Textbook scrollbar (reusable init) — identical to mock exam scrollbar
     function tbInitScrollbar() {
       const panel = document.getElementById('tbPassagePanel');
       const wrap = document.getElementById('tbPassagesWrap');
@@ -5052,6 +5052,14 @@
       const thumb = track.querySelector('.mk-custom-scrollbar-thumb');
 
       let hideTimer = null;
+      let dragging = false;
+      let dragStartY = 0;
+      let dragStartScroll = 0;
+      let mouseInZone = false;
+      let rightPadding = false;
+      let exitedLeft = false;
+      const LEFT_HIDE_DIST = 35;
+
       function updateThumb() {
         const { scrollTop, scrollHeight, clientHeight } = panel;
         if (scrollHeight <= clientHeight) { track.classList.remove('visible'); return; }
@@ -5065,16 +5073,109 @@
         thumb.style.height = thumbH + 'px';
         thumb.style.top = thumbTop + 'px';
       }
-      function showBar() { clearTimeout(hideTimer); updateThumb(); track.classList.add('visible'); }
-      function hideBar() { clearTimeout(hideTimer); hideTimer = setTimeout(() => { track.classList.remove('visible'); track.classList.remove('hovered'); }, 1000); }
-      panel.addEventListener('scroll', () => { updateThumb(); track.classList.add('visible'); clearTimeout(hideTimer); hideTimer = setTimeout(() => hideBar(), 150); });
+      function showBar() {
+        clearTimeout(hideTimer); hideTimer = null;
+        updateThumb(); track.classList.add('visible');
+      }
+      function hideBar() {
+        if (dragging) return;
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(() => {
+          track.classList.remove('visible');
+          track.classList.remove('hovered');
+          hideTimer = null;
+        }, 1000);
+      }
+      let scrollEndTimer = null;
+      panel.addEventListener('scroll', () => {
+        updateThumb();
+        track.classList.add('visible');
+        clearTimeout(hideTimer); hideTimer = null;
+        clearTimeout(scrollEndTimer);
+        scrollEndTimer = setTimeout(() => {
+          if (!mouseInZone && !rightPadding) hideBar();
+        }, 150);
+      });
+
+      const tbOptionsPanel = wrap.closest('.tb-options');
       wrap.addEventListener('mousemove', (e) => {
+        rightPadding = false;
         const rect = wrap.getBoundingClientRect();
         const dist = rect.right - e.clientX;
-        if (dist <= 26 && dist >= 0) { showBar(); if (dist <= 14) track.classList.add('hovered'); else track.classList.remove('hovered'); }
-        else { track.classList.remove('hovered'); if (dist >= 35) hideBar(); }
+        if (dist <= 26 && dist >= 0) {
+          mouseInZone = true; exitedLeft = false; showBar();
+          if (dist <= 14) track.classList.add('hovered');
+          else track.classList.remove('hovered');
+        } else if (dist > 26) {
+          mouseInZone = false; track.classList.remove('hovered');
+          if (dist >= LEFT_HIDE_DIST) {
+            if (!exitedLeft) { exitedLeft = true; hideBar(); }
+          } else {
+            exitedLeft = false;
+            if (!hideTimer) hideBar();
+          }
+        }
       });
-      wrap.addEventListener('mouseleave', () => { track.classList.remove('hovered'); hideBar(); });
+      wrap.addEventListener('mouseleave', (e) => {
+        mouseInZone = false; track.classList.remove('hovered');
+        const wrapRect = wrap.getBoundingClientRect();
+        const tbRect = tbOptionsPanel ? tbOptionsPanel.getBoundingClientRect() : wrapRect;
+        if (e.clientX >= wrapRect.right - 2 && e.clientX <= tbRect.right) {
+          rightPadding = true; exitedLeft = false; return;
+        }
+        rightPadding = false; exitedLeft = true;
+        if (!dragging) hideBar();
+      });
+      if (tbOptionsPanel) {
+        tbOptionsPanel.addEventListener('mouseleave', () => {
+          mouseInZone = false; rightPadding = false; exitedLeft = true;
+          track.classList.remove('hovered');
+          if (!dragging) hideBar();
+        });
+      }
+
+      // Drag scrolling
+      wrap.addEventListener('mousedown', (e) => {
+        const rect = wrap.getBoundingClientRect();
+        const dist = rect.right - e.clientX;
+        if (dist > 14 || dist < 0) return;
+        e.preventDefault();
+        dragging = true; dragStartY = e.clientY; dragStartScroll = panel.scrollTop;
+        document.body.style.userSelect = 'none';
+      });
+      window.addEventListener('mousemove', (e) => {
+        if (!dragging) return;
+        const { scrollHeight, clientHeight } = panel;
+        const ratio = clientHeight / scrollHeight;
+        const thumbH = Math.max(ratio * clientHeight, 30);
+        const trackH = clientHeight - thumbH;
+        const maxScroll = scrollHeight - clientHeight;
+        const dy = e.clientY - dragStartY;
+        panel.scrollTop = dragStartScroll + (dy / trackH) * maxScroll;
+        updateThumb();
+      });
+      window.addEventListener('mouseup', () => {
+        if (!dragging) return;
+        dragging = false; document.body.style.userSelect = '';
+        hideBar();
+      });
+
+      // Click on track to jump
+      wrap.addEventListener('click', (e) => {
+        const wrapRect = wrap.getBoundingClientRect();
+        const dist = wrapRect.right - e.clientX;
+        if (dist > 14 || dist < 0) return;
+        const rect = track.getBoundingClientRect();
+        const header = panel.querySelector('.mk-passages-header');
+        const headerH = header ? header.offsetHeight : 0;
+        const clickY = e.clientY - rect.top - headerH;
+        const { scrollHeight, clientHeight } = panel;
+        const trackHeight = clientHeight - headerH;
+        const ratio = Math.max(0, clickY / trackHeight);
+        panel.scrollTop = ratio * (scrollHeight - clientHeight);
+        updateThumb();
+      });
+
       new ResizeObserver(() => updateThumb()).observe(panel);
     }
 
