@@ -4896,7 +4896,7 @@
     }
     function isSubtitle(text) {
       if (!text) return false;
-      const t = normalizeQuotes(text.trim());
+      const t = normalizeQuotes(text.replace(/<\/?b>/g, '').trim());
       return knownSubtitles.has(t);
     }
 
@@ -4949,7 +4949,7 @@
       if (!text) return text;
       return text
         .replace(/^by\s+[A-Z][A-Za-z\s.'-]+$/gm, '')  // Remove author attributions
-        .replace(/<그림>/g, '')                          // Remove <그림>
+        .replace(/<그림>/g, '')                          // Remove <그림> (not <b>)
         .replace(/\[그림[^\]]*\]/g, '')                  // Remove [그림], [그림 설명] etc
         .replace(/^\s*[\n]+/gm, '\n')                    // Clean up empty lines
         .trim();
@@ -5066,40 +5066,29 @@
             } else {
               subtitleHeader += `<div style="border-top:2px solid var(--ink-200);margin:12px 16px 0;"></div>`;
             }
-            const safeSub = pendingSubtitle.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            const safeSub = pendingSubtitle.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/&lt;b&gt;/g,'').replace(/&lt;\/b&gt;/g,'');
             subtitleHeader += `<div style="padding:6px 16px 10px;font-weight:700;font-size:14px;color:var(--ink-900);">&lt; ${safeSub} &gt;</div>`;
             if (pendingSubtitleKo) {
-              const safeSubKo = pendingSubtitleKo.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+              const safeSubKo = pendingSubtitleKo.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/&lt;b&gt;/g,'').replace(/&lt;\/b&gt;/g,'');
               subtitleHeader += `<div class="passage-ko" style="border-bottom:1px solid var(--ink-100);"><div style="font-weight:700;font-size:12px;color:var(--honey-ink);margin-bottom:6px;">해석</div><div style="white-space:pre-wrap;font-weight:500;">${safeSubKo}</div></div>`;
             }
             pendingSubtitle = null;
             pendingSubtitleKo = null;
           }
 
-          // Check for embedded title in first line (bold first line, keep in same text block)
-          const embedded = extractEmbeddedTitle(enText);
-          let formattedText;
-          if (embedded && embedded.body) {
-            // Bold the first line, keep the rest as normal text — all in one pre-wrap block
-            const safeTitle = embedded.title.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-            let bodyText = embedded.body.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-            bodyText = formatDialogueSpeakers(bodyText);
-            formattedText = `<span style="font-weight:700;">${safeTitle}</span>\n${bodyText}`;
-          } else {
-            formattedText = enText.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-            formattedText = formatDialogueSpeakers(formattedText);
+          // Helper: HTML-escape text but preserve <b>...</b> bold tags from DB
+          function safeHtmlWithBold(text) {
+            if (!text) return '';
+            return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+              .replace(/&lt;b&gt;/g, '<b>').replace(/&lt;\/b&gt;/g, '</b>');
           }
 
-          let safeKo = (p.passage_ko || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-          // Bold subtitles/embedded titles in KO text (first line if short)
-          if (safeKo) {
-            const koEmbedded = extractEmbeddedTitle(p.passage_ko || '');
-            if (koEmbedded && koEmbedded.body) {
-              const safeKoTitle = koEmbedded.title.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-              const safeKoBody = koEmbedded.body.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-              safeKo = `<span style="font-weight:500;">${safeKoTitle}</span>\n${safeKoBody}`;
-            }
-          }
+          // Format EN text: escape HTML, restore <b> tags, apply dialogue formatting
+          let formattedText = safeHtmlWithBold(enText);
+          formattedText = formatDialogueSpeakers(formattedText);
+
+          // Format KO text
+          let safeKo = safeHtmlWithBold(p.passage_ko || '');
           const transInner = p.passage_ko
             ? `<div style="font-weight:700;font-size:12px;color:var(--honey-ink);margin-bottom:6px;">해석</div><div style="white-space:pre-wrap;">${safeKo}</div>`
             : `<div style="color:var(--ink-300);font-size:12px;font-style:italic;">해석이 준비되지 않았습니다.</div>`;
